@@ -37,7 +37,10 @@ dependencies:
   flutter_map: ^0.14.0
   #latlng: ^0.1.0
   latlong: ^0.6.1
+  location: ^4.3.0
+  mapbox_gl: ^0.15.0
   # mapbox_gl: ^0.15.0
+  
 
 
 
