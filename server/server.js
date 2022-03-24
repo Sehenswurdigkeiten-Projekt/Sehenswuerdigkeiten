@@ -1,3 +1,5 @@
+//maybe move some of this stuff to other files?
+
 const express = require("express")
 const app = express()
 
@@ -19,7 +21,7 @@ const port = 30000
 //let salt = bcrypt.genSaltSync(10);
 //var hash = bcrypt.hashSync("Hummer", salt);
 
-
+//TODO: should probably return Friends and Groups or maybe make new Post requests
 app.post('/LOGIN', jsonParser, async (req, res) => {
   let user = req.body.username;
   let query = "Select Password, AuthToken from User where Username like ?"
@@ -39,34 +41,53 @@ app.post('/LOGIN', jsonParser, async (req, res) => {
 //TODO: Check for duplicates
 app.post("/CREATE_ACCOUNT/",jsonParser, async (req, res)=>{
 
-    let username = req.body.username;
+  let username = req.body.username;
 
-    if(await check_if_user_exists(username)){
-      res.statusMessage = "User Exists";
-      res.status(400).end();
-      return;
-    }
+  if(await check_if_user_exists(username)){
+    res.statusMessage = "User Exists";
+    res.status(400).end();
+    return;
+  }
 
-    let salt = bcrypt.genSaltSync(10);
-    let hash_password = bcrypt.hashSync(req.body.pwd, salt);
-    let authToken = await generate_AuthToken(25);
+  let salt = bcrypt.genSaltSync(10);
+  let hash_password = bcrypt.hashSync(req.body.pwd, salt);
+  let authToken = await generate_AuthToken(25);
 
-    const query ="INSERT INTO User(Username, Password, AuthToken) VALUES( ?, ?, ?)" 
-    const [rows, fields] = await promisePool.execute(query, [username, hash_password, authToken])
+  const query ="INSERT INTO User(Username, Password, AuthToken) VALUES( ?, ?, ?)" 
+  const [rows, fields] = await promisePool.execute(query, [username, hash_password, authToken])
 
-    console.log("inserted user:" + username+", "+ hash_password + ", " + authToken);
-    res.statusMessage = "Account created";
-    res.status(200).send({token : authToken});
+  console.log("inserted user:" + username+", "+ hash_password + ", " + authToken);
+  res.statusMessage = "Account created";
+  res.status(200).send({token : authToken});
 });
 
 app.post("/UPDATE_GPS/", jsonParser, async (req, res)=>{
   let token = req.body.token
   let username = req.body.username
-  if(await validate_token(token, username))
-    res.end("passt");
+  let pos = req.body.pos
+  let toNotify = req.body.toNotify //maybe either a GroupID or empty for friends
+  if(await validate_token(token, username)){
+    promisePool
+    res.end("passt")
+  }
   else
     res.end("Fogg");
 
+})
+//TODO: Set up DB again
+//TODO: DELTE USER, DELETE GROUP, DELETE ROUTE, IMPLEMENT !SHIT BELOW!
+
+//should probably return GroupID
+app.post("/CREATE_GROUP", jsonParser, async function(req,res){
+  let leader = res.body.username
+})
+
+app.post("/JOIN_GROUP", jsonParser, async function(req,res){
+  
+})
+
+app.post("/CREATE_ROUTE", jsonParser, async function(req,res){
+  
 })
 
 app.post("/ADD_FRIEND/", jsonParser, async (req, res)=>{
@@ -93,7 +114,7 @@ app.post("/ADD_FRIEND/", jsonParser, async (req, res)=>{
   res.end("done");
 
 })
-
+  //TODO: maybe move these to new File
   async function get_UserID_from_Username(username){
     const query = "Select UserID from User where username =?"
     const[row, field] = await promisePool.execute(query, [username])
@@ -119,6 +140,8 @@ async function validate_token(token, username){
   return false;
 }
 
+
+//TODO: maybe move this to new file
 async function generate_AuthToken(length) {
   var result           = '';
   var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
