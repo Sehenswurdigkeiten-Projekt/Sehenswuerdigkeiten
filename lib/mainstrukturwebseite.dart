@@ -56,11 +56,11 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffC4DFCB),
-    appBar: AppBar(
-       // leading: Icon(
-       //  Icons.menu,
-       //   color: Theme.of(context).primaryColor,
-       // ),
+      appBar: AppBar(
+        // leading: Icon(
+        //  Icons.menu,
+        //   color: Theme.of(context).primaryColor,
+        // ),
         title: Text(
           "Chefs",
           style: TextStyle(
@@ -224,19 +224,60 @@ class Page2 extends StatefulWidget {
 }
 
 class _Page2State extends State<Page2> {
+  late Timer timer;
+  late LatLng result;
+  late MapboxMapController mapboxmapcontroller;
   @override
-  Widget build(BuildContext context) {
-    Timer.periodic(Duration(seconds: 10), (timer) async {
-      print(DateTime.now());
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    timer = Timer.periodic(Duration(seconds: 1), (timer) async {
+      //print(DateTime.now());
       //Hier alles
-      final result = await acquireCurrentLocation();
-      print(result?.latitude);
-      print(result?.longitude);
+      if(mapboxmapcontroller == null) return;
+      print(mapboxmapcontroller.circles.first);
+      //mapboxmapcontroller.circles.first.options.geometry = await acquireCurrentLocation();
 
+      result = (await acquireCurrentLocation())!;
+
+      mapboxmapcontroller.clearCircles();
+      mapboxmapcontroller.addCircle(
+        CircleOptions(
+          circleRadius: 8.0,
+          circleColor: '#116992',
+          circleOpacity: 0.8,
+
+          // YOU NEED TO PROVIDE THIS FIELD!!!
+          // Otherwise, you'll get a silent exception somewhere in the stack
+          // trace, but the parameter is never marked as @required, so you'll
+          // never know unless you check the stack trace
+          geometry: result,
+          draggable: false,
+        ),
+      );
+      /*
+      var restemp = (await acquireCurrentLocation())!;
+      print("${result.latitude} / ${result.longitude}");
+      setState(() {
+        result = restemp;
+      });
+       */
     });
 
-    /*
+  }
 
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    timer.cancel();
+  }
+  @override
+  Widget build(BuildContext context) {
+
+
+    /*
     return Scaffold(
         body: FlutterMap(
           options: MapOptions(
@@ -244,8 +285,6 @@ class _Page2State extends State<Page2> {
             center: latLng.LatLng(51.5, 0.09),
             zoom: 13.0,
           ),
-
-
           layers: [
             TileLayerOptions(
               urlTemplate: "https://api.mapbox.com/styles/v1/sehenswuerdigkeiten-proj/cl11y8pv5000f14m4pbcb826y/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1Ijoic2VoZW5zd3VlcmRpZ2tlaXRlbi1wcm9qIiwiYSI6ImNsMTBuY2E4djAwNjkzYm5zdjIwY3RpY3cifQ.blnV9_r4xomVn57TX0-i_g",
@@ -273,7 +312,6 @@ class _Page2State extends State<Page2> {
           ],
         )
     );
-
   */
 
     final String token = 'pk.eyJ1Ijoic2VoZW5zd3VlcmRpZ2tlaXRlbi1wcm9qIiwiYSI6ImNsMTBuY2E4djAwNjkzYm5zdjIwY3RpY3cifQ.blnV9_r4xomVn57TX0-i_g';
@@ -289,39 +327,43 @@ class _Page2State extends State<Page2> {
         ),
 
 
-          onMapCreated: (MapboxMapController controller) async {
-            // Acquire current location (returns the LatLng instance)
-            final result = await acquireCurrentLocation();
 
-            // You can either use the moveCamera or animateCamera, but the former
-            // causes a sudden movement from the initial to 'new' camera position,
-            // while animateCamera gives a smooth animated transition
-            await controller.animateCamera(
-              CameraUpdate.newLatLng(result!),
-            );
 
-            // Add a circle denoting current user location
+        onMapCreated: (MapboxMapController controller) async {
+          mapboxmapcontroller = controller;
 
-            await controller.addCircle(
-              CircleOptions(
-                circleRadius: 8.0,
-                circleColor: '#006992',
-                circleOpacity: 0.8,
+          //Acquire current location (returns the LatLong instance)
+          final result = await acquireCurrentLocation();
 
-                // YOU NEED TO PROVIDE THIS FIELD!!!
-                // Otherwise, you'll get a silent exception somewhere in the stack
-                // trace, but the parameter is never marked as @required, so you'll
-                // never know unless you check the stack trace
-                geometry: result,
-                draggable: false,
-              ),
-            );
-          }
+          // You can either use the moveCamera or animateCamera, but the former
+          // causes a sudden movement from the initial to 'new' camera position,
+          // while animateCamera gives a smooth animated transition
+          await controller.animateCamera(
+            CameraUpdate.newLatLng(result!),
+          );
+
+          // Add a circle denoting current user location
+          print(result);
+          print("Jetzt in der onMapCreated");
+          await controller.addCircle(
+            CircleOptions(
+              circleRadius: 8.0,
+              circleColor: '#006992',
+              circleOpacity: 0.8,
+
+              // YOU NEED TO PROVIDE THIS FIELD!!!
+              // Otherwise, you'll get a silent exception somewhere in the stack
+              // trace, but the parameter is never marked as @required, so you'll
+              // never know unless you check the stack trace
+              geometry: result,
+              draggable: false,
+            ),
+          );
+        },
+
       ),
     );
 
 
   }
 }
-
-

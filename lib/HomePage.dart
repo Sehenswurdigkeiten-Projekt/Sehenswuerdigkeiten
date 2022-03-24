@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
-class HomePage extends StatefulWidget {
+class HomePageDep extends StatefulWidget {
   @override
-  _HomePageState createState() => _HomePageState();
+  _HomePageDepState createState() => _HomePageDepState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageDepState extends State<HomePageDep> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
