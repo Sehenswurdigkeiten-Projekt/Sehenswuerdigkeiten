@@ -30,16 +30,23 @@ app.post('/LOGIN', jsonParser, async (req, res) => {
   }
   else{
     console.log("Login Failed for user:" + user);
-    res.send("Wrong Password or Username");
+    res.statusMessage = "Wrong Password or Username";
+    res.status(401).end();
   }
 });
 
 //TODO: ERROR HANDLING WICHTIG
 //TODO: Check for duplicates
-//TODO: Prevent sql injections
 app.post("/CREATE_ACCOUNT/",jsonParser, async (req, res)=>{
 
     let username = req.body.username;
+
+    if(await check_if_user_exists(username)){
+      res.statusMessage = "User Exists";
+      res.status(400).end();
+      return;
+    }
+
     let salt = bcrypt.genSaltSync(10);
     let hash_password = bcrypt.hashSync(req.body.pwd, salt);
     let authToken = await generate_AuthToken(25);
@@ -48,13 +55,14 @@ app.post("/CREATE_ACCOUNT/",jsonParser, async (req, res)=>{
     const [rows, fields] = await promisePool.execute(query, [username, hash_password, authToken])
 
     console.log("inserted user:" + username+", "+ hash_password + ", " + authToken);
-    res.end("Success, token:" + authToken);
+    res.statusMessage = "Account created";
+    res.status(200).send({token : authToken});
 });
 
 app.post("/UPDATE_GPS/", jsonParser, async (req, res)=>{
   let token = req.body.token
   let username = req.body.username
-  if(await validate_token(token))
+  if(await validate_token(token, username))
     res.end("passt");
   else
     res.end("Fogg");
@@ -65,17 +73,22 @@ app.post("/ADD_FRIEND/", jsonParser, async (req, res)=>{
   let username1 = req.body.username
   let username2 = req.body.friend
   let token = req.body.token
-  
-  let userID1 = await get_UserID_from_Username(username1)
-  let userID2 = await get_UserID_from_Username(username1)
-  
-  let isReal = await check_if_user_exists(username1) && await check_if_user_exists(username2);
-  let isValid = await validate_token(token);
+
+  let isReal = await check_if_user_exists(username2);
+  let isValid = await validate_token(token, username1);
 
   const query = "INSERT INTO User_Friends Values(?,?)"
+
+
   if(isValid && isReal){
+    let userID1 = await get_UserID_from_Username(username1)
+    let userID2 = await get_UserID_from_Username(username2)
     console.log(userID1, userID2);
     const [rows, fields] = await promisePool.execute(query,[userID1, userID2])
+  }
+  else{
+    res.statusMessage = "Failed to add friend"
+    res.status(403).end();
   }
   res.end("done");
 
@@ -93,14 +106,14 @@ app.post("/ADD_FRIEND/", jsonParser, async (req, res)=>{
 async function check_if_user_exists(username){
   const query = "Select count(*) as i from User where username like ?"
   const [row, fields] = await promisePool.execute(query,[username])
-  if(row[0].i == 1)
+  if(row[0].i >= 1)
     return true;
   return false;
 }
 
-async function validate_token(token){
-  const query = "Select count(*) as i from User where AuthToken like ?"
-  const [rows, fields] = await promisePool.execute(query,[token]);
+async function validate_token(token, username){
+  const query = "Select count(*) as i from User where AuthToken like ? and Username like ?"
+  const [rows, fields] = await promisePool.execute(query,[token, username]);
   if(rows[0].i == 1)
     return true;
   return false;
