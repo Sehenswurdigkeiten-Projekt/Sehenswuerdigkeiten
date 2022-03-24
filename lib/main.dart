@@ -15,8 +15,17 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'One Trip',
+      theme: ThemeData.dark().copyWith(
+
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xff2F8D46), //0xff2196F3
+        ),
+
+        primaryColor: const Color(0xff2F8D46),
+        splashColor: Colors.transparent,
+      ),
       home:  Scaffold(
-        appBar: AppBar(title: const Text(_title), toolbarHeight: 50,),
+        appBar: AppBar(title: const Text(_title)),
         body: const MyLoginWidget(),
       ),
     );
