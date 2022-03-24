@@ -273,50 +273,11 @@ class _Page2State extends State<Page2> {
     super.dispose();
     timer.cancel();
   }
+
+  final String token = 'pk.eyJ1Ijoic2VoZW5zd3VlcmRpZ2tlaXRlbi1wcm9qIiwiYSI6ImNsMTBuY2E4djAwNjkzYm5zdjIwY3RpY3cifQ.blnV9_r4xomVn57TX0-i_g';
+  final String style = 'mapbox://styles/sehenswuerdigkeiten-proj/cl11y8pv5000f14m4pbcb826y';
   @override
   Widget build(BuildContext context) {
-
-
-    /*
-    return Scaffold(
-        body: FlutterMap(
-          options: MapOptions(
-            //center: latLng.LatLng(51.5, -0.09),
-            center: latLng.LatLng(51.5, 0.09),
-            zoom: 13.0,
-          ),
-          layers: [
-            TileLayerOptions(
-              urlTemplate: "https://api.mapbox.com/styles/v1/sehenswuerdigkeiten-proj/cl11y8pv5000f14m4pbcb826y/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1Ijoic2VoZW5zd3VlcmRpZ2tlaXRlbi1wcm9qIiwiYSI6ImNsMTBuY2E4djAwNjkzYm5zdjIwY3RpY3cifQ.blnV9_r4xomVn57TX0-i_g",
-              additionalOptions: {
-                'accessToken': 'pk.eyJ1Ijoic2VoZW5zd3VlcmRpZ2tlaXRlbi1wcm9qIiwiYSI6ImNsMTBuY2E4djAwNjkzYm5zdjIwY3RpY3cifQ.blnV9_r4xomVn57TX0-i_g',
-                'id': 'mapbox.mapbox-streets-v8'
-              },
-              attributionBuilder: (_) {
-                return Text("© OpenStreetMap contributors");
-              },
-            ),
-            MarkerLayerOptions(
-            markers: [
-              Marker(
-                width: 80.0,
-                height: 80.0,
-                point: latLng.LatLng(51.5, -0.09),
-                builder: (ctx) =>
-                    Container(
-                      child: FlutterLogo(),
-                    ),
-              ),
-            ],
-          ),
-          ],
-        )
-    );
-  */
-
-    final String token = 'pk.eyJ1Ijoic2VoZW5zd3VlcmRpZ2tlaXRlbi1wcm9qIiwiYSI6ImNsMTBuY2E4djAwNjkzYm5zdjIwY3RpY3cifQ.blnV9_r4xomVn57TX0-i_g';
-    final String style = 'mapbox://styles/sehenswuerdigkeiten-proj/cl11y8pv5000f14m4pbcb826y';
-
     return Scaffold(
       body: MapboxMap(
         accessToken: token,
@@ -325,9 +286,6 @@ class _Page2State extends State<Page2> {
           zoom: 15.0,
           target: LatLng(14.508, 46.048),
         ),
-
-
-
 
         onMapCreated: (MapboxMapController controller) async {
           mapboxmapcontroller = controller;
@@ -350,11 +308,6 @@ class _Page2State extends State<Page2> {
               circleRadius: 8.0,
               circleColor: '#006992',
               circleOpacity: 0.8,
-
-              // YOU NEED TO PROVIDE THIS FIELD!!!
-              // Otherwise, you'll get a silent exception somewhere in the stack
-              // trace, but the parameter is never marked as @required, so you'll
-              // never know unless you check the stack trace
               geometry: result,
               draggable: false,
             ),
