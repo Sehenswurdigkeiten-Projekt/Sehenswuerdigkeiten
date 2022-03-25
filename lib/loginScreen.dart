@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:untitled/mainstrukturwebseite.dart';
 import 'package:untitled/signUpScreen.dart';
@@ -61,6 +62,10 @@ class _MyLoginWidget extends State<MyLoginWidget> {
                 cursorColor: const Color(0xff9a9a9a),
                 maxLength: 20,
 
+                inputFormatters: <TextInputFormatter>[
+                  FilteringTextInputFormatter.allow(RegExp('[A-Za-z0-9_.-]')),
+                ],
+
                 decoration: const InputDecoration(
                   counterText: "", //Damit 0/20 weckfällt
                   suffixIcon: Icon( //Account Icon
@@ -95,6 +100,11 @@ class _MyLoginWidget extends State<MyLoginWidget> {
                 cursorColor: const Color(0xff9a9a9a),
                 maxLength: 20,
 
+                inputFormatters: <TextInputFormatter>[
+                  FilteringTextInputFormatter.allow(RegExp("[A-Za-z0-9\$!#%&'*+,-./:;<=>?@^_`|~]")),
+                ],
+                //FilteringTextInputFormatter.allow(RegExp("[A-Za-z0-9\$!#%&'*+,-./:;<=>?@^_`|~]")),
+
                 controller: passwordController,
                 decoration: const InputDecoration(
                   suffixIcon: Icon(
@@ -123,8 +133,8 @@ class _MyLoginWidget extends State<MyLoginWidget> {
                     backgroundColor: MaterialStateProperty.all<Color>(const Color(0xff2F8D46)),
                   ),
                   child: const Text('Login'),
-                  onPressed: () {
-                    bool isCorrect = checkIfCorrect(nameController.text, passwordController.text); //checkt ob überall etwas eingegeben wurde und es richtig ist
+                  onPressed: () async {
+                    bool isCorrect = await checkIfCorrect(nameController.text, passwordController.text); //checkt ob überall etwas eingegeben wurde und es richtig ist
                     if (isCorrect == false){
                       Alert(
                         type: AlertType.warning,
@@ -187,26 +197,39 @@ class NewScreen extends StatelessWidget {
   }
 }
 
-bool checkIfCorrect (String name, String pass){
+Future<bool> checkIfCorrect (String name, String pass) async {
   bool isCorrect = false;
-  //var data = getDataFromServer() --> für die richtigen daten oder so
-  var data = ['{"username":"hans","pwd":"pass1"}','{"username":"Larcher","pwd":"pass2"}'];
-  //name, pass
 
   if (name != "" && pass != ""){
-    isCorrect = true;
+    var resArray = await requestServer(name, pass);
+    Object token = resArray[0];
+    Object statusCode = resArray[1].toString();
+
+    if(statusCode != "401"){
+      isCorrect = true;
+    }
+
+    print("TOKEN OBJ: $token");
+    print("STATUSCODE: $statusCode");
   }
   return isCorrect;
 }
 
-/*
-{
-	"username":"hans",
-	"pwd":"pass1"
-}
+Future<List<Object>> requestServer(String name, String pass) async{
+  var body = {
+    "username":name,
+    "pwd":pass
+  };
 
-{
-	"username":"Larcher",
-	"token":"Schule22"
+  var address = 'http://185.5.199.33:30000';
+
+  var client = new http.Client();
+  var uri = Uri.parse("$address/login");
+  http.Response res = await client.post(uri, body: body);
+
+  var resArray = [res.body, res.statusCode];
+
+  print("RESARRAY: $resArray");
+
+  return resArray;
 }
-*/
