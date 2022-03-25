@@ -38,11 +38,19 @@ dependencies:
   flutter_map: ^0.14.0
   rflutter_alert: ^2.0.4
   #latlng: ^0.1.0
+  http: ^0.13.4
   latlong: ^0.6.1
   location: ^4.3.0
   mapbox_gl: ^0.15.0
+  flutter_launcher_icons: ^0.9.2
+  #path_provider: ^2.0.9
 
-
+flutter_icons:
+  image_path: "assets/icons/logo3.jpg"
+  android: true # can specify file name here e.g. "ic_launcher"
+  ios: true # can specify file name here e.g. "My-Launcher-Icon"
+  adaptive_icon_background: "assets/icons/logo3.jpg" # only available for Android 8.0 devices and above
+  adaptive_icon_foreground: "assets/icons/logo3.jpg" # only available for Android 8.0 devices and above
 
 dev_dependencies:
   flutter_test:
@@ -67,9 +75,9 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
+  assets:
+    - assets/images/
+    - assets/icons/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
