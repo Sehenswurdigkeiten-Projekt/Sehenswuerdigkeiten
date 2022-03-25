@@ -1,8 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import "package:latlong2/latlong.dart" as latLng;
-import 'package:mapbox_gl/mapbox_gl.dart';
-import 'locationstuff.dart';
+import 'package:mapbox_gl/mapbox_gl.dart'; import 'locationstuff.dart';
 
 
 void main() {
@@ -290,7 +289,6 @@ class _Page2State extends State<Page2> {
         onMapCreated: (MapboxMapController controller) async {
           //Acquire current location (returns the LatLong instance)
           final result = await acquireCurrentLocation();
-          print("Jetzt in der onMapCreated");
 
           // You can either use the moveCamera or animateCamera, but the former
           // causes a sudden movement from the initial to 'new' camera position,
@@ -298,12 +296,6 @@ class _Page2State extends State<Page2> {
           await controller.animateCamera(
             CameraUpdate.newLatLng(result!),
           );
-
-
-
-          // Add a circle denoting current user location
-          print(result);
-
 
           await controller.addCircle(
             CircleOptions(
@@ -315,10 +307,7 @@ class _Page2State extends State<Page2> {
             ),
           );
           userCircle = controller.circles.first;
-          print("bbb");
-
-          friendLocationListLatLng = await acquireOthersLocation() as List;
-          print("ahhhj");
+          friendLocationListLatLng = await acquireOthersLocation();
 
           for(var i=0; i<friendLocationListLatLng.length;i++){
             await controller.addCircle(
@@ -326,19 +315,12 @@ class _Page2State extends State<Page2> {
                 circleRadius: 8.0,
                 circleColor: otherColorCircle,
                 circleOpacity: 0.8,
-                geometry: result,
+                geometry: friendLocationListLatLng[i],
                 draggable: false,
               ),
             );
 
-            print("Jetzt commt der Circle");
-
-
-            print(controller.circles.length);
             friendListCircle.add(controller.circles.last);
-            //da jetzt stehen geblieben!! --> Schauen ob die LÄnge vom Array schon 2 ist weil dann müsste eigentlich der Index passen damits funktioneirt. bruh
-            print(controller.circles.length);
-           // print("Circle ID: ${friend.id} ok und in circles: ${controller.circles.elementAt(i+1).id}");
           }
           print("JETZT IST DIE oinMAPLOADIng function fertig");
           mapboxmapcontroller = controller;
