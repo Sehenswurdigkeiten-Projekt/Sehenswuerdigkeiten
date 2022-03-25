@@ -22,7 +22,7 @@ const port = 30000
 //var hash = bcrypt.hashSync("Hummer", salt);
 
 //TODO: should probably return Friends and Groups or maybe make new Post requests
-app.post('/LOGIN', jsonParser, async (req, res) => {
+app.post('/LOGIN', urlencodedParser,jsonParser, async (req, res) => {
   let user = req.body.username;
   let query = "Select Password, AuthToken from User where Username like ?"
   const [rows, fields] = await promisePool.execute(query, [user]);
@@ -39,9 +39,13 @@ app.post('/LOGIN', jsonParser, async (req, res) => {
 
 //TODO: ERROR HANDLING WICHTIG
 //TODO: Check for duplicates
-app.post("/CREATE_ACCOUNT/",jsonParser, async (req, res)=>{
+app.post("/CREATE_ACCOUNT/",urlencodedParser,jsonParser, async (req, res)=>{
 
   let username = req.body.username;
+
+  console.log(req.body.username);
+
+
 
   if(await check_if_user_exists(username)){
     res.statusMessage = "User Exists";
@@ -51,27 +55,40 @@ app.post("/CREATE_ACCOUNT/",jsonParser, async (req, res)=>{
 
   let salt = bcrypt.genSaltSync(10);
   let hash_password = bcrypt.hashSync(req.body.pwd, salt);
-  let authToken = await generate_AuthToken(25);
+  let authToken = await generateToken(25);
+
+
+  while(!await check_token(authToken)){
+    authToken = generateToken(length)
+  } 
 
   const query ="INSERT INTO User(Username, Password, AuthToken) VALUES( ?, ?, ?)" 
   const [rows, fields] = await promisePool.execute(query, [username, hash_password, authToken])
 
   console.log("inserted user:" + username+", "+ hash_password + ", " + authToken);
-  res.statusMessage = "Account created";
-  res.status(200).send({token : authToken});
+  res.statusMessage = "Account created"
+  res.status(200).send({token : authToken})
 });
 
-app.post("/UPDATE_GPS/", jsonParser, async (req, res)=>{
+app.post("/UPDATE_GPS/",urlencodedParser,jsonParser, async (req, res)=>{
+  console.log("gps")
   let token = req.body.token
   let username = req.body.username
   let pos = req.body.pos
-  let toNotify = req.body.toNotify //maybe either a GroupID or empty for friends
+
+  console.log(pos);
+
+  let toNotify = req.body.toNotify //maybe either a GroupID(multiple) or empty for friends
+  const query = "UPDATE User set CurrentPos = ? where UserID = ?"
+  const query2 = "SELECT Username, CurrentPos, FriendID from User join User_Friends on UserID = UserID and User.UserID = ?"
   if(await validate_token(token, username)){
-    promisePool
-    res.end("passt")
+    let userID = get_UserID_from_Username(username)
+    await promisePool.execute(query, [pos, userID])
+    const [rows, fields] = await promisePool.execute(query2, [userID])
+    res.end(rows);
   }
   else
-    res.end("Fogg");
+    res.end("Fogg")
 
 })
 //TODO: Set up DB again
@@ -79,7 +96,27 @@ app.post("/UPDATE_GPS/", jsonParser, async (req, res)=>{
 
 //should probably return GroupID
 app.post("/CREATE_GROUP", jsonParser, async function(req,res){
-  let leader = res.body.username
+  let leader = req.body.username
+  let token = req.body.token
+  let routeID = req.body.routeID
+  
+  if(!await validate_token(token, leader)){
+    res.statusMessage = "Failed to create Group"
+    res.status(404).end()
+    return
+  }
+  let groupCode = generateToken(6);
+
+  const query = "Insert into UserGroup(LeaderID, RouteID, GroupCode) VALUES(?,?,?);"
+
+  let leaderID = get_UserID_from_Username(leader);
+  while(!await check_group_code(groupCode)){
+    groupCode = generateToken(6);
+  }
+
+  res.send(groupCode);
+  
+  const [rows, fields] = await promisePool.execute(query, [leaderID, routeID, groupCode])
 })
 
 app.post("/JOIN_GROUP", jsonParser, async function(req,res){
@@ -118,9 +155,10 @@ app.post("/ADD_FRIEND/", jsonParser, async (req, res)=>{
   async function get_UserID_from_Username(username){
     const query = "Select UserID from User where username =?"
     const[row, field] = await promisePool.execute(query, [username])
-    if(!isNaN(row[0].UserID))
+    
+    if(row[0] && !isNaN(row[0].UserID))
       return row[0].UserID
-    return resolve(-1)
+    return -1
 
   }
 
@@ -142,7 +180,7 @@ async function validate_token(token, username){
 
 
 //TODO: maybe move this to new file
-async function generate_AuthToken(length) {
+async function generateToken(length) {
   var result           = '';
   var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   var charactersLength = characters.length;
@@ -150,9 +188,6 @@ async function generate_AuthToken(length) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
 
-  while(!await check_token(result)){
-    result = generate_AuthToken(length)
-  } 
  return result;
 }
 
@@ -163,5 +198,17 @@ async function check_token(authToken){
     return true
   return false;
 }
+
+async function check_group_code(code){
+  console.log(code);
+  const query = "Select count(*) as i from UserGroup where GroupCode = ?"
+  const[rows, fields] = await promisePool.execute(query, [code])
+
+  if(rows[0].i == 0)
+    return true;
+  return false;
+
+}
+
 
 app.listen(port, () => console.log(`Hello world app listening on port ${port}!`))
