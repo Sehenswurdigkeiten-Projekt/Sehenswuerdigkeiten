@@ -28,7 +28,8 @@ app.post('/LOGIN', urlencodedParser,jsonParser, async (req, res) => {
   const [rows, fields] = await promisePool.execute(query, [user]);
 
   if(rows[0] && bcrypt.compareSync(req.body.pwd, rows[0].Password)){
-    res.send("OK," + rows[0].AuthToken);
+    console.log("Login succesful sending token:" + rows[0].AuthToken);
+    res.status(200).send({token : rows[0].AuthToken})
   }
   else{
     console.log("Login Failed for user:" + user);
@@ -48,12 +49,14 @@ app.post("/CREATE_ACCOUNT/",urlencodedParser,jsonParser, async (req, res)=>{
 
 
   if(await check_if_user_exists(username)){
+    console.log("Account creation failed for: " + username);
     res.statusMessage = "User Exists";
     res.status(400).end();
     return;
   }
 
   let salt = bcrypt.genSaltSync(10);
+
   let hash_password = bcrypt.hashSync(req.body.pwd, salt);
   let authToken = await generateToken(25);
 
@@ -62,7 +65,7 @@ app.post("/CREATE_ACCOUNT/",urlencodedParser,jsonParser, async (req, res)=>{
     authToken = generateToken(length)
   } 
 
-  const query ="INSERT INTO User(Username, Password, AuthToken) VALUES( ?, ?, ?)" 
+  const query ="INSERT INTO User(Username, Password, AuthToken) VALUES( ?, ?, ?);" 
   const [rows, fields] = await promisePool.execute(query, [username, hash_password, authToken])
 
   console.log("inserted user:" + username+", "+ hash_password + ", " + authToken);
@@ -75,27 +78,26 @@ app.post("/UPDATE_GPS/",urlencodedParser,jsonParser, async (req, res)=>{
   let token = req.body.token
   let username = req.body.username
   let pos = req.body.pos
-
-  console.log(pos);
-
   let toNotify = req.body.toNotify //maybe either a GroupID(multiple) or empty for friends
-  const query = "UPDATE User set CurrentPos = ? where UserID = ?"
-  const query2 = "SELECT Username, CurrentPos, FriendID from User join User_Friends on UserID = UserID and User.UserID = ?"
+  const query = "update User set CurrentPos = ? where UserID = ?;"
+  const query2 = "select c.CurrentPos,c.Username from User join User_Friends as b on User.UserID = b.UserID and User.UserID = ? join User as c on FriendID = c.UserID;"
   if(await validate_token(token, username)){
-    let userID = get_UserID_from_Username(username)
+    let userID = await get_UserID_from_Username(username)
     await promisePool.execute(query, [pos, userID])
     const [rows, fields] = await promisePool.execute(query2, [userID])
-    res.end(rows);
+    res.status(200).send(rows);
   }
-  else
-    res.end("Fogg")
+  else{
+    res.statusMessage = "Update Failed"
+    res.status(402).end()
+  }
 
 })
 //TODO: Set up DB again
 //TODO: DELTE USER, DELETE GROUP, DELETE ROUTE, IMPLEMENT !SHIT BELOW!
 
 //should probably return GroupID
-app.post("/CREATE_GROUP", jsonParser, async function(req,res){
+app.post("/CREATE_GROUP", urlencodedParser,jsonParser, async function(req,res){
   let leader = req.body.username
   let token = req.body.token
   let routeID = req.body.routeID
@@ -108,26 +110,49 @@ app.post("/CREATE_GROUP", jsonParser, async function(req,res){
   let groupCode = generateToken(6);
 
   const query = "Insert into UserGroup(LeaderID, RouteID, GroupCode) VALUES(?,?,?);"
+  const query2 = "Select GroupID from UserGroup where LeaderID = ?"
+  const query3 = "Insert into User_UserGroup Values(?, ?)";
 
-  let leaderID = get_UserID_from_Username(leader);
+  let leaderID = await get_UserID_from_Username(leader);
   while(!await check_group_code(groupCode)){
     groupCode = generateToken(6);
   }
 
-  res.send(groupCode);
-  
-  const [rows, fields] = await promisePool.execute(query, [leaderID, routeID, groupCode])
+  await promisePool.execute(query, [leaderID, routeID, groupCode])
+  const rows = await promisePool.execute(query2, [leaderID]);
+  await promisePool.execute(query3, [leaderID, rows[0].GroupID]);
+  res.status(200).send({"code":groupCode});
 })
 
-app.post("/JOIN_GROUP", jsonParser, async function(req,res){
+app.post("/JOIN_GROUP", urlencodedParser,jsonParser, async function(req,res){
+  let username = req.body.username;
+  let token = req.body.token;
+  let groupCode = req.body.code;
+  let query = "Select GroupID from UserGroup where GroupCode = ?"
+  let query2 = "Insert into User_UserGroup(?,?)"
+  let groupID;
+  let userID;
+  const rows = await promisePool.execute(query, [groupCode])
+  if(!await validate_token(token, username) || !rows){
+    res.statusMessage = "Failed to join group"
+    res.status(405).end();
+    return
+  }
+  groupID = rows[0].GroupID;
+  userID = get_UserID_from_Username(username);
+  await promisePool.execute(query2, [userID, groupID]);
+
+})
+
+app.post("/CREATE_ROUTE", urlencodedParser,jsonParser, async function(req,res){
   
 })
 
-app.post("/CREATE_ROUTE", jsonParser, async function(req,res){
-  
+app.post("/SET_GROUP_ROUTE", urlencodedParser, jsonParser, async function(req, res){
+
 })
 
-app.post("/ADD_FRIEND/", jsonParser, async (req, res)=>{
+app.post("/ADD_FRIEND/", urlencodedParser,jsonParser, async (req, res)=>{
   let username1 = req.body.username
   let username2 = req.body.friend
   let token = req.body.token
@@ -211,4 +236,4 @@ async function check_group_code(code){
 }
 
 
-app.listen(port, () => console.log(`Hello world app listening on port ${port}!`))
+app.listen(30000, () => console.log(`Hello world app listening on port ${port}!`))
