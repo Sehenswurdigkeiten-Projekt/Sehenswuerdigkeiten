@@ -1,10 +1,14 @@
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_launcher_icons/constants.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:untitled/loginScreen.dart';
 import 'package:untitled/mainstrukturwebseite.dart';
-import 'dart:convert';
 import 'package:http/http.dart' as http;
+
+import 'dart:convert';
 
 class MySignupWidget extends StatefulWidget {
   const MySignupWidget({Key? key}) : super(key: key);
@@ -62,6 +66,11 @@ class _MySignupWidget extends State<MySignupWidget> {
                 cursorColor: const Color(0xff9a9a9a),
                 maxLength: 20,
 
+                inputFormatters: <TextInputFormatter>[
+                  FilteringTextInputFormatter.allow(RegExp('[A-Za-zÀÁÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿÆÐƎƏƐƔĲŊŒẞÞǷȜæðǝəɛɣĳŋœĸſßþƿȝĄƁÇĐƊĘĦĮƘŁØƠŞȘŢȚŦŲƯY̨Ƴąɓçđɗęħįƙłøơşșţțŧųưy̨ƴÁÀÂÄǍĂĀÃÅǺĄÆǼǢƁĆĊĈČÇĎḌĐƊÐÉÈĖÊËĚĔĒĘẸƎƏƐĠĜǦĞĢƔáàâäǎăāãåǻąæǽǣɓćċĉčçďḍđɗðéèėêëěĕēęẹǝəɛġĝǧğģɣĤḤĦIÍÌİÎÏǏĬĪĨĮỊĲĴĶƘĹĻŁĽĿʼNŃN̈ŇÑŅŊÓÒÔÖǑŎŌÕŐỌØǾƠŒĥḥħıíìiîïǐĭīĩįịĳĵķƙĸĺļłľŀŉńn̈ňñņŋóòôöǒŏōõőọøǿơœŔŘŖŚŜŠŞȘṢẞŤŢṬŦÞÚÙÛÜǓŬŪŨŰŮŲỤƯẂẀŴẄǷÝỲŶŸȲỸƳŹŻŽẒŕřŗſśŝšşșṣßťţṭŧþúùûüǔŭūũűůųụưẃẁŵẅƿýỳŷÿȳỹƴźżžẓ0-9_.-]')),
+                  //FilteringTextInputFormatter.allow(RegExp('[A-Za-zÀÁÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿÆÐƎƏƐƔĲŊŒẞÞǷȜæðǝəɛɣĳŋœĸſßþƿȝĄƁÇĐƊĘĦĮƘŁØƠŞȘŢȚŦŲƯY̨Ƴąɓçđɗęħįƙłøơşșţțŧųưy̨ƴÁÀÂÄǍĂĀÃÅǺĄÆǼǢƁĆĊĈČÇĎḌĐƊÐÉÈĖÊËĚĔĒĘẸƎƏƐĠĜǦĞĢƔáàâäǎăāãåǻąæǽǣɓćċĉčçďḍđɗðéèėêëěĕēęẹǝəɛġĝǧğģɣĤḤĦIÍÌİÎÏǏĬĪĨĮỊĲĴĶƘĹĻŁĽĿʼNŃN̈ŇÑŅŊÓÒÔÖǑŎŌÕŐỌØǾƠŒĥḥħıíìiîïǐĭīĩįịĳĵķƙĸĺļłľŀŉńn̈ňñņŋóòôöǒŏōõőọøǿơœŔŘŖŚŜŠŞȘṢẞŤŢṬŦÞÚÙÛÜǓŬŪŨŰŮŲỤƯẂẀŴẄǷÝỲŶŸȲỸƳŹŻŽẒŕřŗſśŝšşșṣßťţṭŧþúùûüǔŭūũűůųụưẃẁŵẅƿýỳŷÿȳỹƴźżžẓ0-9_.-]')),
+                ],
+
                 decoration: const InputDecoration(
                   counterText: "", //Damit 0/20 weckfällt
                   suffixIcon: Icon( //Account Icon
@@ -96,6 +105,11 @@ class _MySignupWidget extends State<MySignupWidget> {
                 cursorColor: const Color(0xff9a9a9a),
                 maxLength: 20,
 
+                inputFormatters: <TextInputFormatter>[
+                  FilteringTextInputFormatter.allow(RegExp("[A-Za-zÀÁÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿÆÐƎƏƐƔĲŊŒẞÞǷȜæðǝəɛɣĳŋœĸſßþƿȝĄƁÇĐƊĘĦĮƘŁØƠŞȘŢȚŦŲƯY̨Ƴąɓçđɗęħįƙłøơşșţțŧųưy̨ƴÁÀÂÄǍĂĀÃÅǺĄÆǼǢƁĆĊĈČÇĎḌĐƊÐÉÈĖÊËĚĔĒĘẸƎƏƐĠĜǦĞĢƔáàâäǎăāãåǻąæǽǣɓćċĉčçďḍđɗðéèėêëěĕēęẹǝəɛġĝǧğģɣĤḤĦIÍÌİÎÏǏĬĪĨĮỊĲĴĶƘĹĻŁĽĿʼNŃN̈ŇÑŅŊÓÒÔÖǑŎŌÕŐỌØǾƠŒĥḥħıíìiîïǐĭīĩįịĳĵķƙĸĺļłľŀŉńn̈ňñņŋóòôöǒŏōõőọøǿơœŔŘŖŚŜŠŞȘṢẞŤŢṬŦÞÚÙÛÜǓŬŪŨŰŮŲỤƯẂẀŴẄǷÝỲŶŸȲỸƳŹŻŽẒŕřŗſśŝšşșṣßťţṭŧþúùûüǔŭūũűůųụưẃẁŵẅƿýỳŷÿȳỹƴźżžẓ0-9\$!#%&'*+,-./:;<=>?@^_`|~]")),
+                  //FilteringTextInputFormatter.allow(RegExp("[A-Za-zÀÁÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿÆÐƎƏƐƔĲŊŒẞÞǷȜæðǝəɛɣĳŋœĸſßþƿȝĄƁÇĐƊĘĦĮƘŁØƠŞȘŢȚŦŲƯY̨Ƴąɓçđɗęħįƙłøơşșţțŧųưy̨ƴÁÀÂÄǍĂĀÃÅǺĄÆǼǢƁĆĊĈČÇĎḌĐƊÐÉÈĖÊËĚĔĒĘẸƎƏƐĠĜǦĞĢƔáàâäǎăāãåǻąæǽǣɓćċĉčçďḍđɗðéèėêëěĕēęẹǝəɛġĝǧğģɣĤḤĦIÍÌİÎÏǏĬĪĨĮỊĲĴĶƘĹĻŁĽĿʼNŃN̈ŇÑŅŊÓÒÔÖǑŎŌÕŐỌØǾƠŒĥḥħıíìiîïǐĭīĩįịĳĵķƙĸĺļłľŀŉńn̈ňñņŋóòôöǒŏōõőọøǿơœŔŘŖŚŜŠŞȘṢẞŤŢṬŦÞÚÙÛÜǓŬŪŨŰŮŲỤƯẂẀŴẄǷÝỲŶŸȲỸƳŹŻŽẒŕřŗſśŝšşșṣßťţṭŧþúùûüǔŭūũűůųụưẃẁŵẅƿýỳŷÿȳỹƴźżžẓ0-9\$!#%&'*+,-./:;<=>?@^_`|~]")),
+                ],
+
                 controller: passwordController,
                 decoration: const InputDecoration(
                   counterText: "",
@@ -123,6 +137,10 @@ class _MySignupWidget extends State<MySignupWidget> {
                 obscureText: true,
                 cursorColor: const Color(0xff9a9a9a),
                 maxLength: 20,
+
+                inputFormatters: <TextInputFormatter>[
+                  FilteringTextInputFormatter.allow(RegExp("[A-Za-zÀÁÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿÆÐƎƏƐƔĲŊŒẞÞǷȜæðǝəɛɣĳŋœĸſßþƿȝĄƁÇĐƊĘĦĮƘŁØƠŞȘŢȚŦŲƯY̨Ƴąɓçđɗęħįƙłøơşșţțŧųưy̨ƴÁÀÂÄǍĂĀÃÅǺĄÆǼǢƁĆĊĈČÇĎḌĐƊÐÉÈĖÊËĚĔĒĘẸƎƏƐĠĜǦĞĢƔáàâäǎăāãåǻąæǽǣɓćċĉčçďḍđɗðéèėêëěĕēęẹǝəɛġĝǧğģɣĤḤĦIÍÌİÎÏǏĬĪĨĮỊĲĴĶƘĹĻŁĽĿʼNŃN̈ŇÑŅŊÓÒÔÖǑŎŌÕŐỌØǾƠŒĥḥħıíìiîïǐĭīĩįịĳĵķƙĸĺļłľŀŉńn̈ňñņŋóòôöǒŏōõőọøǿơœŔŘŖŚŜŠŞȘṢẞŤŢṬŦÞÚÙÛÜǓŬŪŨŰŮŲỤƯẂẀŴẄǷÝỲŶŸȲỸƳŹŻŽẒŕřŗſśŝšşșṣßťţṭŧþúùûüǔŭūũűůųụưẃẁŵẅƿýỳŷÿȳỹƴźżžẓ0-9\$!#%&'*+,-./:;<=>?@^_`|~]")),
+                ],
 
                 controller: confirmPasswordController,
                 decoration: const InputDecoration(
@@ -152,10 +170,9 @@ class _MySignupWidget extends State<MySignupWidget> {
                     backgroundColor: MaterialStateProperty.all<Color>(Color(0xff2F8D46)),
                   ),
                   child: const Text('Sign Up'),
-                  onPressed: () {
-                    print("1");
-                    bool isCorrect = checkIfCorrect(nameController.text, passwordController.text, confirmPasswordController.text);
-                    print("2");
+                  onPressed: () async{
+                    bool isCorrect = await checkIfCorrect(nameController.text, passwordController.text, confirmPasswordController.text);
+                    print("BIIIIIITTTTTEEEE: $isCorrect");
                     if(isCorrect == false) {
                       Alert(
                         type: AlertType.warning,
@@ -173,7 +190,6 @@ class _MySignupWidget extends State<MySignupWidget> {
                       passwordController.text = "";
                       confirmPasswordController.text = "";
                       _navigateToMap(context);
-                      HomePage();
                     }
                   },
                 )
@@ -216,13 +232,38 @@ class NewScreen extends StatelessWidget {
   }
 }
 
-bool checkIfCorrect (String name, String pass, String confPass){
+Future<bool> checkIfCorrect (String name, String pass, String confPass) async {
   bool isCorrect = false;
+
+  print("Name: $name, Pass: $pass, ConfPass: $pass");
   if(pass == confPass && name != "" && pass != "") {
-    print("Name: " + name);
-    print("Pass: " + pass);
-    print("Conf Pass: " + confPass);
-    isCorrect = true;
+    var resArray = await requestServer(name, pass);
+    Object token = resArray[0];
+    Object statusCode = resArray[1].toString();
+
+    if(statusCode != "400"){
+      isCorrect = true;
+    }
   }
+  print(isCorrect);
   return isCorrect;
+}
+
+Future<List<Object>> requestServer(String name, String pass) async{
+  var body = {
+    "username":name,
+    "pwd":pass
+  };
+
+  var address = "http://185.5.199.33:30000";
+
+  var client = new http.Client();
+  var uri = Uri.parse("$address/create_account");
+  http.Response res = await client.post(uri, body: body);
+
+  var resArray = [res.body, res.statusCode];
+
+  print("RESARRAY: $resArray");
+
+  return resArray;
 }
