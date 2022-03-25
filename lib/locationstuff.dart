@@ -1,7 +1,7 @@
+import 'dart:math';
 import 'package:location/location.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import "package:latlong2/latlong.dart" as latLng;
-
 
 
 Future<LatLng?> acquireCurrentLocation() async {
@@ -38,4 +38,18 @@ Future<LatLng?> acquireCurrentLocation() async {
   // Gets the current location of the user
   final locationData = await location.getLocation();
   return LatLng(locationData.latitude ?? 0.0, locationData.longitude ?? 0.0);
+}
+
+
+Future<List> acquireOthersLocation() async {
+  //Connect to Server and get the location from the people
+  var latlongs = [];
+  var rng = Random();
+
+
+  latlongs.add(LatLng(rng.nextDouble() * 90,rng.nextDouble() * 90));
+
+  latlongs.add(LatLng(rng.nextDouble() * 90,rng.nextDouble() * 90));
+
+  return latlongs;
 }

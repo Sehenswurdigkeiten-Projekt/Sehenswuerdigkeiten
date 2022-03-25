@@ -1,15 +1,7 @@
 import 'dart:async';
-import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
-//import 'package:latlong/latlong.dart';
 import "package:latlong2/latlong.dart" as latLng;
-
-import 'package:location/location.dart';
-import 'package:mapbox_gl/mapbox_gl.dart';
-
-import 'locationstuff.dart';
+import 'package:mapbox_gl/mapbox_gl.dart'; import 'locationstuff.dart';
 
 
 void main() {
@@ -224,58 +216,65 @@ class Page2 extends StatefulWidget {
 }
 
 class _Page2State extends State<Page2> {
-  late Timer timer;
-  late LatLng result;
-  late MapboxMapController mapboxmapcontroller;
+  late Timer timerOwnLocation;
+  late Timer timerFriendLocation;
+  late LatLng ownLocationLatLng;
+  late List friendLocationListLatLng;
+  late MapboxMapController mapboxmapcontroller; //Der controller für die Circles etc.
+  var myColorCircle = '#006992';
+  var otherColorCircle = '#009229';
+  late Circle userCircle;
+  late List friendListCircle = [];
+  final String token = 'pk.eyJ1Ijoic2VoZW5zd3VlcmRpZ2tlaXRlbi1wcm9qIiwiYSI6ImNsMTBuY2E4djAwNjkzYm5zdjIwY3RpY3cifQ.blnV9_r4xomVn57TX0-i_g';
+  final String style = 'mapbox://styles/sehenswuerdigkeiten-proj/cl11y8pv5000f14m4pbcb826y';
+
   @override
   void initState() {
-    // TODO: implement initState
+    //10.10.30.96:3000
     super.initState();
-    timer = Timer.periodic(Duration(seconds: 1), (timer) async {
-      //print(DateTime.now());
-      //Hier alles
+    timerOwnLocation = Timer.periodic(Duration(seconds: 1), (timer) async { //Hier der Timer zum updaten der eigenen Location!
       if(mapboxmapcontroller == null) return;
-      print(mapboxmapcontroller.circles.first);
-      //mapboxmapcontroller.circles.first.options.geometry = await acquireCurrentLocation();
+      print("Eigene Location loading");
 
-      result = (await acquireCurrentLocation())!;
+      ownLocationLatLng = (await acquireCurrentLocation())!;
 
-      mapboxmapcontroller.clearCircles();
-      mapboxmapcontroller.addCircle(
-        CircleOptions(
-          circleRadius: 8.0,
-          circleColor: '#116992',
-          circleOpacity: 0.8,
-
-          // YOU NEED TO PROVIDE THIS FIELD!!!
-          // Otherwise, you'll get a silent exception somewhere in the stack
-          // trace, but the parameter is never marked as @required, so you'll
-          // never know unless you check the stack trace
-          geometry: result,
-          draggable: false,
-        ),
+      mapboxmapcontroller.updateCircle(userCircle, CircleOptions(
+        circleRadius: 8.0,
+        circleColor:  myColorCircle,
+        circleOpacity: 0.8,
+        geometry: ownLocationLatLng,
+        draggable: false,
+      )
       );
-      /*
-      var restemp = (await acquireCurrentLocation())!;
-      print("${result.latitude} / ${result.longitude}");
-      setState(() {
-        result = restemp;
-      });
-       */
     });
 
+
+    timerFriendLocation = Timer.periodic(Duration(seconds: 5), (timer) async { //Hier der Timer zum updaten der Freunde Location!
+      if(mapboxmapcontroller == null) return;
+      print("Other Location Loading");
+      friendLocationListLatLng = (await acquireOthersLocation());
+
+
+      for(var i=0; i<friendListCircle.length; i++){
+        mapboxmapcontroller.updateCircle(friendListCircle[i], CircleOptions(
+          circleRadius: 8.0,
+          circleColor:  otherColorCircle,
+          circleOpacity: 0.8,
+          geometry: friendLocationListLatLng[i],
+          draggable: false,
+        ));
+      }
+    });
   }
 
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
-    timer.cancel();
+    timerOwnLocation.cancel();
+    timerFriendLocation.cancel();
   }
 
-  final String token = 'pk.eyJ1Ijoic2VoZW5zd3VlcmRpZ2tlaXRlbi1wcm9qIiwiYSI6ImNsMTBuY2E4djAwNjkzYm5zdjIwY3RpY3cifQ.blnV9_r4xomVn57TX0-i_g';
-  final String style = 'mapbox://styles/sehenswuerdigkeiten-proj/cl11y8pv5000f14m4pbcb826y';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -288,8 +287,6 @@ class _Page2State extends State<Page2> {
         ),
 
         onMapCreated: (MapboxMapController controller) async {
-          mapboxmapcontroller = controller;
-
           //Acquire current location (returns the LatLong instance)
           final result = await acquireCurrentLocation();
 
@@ -300,23 +297,38 @@ class _Page2State extends State<Page2> {
             CameraUpdate.newLatLng(result!),
           );
 
-          // Add a circle denoting current user location
-          print(result);
-          print("Jetzt in der onMapCreated");
           await controller.addCircle(
             CircleOptions(
               circleRadius: 8.0,
-              circleColor: '#006992',
+              circleColor: myColorCircle,
               circleOpacity: 0.8,
               geometry: result,
               draggable: false,
             ),
           );
+          userCircle = controller.circles.first;
+          friendLocationListLatLng = await acquireOthersLocation();
+
+          for(var i=0; i<friendLocationListLatLng.length;i++){
+            await controller.addCircle(
+              CircleOptions(
+                circleRadius: 8.0,
+                circleColor: otherColorCircle,
+                circleOpacity: 0.8,
+                geometry: friendLocationListLatLng[i],
+                draggable: false,
+              ),
+            );
+
+            friendListCircle.add(controller.circles.last);
+          }
+          print("JETZT IST DIE oinMAPLOADIng function fertig");
+          mapboxmapcontroller = controller;
         },
 
       ),
-    );
+);
 
 
-  }
+}
 }
