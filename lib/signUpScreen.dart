@@ -56,7 +56,7 @@ class _MySignupWidget extends State<MySignupWidget> {
                 padding: const EdgeInsets.all(10),
                 child: const Text(
                   'Sign Up',
-                  style: TextStyle(fontSize: 21),
+                  style: TextStyle(fontSize: 22),
                 )),
             Container( //https://medium.com/flutter-community/a-visual-guide-to-input-decorations-for-flutter-textfield-706cf1877e25
               padding: const EdgeInsets.all(10),
@@ -219,7 +219,7 @@ class _MySignupWidget extends State<MySignupWidget> {
     Navigator.pop(context);
   }
   void _navigateToMap(BuildContext context) {
-    Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomePage()));
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyApp()));
   }
 }
 class NewScreen extends StatelessWidget {
