@@ -25,6 +25,8 @@ app.post("/ADD_FRIEND/", urlencodedParser,jsonParser, request.addFriend)
 app.post("/REMOVE_FRIEND", urlencodedParser, jsonParser, request.removeFriend);
 app.post("/GET_FRIENDREQUESTS", urlencodedParser, jsonParser, request.getFriendRequests);
 app.post("/CHANGE_PASSWORD", urlencodedParser, jsonParser, request.changePassword)
+app.post("/DELETE_GROUP", urlencodedParser, jsonParser, request.delteGroup)
+app.post("/LEAVE_GROUP", urlencodedParser, jsonParser, request.leaveGroup)
 
 app.post("/CREATE_ROUTE", urlencodedParser,jsonParser, async function(req,res){
   

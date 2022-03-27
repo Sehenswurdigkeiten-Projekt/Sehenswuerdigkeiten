@@ -64,7 +64,7 @@ exports.updateGPS = async function(req, res){
     res.status(200).send(rows);
   }
   else{
-    console.log("[SERVER %s]: no valid token for user("+username+")", dateTime());
+    console.log("[SERVER %s]: not a valid token for user("+username+")", dateTime());
     res.statusMessage = "GPS Update Failed"
     res.status(402).end()
   }
@@ -83,13 +83,12 @@ exports.createGroup = async function(req,res)
   }
   let groupCode = generateToken(6);
 
-  let leaderID = await db.getUseridFromUsername(leader);
   while(!await db.checkGroupCode(groupCode)){
     groupCode = generateToken(6);
   }
-
+  let leaderID = await db.getUseridFromUsername(leader);
   await db.createUserGroup(leaderID, routeID, groupCode)
-  const rows = await db.getGroupidFromLeaderid(leaderID);
+  const rows = await db.getGroupidFromGroupcode(groupCode);
   await db.joinUserGroup(leaderID, rows[0].GroupID);
 
   res.status(200).send({"code":groupCode});
@@ -118,16 +117,25 @@ exports.joinGroup = async function(req,res)
   let groupCode = req.body.code;
   let groupID;
   let userID;
-  if(!await db.validateToken(token, username) || !rows){
+
+  if(!await db.validateToken(token, username)){
+    res.statusMessage = "Failed to join group"
+    res.status(405).end();
+    return
+  }
+  
+  const rows = await db.getGroupidFromGroupcode(groupCode)
+  groupID = rows[0].GroupID;
+  userID = await db.getUseridFromUsername(username);
+
+  if(await db.checkIfUserIsInGroup(userID, groupID)){
     res.statusMessage = "Failed to join group"
     res.status(405).end();
     return
   }
 
-  const rows = await db.getGroupidFromGroupcode(groupCode)
-  groupID = rows[0].GroupID;
-  userID = await db.getUseridFromUsername(username);
-  await db.joinUserGroup(groupID, userID);
+  await db.joinUserGroup(userID, groupID);
+  res.status(200).end("Joined Group")
 
 }
 exports.removeFriend = async function (req, res) {
@@ -210,6 +218,26 @@ exports.addFriend =  async function(req, res)
   }
   console.log("[SERVER %s]: Send friendrequest(%s) from User(%s)", dateTime(), username2, username1);
   res.status(200).end("Send");
+}
+
+exports.leaveGroup = async function(req, res){
+  let username = req.body.username;
+  let token = req.body.token;
+  let code = req.body.code;
+
+  let valid = await db.validateToken(token, username)
+  let groupid = await db.getGroupidFromGroupcode(code);
+  if(valid && groupid){
+    await db.leaveGroup(await db.getUseridFromUsername(username), groupid);
+  }
+  else{
+    res.statusMessage = "Failed to get Friendrequests"
+    res.status(409).end();
+  }
+}
+
+exports.delteGroup = async function(req, res){
+
 }
 
 exports.getFriendRequests = async function(req, res) {
