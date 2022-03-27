@@ -76,16 +76,19 @@ Future<List<dynamic>> requestServerFriendPos(String name, LatLng myLocation) asy
   if(username == "") username = MySignupWidget2.username;
 
   var body = {
-    "username":"${token}",
-    "token":"${username}",
+    "username":"${username}",
+    "token":"${token}",
     "lon": "${myLocation.longitude}",
     "lat": "${myLocation.latitude}",
     "toNotify":"-"
   };
+  print("DA");
 
   var client = new http.Client();
   var uri = Uri.parse(name);
   http.Response res = await client.post(uri, body: body);
+  print("DA2");
+  print(res.body);
   var list = jsonDecode(res.body);
   //Da steht dann drinnen: lon, lat
 
