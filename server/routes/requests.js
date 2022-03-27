@@ -1,7 +1,7 @@
-const promisePool = require("./db").getPromisePool();
+const promisePool = require("../modules/database/db").getPromisePool();
 const bcrypt = require('bcryptjs');
-const dateTime = require('./dateHelper').getDateTime;
-const db = require("./dbHelperQueries");
+const dateTime = require('../modules/dateHelper').getDateTime;
+const db = require("../modules/database/dbHelperQueries");
 const {generateToken, checkIfValidInput} = require('./requestHelper')
 
 exports.login = async function(req, res)
@@ -45,6 +45,7 @@ exports.createAccount = async function(req, res)
   res.statusMessage = "Account created"
   res.status(200).send({token : authToken})
 }
+
 exports.updateGPS = async function(req, res){
 
   let token = req.body.token
@@ -166,11 +167,17 @@ exports.addFriend =  async function(req, res)
 
   let isReal = await db.checkIfUserExists(username2);
   let isValid = await db.validateToken(token, username1);
-  let areFriends = await db.checkIfFriends(username1 , username2)
-  if(isValid && isReal && !areFriends){
+  if(isValid && isReal){
+
     let userID1 = await db.getUseridFromUsername(username1)
     let userID2 = await db.getUseridFromUsername(username2)
-
+    let areFriends = await db.checkIfFriends(userID1 , userID2)
+    if(areFriends){
+      console.log("[SERVER %s]: Failed to add friend(" + username2 + ", "+isReal+") for User("+username1+", "+isValid+")", dateTime())
+      res.statusMessage = "you are already friends"
+      res.status(403).end();
+      return;
+    } 
     let duplicateRequest = await db.checkForFriendrequest(userID1, userID2);
     const rows = await db.checkForFriendrequest(userID2, userID1)
 

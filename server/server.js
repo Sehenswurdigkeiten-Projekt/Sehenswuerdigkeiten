@@ -11,7 +11,7 @@ const port = 30000
 //TODO: DELTE USER, DELETE GROUP, DELETE ROUTE, IMPLEMENT !SHIT BELOW!
 //TODO: ERROR HANDLING WICHTIG
 
-const request = require("./requests");
+const request = require("./routes/requests");
 const { application } = require("express");
 
 //TODO: should probably return Friends and Groups or maybe make new Post requests

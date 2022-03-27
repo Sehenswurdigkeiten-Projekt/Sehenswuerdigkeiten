@@ -50,7 +50,8 @@ exports.getUseridFromUsername = async function get_userID_from_username(username
 exports.checkIfFriends = async function checkIfFriends(userID, friendID) {
     const query = "Select count(*) as i from User_Friends where userID = ? and friendID = ?"
     const[row, field] = await promisePool.execute(query, [userID, friendID])
-
+    
+    console.log(row);
 
     if(row[0].i == 1){
         return true
