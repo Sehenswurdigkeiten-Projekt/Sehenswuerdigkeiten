@@ -52,7 +52,7 @@ class _MyLoginWidget extends State<MyLoginWidget> {
                 padding: const EdgeInsets.all(10),
                 child: const Text(
                   'Login',
-                  style: TextStyle(fontSize: 21),
+                  style: TextStyle(fontSize: 22),
                 )),
             Container( //https://medium.com/flutter-community/a-visual-guide-to-input-decorations-for-flutter-textfield-706cf1877e25
               padding: const EdgeInsets.all(10),
@@ -183,7 +183,7 @@ class _MyLoginWidget extends State<MyLoginWidget> {
     Navigator.of(context).push(MaterialPageRoute(builder: (context) => NewScreen()));
   }
   void _navigateToMap(BuildContext context) {
-    Navigator.of(context).push(MaterialPageRoute(builder: (context) => const HomePage()));
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyApp()));
   }
 }
 
