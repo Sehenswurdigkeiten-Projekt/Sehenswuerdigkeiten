@@ -327,6 +327,18 @@ class _Page2State extends State<Page2> {
 
             friendListCircle.add(controller.circles.last);
           }
+
+          await controller.addSymbol(SymbolOptions(
+            iconSize: 1,
+            iconImage: "assets/icons/logo3.jpg",
+            iconOpacity: 1,
+            textField: "SymbolTest",
+            textOpacity: 1,
+            geometry: ownLocationLatLng
+          ));
+
+
+
           print("JETZT IST DIE oinMAPLOADIng function fertig");
           mapboxmapcontroller = controller;
         },
