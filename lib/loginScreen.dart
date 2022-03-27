@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -11,12 +13,15 @@ class MyLoginWidget extends StatefulWidget {
   const MyLoginWidget({Key? key}) : super(key: key);
 
   @override
-  State<MyLoginWidget> createState() => _MyLoginWidget();
+  State<MyLoginWidget> createState() => MyLoginWidget2();
 }
 
-class _MyLoginWidget extends State<MyLoginWidget> {
+class MyLoginWidget2 extends State<MyLoginWidget> {
   TextEditingController nameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+
+  static String _username="";
+  static String _token="";
 
   @override
   Widget build(BuildContext context) {
@@ -134,8 +139,8 @@ class _MyLoginWidget extends State<MyLoginWidget> {
                   ),
                   child: const Text('Login'),
                   onPressed: () async {
-                    bool isCorrect = await checkIfCorrect(nameController.text, passwordController.text); //checkt ob überall etwas eingegeben wurde und es richtig ist
-                    if (isCorrect == false){
+                    List<Object> resArray = await checkIfCorrect(nameController.text, passwordController.text); //checkt ob überall etwas eingegeben wurde und es richtig ist
+                    if (resArray[0] == false){
                       Alert(
                         type: AlertType.warning,
                         context: context,
@@ -148,11 +153,15 @@ class _MyLoginWidget extends State<MyLoginWidget> {
                       print(passwordController.text);
 
                       String jsonString = '{"username":"${nameController.text}","pwd":"${passwordController.text}"}';
+                      var token = resArray[1].toString();
+                      _token = jsonDecode(token)['token'].toString();
+                      _username = nameController.text;
 
                       print(jsonString); // Dart
 
                       nameController.text = "";
                       passwordController.text = "";
+
                       _navigateToMap(context);
                     }
                   },
@@ -185,6 +194,19 @@ class _MyLoginWidget extends State<MyLoginWidget> {
   void _navigateToMap(BuildContext context) {
     Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyApp()));
   }
+
+  static String get token => _token;
+
+  static set token(String value) {
+    _token = value;
+  }
+
+  static String get username => _username;
+
+  static set username(String value) {
+    _username = value;
+  }
+
 }
 
 class NewScreen extends StatelessWidget {
@@ -197,12 +219,13 @@ class NewScreen extends StatelessWidget {
   }
 }
 
-Future<bool> checkIfCorrect (String name, String pass) async {
+Future<List<Object>> checkIfCorrect (String name, String pass) async {
   bool isCorrect = false;
+  late Object token;
 
   if (name != "" && pass != ""){
     var resArray = await requestServer(name, pass);
-    Object token = resArray[0];
+    token = resArray[0];
     Object statusCode = resArray[1].toString();
 
     if(statusCode != "401"){
@@ -212,7 +235,10 @@ Future<bool> checkIfCorrect (String name, String pass) async {
     print("TOKEN OBJ: $token");
     print("STATUSCODE: $statusCode");
   }
-  return isCorrect;
+  var resArray = [isCorrect, token];
+
+
+  return resArray;
 }
 
 Future<List<Object>> requestServer(String name, String pass) async{

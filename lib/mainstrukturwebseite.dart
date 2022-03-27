@@ -1,15 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import "package:latlong2/latlong.dart" as latLng;
 import 'package:mapbox_gl/mapbox_gl.dart'; import 'locationstuff.dart';
 
 
-void main() {
-  runApp(const MyApp());
-}
-
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+
+  MyApp({Key? key}) : super(key: key);
 
 // This widget is the root of your application.
   @override
@@ -219,7 +215,7 @@ class _Page2State extends State<Page2> {
   late Timer timerOwnLocation;
   late Timer timerFriendLocation;
   late LatLng ownLocationLatLng;
-  late List friendLocationListLatLng;
+  late List<dynamic> friendLocationListLatLng;
   late MapboxMapController mapboxmapcontroller; //Der controller für die Circles etc.
   var myColorCircle = '#006992';
   var otherColorCircle = '#009229';
@@ -252,15 +248,15 @@ class _Page2State extends State<Page2> {
     timerFriendLocation = Timer.periodic(Duration(seconds: 5), (timer) async { //Hier der Timer zum updaten der Freunde Location!
       if(mapboxmapcontroller == null) return;
       print("Other Location Loading");
-      friendLocationListLatLng = (await acquireOthersLocation());
-
-
+      friendLocationListLatLng = (await acquireOthersLocation(ownLocationLatLng));
       for(var i=0; i<friendListCircle.length; i++){
+        if(friendLocationListLatLng[i]['Lon'] == null || friendLocationListLatLng[i]['Lat'] == null) continue;
+
         mapboxmapcontroller.updateCircle(friendListCircle[i], CircleOptions(
           circleRadius: 8.0,
           circleColor:  otherColorCircle,
           circleOpacity: 0.8,
-          geometry: friendLocationListLatLng[i],
+          geometry: LatLng(friendLocationListLatLng[i]['Lon'], friendLocationListLatLng[i]['Lat']),
           draggable: false,
         ));
       }
@@ -287,14 +283,15 @@ class _Page2State extends State<Page2> {
         ),
 
         onMapCreated: (MapboxMapController controller) async {
+          print("jetzt in der onMapCreated");
           //Acquire current location (returns the LatLong instance)
-          final result = await acquireCurrentLocation();
+          ownLocationLatLng = (await acquireCurrentLocation())!;
 
           // You can either use the moveCamera or animateCamera, but the former
           // causes a sudden movement from the initial to 'new' camera position,
           // while animateCamera gives a smooth animated transition
           await controller.animateCamera(
-            CameraUpdate.newLatLng(result!),
+            CameraUpdate.newLatLng(ownLocationLatLng),
           );
 
           await controller.addCircle(
@@ -302,12 +299,15 @@ class _Page2State extends State<Page2> {
               circleRadius: 8.0,
               circleColor: myColorCircle,
               circleOpacity: 0.8,
-              geometry: result,
+              geometry: ownLocationLatLng,
               draggable: false,
             ),
           );
           userCircle = controller.circles.first;
-          friendLocationListLatLng = await acquireOthersLocation();
+          friendLocationListLatLng = await acquireOthersLocation(ownLocationLatLng);
+
+          print("JEtzt locations");
+          print(friendLocationListLatLng);
 
           for(var i=0; i<friendLocationListLatLng.length;i++){
             await controller.addCircle(
@@ -315,7 +315,7 @@ class _Page2State extends State<Page2> {
                 circleRadius: 8.0,
                 circleColor: otherColorCircle,
                 circleOpacity: 0.8,
-                geometry: friendLocationListLatLng[i],
+                geometry: LatLng(friendLocationListLatLng[i]['Lon'], friendLocationListLatLng[i]['Lat']),
                 draggable: false,
               ),
             );
@@ -327,8 +327,8 @@ class _Page2State extends State<Page2> {
         },
 
       ),
-);
+    );
 
 
-}
+  }
 }

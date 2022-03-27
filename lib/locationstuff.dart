@@ -1,7 +1,12 @@
+import 'dart:convert';
 import 'dart:math';
 import 'package:location/location.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import "package:latlong2/latlong.dart" as latLng;
+import 'package:http/http.dart' as http;
+import 'package:convert/convert.dart';
+import 'package:untitled/loginScreen.dart';
+import 'package:untitled/signUpScreen.dart';
 
 
 Future<LatLng?> acquireCurrentLocation() async {
@@ -41,15 +46,53 @@ Future<LatLng?> acquireCurrentLocation() async {
 }
 
 
-Future<List> acquireOthersLocation() async {
+Future<List<dynamic>> acquireOthersLocation(LatLng myLocation) async {
+  print("Jetzt otherlocation function");
   //Connect to Server and get the location from the people
   var latlongs = [];
   var rng = Random();
 
+  //myLocation = LatLng(55,55);
 
-  latlongs.add(LatLng(rng.nextDouble() * 90,rng.nextDouble() * 90));
+  //latlongs.add(LatLng(rng.nextDouble() * 90,rng.nextDouble() * 90));
+  //latlongs.add(LatLng(rng.nextDouble() * 90,rng.nextDouble() * 90));
 
-  latlongs.add(LatLng(rng.nextDouble() * 90,rng.nextDouble() * 90));
+  latlongs = await requestServerFriendPos("http://185.5.199.33:30000/UPDATE_GPS", myLocation);
+  print("Jetzt die latlongs bekommen");
+  print(latlongs);
+
 
   return latlongs;
+}
+Future<List<dynamic>> requestServerFriendPos(String name, LatLng myLocation) async{
+  String username = MyLoginWidget2.username;
+  String token = MyLoginWidget2.token;
+
+  print("Jetzt in der requestServer");
+  print(MyLoginWidget2.token);
+  print(MyLoginWidget2.username);
+
+  if(token == "") token = MySignupWidget2.token;
+  if(username == "") username = MySignupWidget2.username;
+
+  var body = {
+    "username":"${token}",
+    "token":"${username}",
+    "lon": "${myLocation.longitude}",
+    "lat": "${myLocation.latitude}",
+    "toNotify":"-"
+  };
+
+  var client = new http.Client();
+  var uri = Uri.parse(name);
+  http.Response res = await client.post(uri, body: body);
+  var list = jsonDecode(res.body);
+  //Da steht dann drinnen: lon, lat
+
+  print(list.length);
+  print(list[0]);
+  print(list[0]['Lon']);
+  print(list[0]['Lat']);
+
+  return list;
 }

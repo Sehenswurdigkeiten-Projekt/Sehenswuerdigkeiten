@@ -14,13 +14,16 @@ class MySignupWidget extends StatefulWidget {
   const MySignupWidget({Key? key}) : super(key: key);
 
   @override
-  State<MySignupWidget> createState() => _MySignupWidget();
+  State<MySignupWidget> createState() => MySignupWidget2();
 }
 
-class _MySignupWidget extends State<MySignupWidget> {
+class MySignupWidget2 extends State<MySignupWidget> {
   TextEditingController nameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
+
+  static String _username="";
+  static String _token="";
 
   @override
   Widget build(BuildContext context) {
@@ -171,9 +174,9 @@ class _MySignupWidget extends State<MySignupWidget> {
                   ),
                   child: const Text('Sign Up'),
                   onPressed: () async{
-                    bool isCorrect = await checkIfCorrect(nameController.text, passwordController.text, confirmPasswordController.text);
-                    print("BIIIIIITTTTTEEEE: $isCorrect");
-                    if(isCorrect == false) {
+                    List<Object> resArray = await checkIfCorrect(nameController.text, passwordController.text, confirmPasswordController.text);
+                    print("BIIIIIITTTTTEEEE: $resArray");
+                    if(resArray[0] == false) {
                       Alert(
                         type: AlertType.warning,
                         context: context,
@@ -183,6 +186,10 @@ class _MySignupWidget extends State<MySignupWidget> {
                     }
                     else{
                       String jsonString = '{"username":"${nameController.text}","pwd":"${passwordController.text}"}';
+                      var token = resArray[1].toString();
+                      _token = jsonDecode(token)['token'].toString();
+                      _username = nameController.text;
+
 
                       print(jsonString); // Dart
 
@@ -221,6 +228,18 @@ class _MySignupWidget extends State<MySignupWidget> {
   void _navigateToMap(BuildContext context) {
     Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyApp()));
   }
+
+  static String get token => _token;
+
+  static set token(String value) {
+    _token = value;
+  }
+
+  static String get username => _username;
+
+  static set username(String value) {
+    _username = value;
+  }
 }
 class NewScreen extends StatelessWidget {
   @override
@@ -232,13 +251,14 @@ class NewScreen extends StatelessWidget {
   }
 }
 
-Future<bool> checkIfCorrect (String name, String pass, String confPass) async {
+Future<List<Object>> checkIfCorrect (String name, String pass, String confPass) async {
   bool isCorrect = false;
+  late Object token;
 
   print("Name: $name, Pass: $pass, ConfPass: $pass");
   if(pass == confPass && name != "" && pass != "") {
     var resArray = await requestServer(name, pass);
-    Object token = resArray[0];
+    token = resArray[0];
     Object statusCode = resArray[1].toString();
 
     if(statusCode != "400"){
@@ -246,7 +266,10 @@ Future<bool> checkIfCorrect (String name, String pass, String confPass) async {
     }
   }
   print(isCorrect);
-  return isCorrect;
+  var resArray = [isCorrect, token];
+
+
+  return resArray;
 }
 
 Future<List<Object>> requestServer(String name, String pass) async{
