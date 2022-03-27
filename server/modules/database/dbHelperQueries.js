@@ -87,8 +87,8 @@ exports.getTokenAndPasswordFromUsername = async function (username) {
 
     return rows;
 }
-exports.joinUserGroup = async function(groupID, userID){
-    let query2 = "Insert into User_UserGroup(?,?)"
+exports.joinUserGroup = async function(userID, groupID){
+    let query2 = "Insert into User_UserGroup Values(?,?)"
     await promisePool.execute(query2, [userID, groupID]);
 }
 exports.createUserGroup = async function(leaderID, routeID, groupCode){
@@ -96,11 +96,7 @@ exports.createUserGroup = async function(leaderID, routeID, groupCode){
     await promisePool.execute(query, [leaderID, routeID, groupCode])
 
 }
-exports.getGroupidFromLeaderid = async function (leaderID) {
-    const query2 = "Select GroupID from UserGroup where LeaderID = ?"
-    const [rows, fields] = await promisePool.execute(query2, [leaderID]);
-    return rows;
-}
+
 exports.changePassword = async function(username, pwd){
     let query = "UPDATE User set Password = ? where Username = ?"
     await promisePool.execute(query, [pwd, username]);
@@ -142,4 +138,17 @@ exports.getFriendRequestsForUserID = async function(userID){
   const query = "Select b.Username from User_Friendrequests as a join User as b using(UserID) where a.FriendID = ?;";
   const [rows, fields] = await promisePool.execute(query, [userID]);
   return rows;
+}
+exports.checkIfUserIsInGroup = async function(userID, groupID){
+    const query = "Select count(*) as i from User_UserGroup where UserID = ? and GroupID = ?"
+    const [rows, fields] = await promisePool.execute(query, [userID, groupID])
+    if(rows[0].i == 1){
+        return true;
+    }
+    return false;
+}
+exports.leaveGroup = async function(userid, groupid){
+    const query = "Delete from User_UserGroup where UserID = ? and GroupID = ?"
+    await promisePool.execute(query, [userid, groupid]);
+
 }
