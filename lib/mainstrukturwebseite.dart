@@ -256,7 +256,7 @@ class _Page2State extends State<Page2> {
           circleRadius: 8.0,
           circleColor:  otherColorCircle,
           circleOpacity: 0.8,
-          geometry: LatLng(friendLocationListLatLng[i]['Lon'], friendLocationListLatLng[i]['Lat']),
+          geometry: LatLng(friendLocationListLatLng[i]['Lat'], friendLocationListLatLng[i]['Lon']),
           draggable: false,
         ));
       }
@@ -308,14 +308,19 @@ class _Page2State extends State<Page2> {
 
           print("JEtzt locations");
           print(friendLocationListLatLng);
+          var geo;
+          var anzeigen;
 
           for(var i=0; i<friendLocationListLatLng.length;i++){
+            (friendLocationListLatLng[i]['Lat'] == null) ? geo = LatLng(0, 0) : geo = LatLng(friendLocationListLatLng[i]['Lat'], friendLocationListLatLng[i]['Lon']);
+            (friendLocationListLatLng[i]['Lat'] == null) ? anzeigen = 0.0 : anzeigen = 0.8;
+
             await controller.addCircle(
               CircleOptions(
                 circleRadius: 8.0,
                 circleColor: otherColorCircle,
-                circleOpacity: 0.8,
-                geometry: LatLng(friendLocationListLatLng[i]['Lon'], friendLocationListLatLng[i]['Lat']),
+                circleOpacity: anzeigen,
+                geometry: geo,
                 draggable: false,
               ),
             );
