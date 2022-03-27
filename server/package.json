@@ -6,7 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "kill $(ps aux | grep /usr/bin/node | grep -v grep | awk '{print $2}');nodemon server.js",
-    "go": "kill $(ps aux | grep /usr/bin/node | grep -v grep | awk '{print $2}'); node server.js"
+    "go": "kill $(ps aux | grep /usr/bin/node | grep -v grep | awk '{print $2}'); node server.js",
+    "forever": "forever -o out.log -e err.log server.js",
+    "kill": "kill $(ps aux | grep /usr/bin/node | grep -v grep | awk '{print $2}');"
   },
   "keywords": [],
   "author": "",
