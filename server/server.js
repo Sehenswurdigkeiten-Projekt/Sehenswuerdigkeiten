@@ -22,10 +22,10 @@ app.post("/UPDATE_GPS/",urlencodedParser,jsonParser,request.updateGPS)
 app.post("/CREATE_GROUP", urlencodedParser,jsonParser, request.createGroup)
 app.post("/JOIN_GROUP", urlencodedParser,jsonParser, request.joinGroup);
 app.post("/ADD_FRIEND/", urlencodedParser,jsonParser, request.addFriend)
+app.post("/REMOVE_FRIEND", urlencodedParser, jsonParser, request.removeFriend);
+app.post("/GET_FRIENDREQUESTS", urlencodedParser, jsonParser, request.getFriendRequests);
+app.post("/CHANGE_PASSWORD", urlencodedParser, jsonParser, request.changePassword)
 
-app.post("/CHANGE_PASSWORD", urlencodedParser, jsonParser, async function(req, res){
-  let username = req.body.username 
-})
 app.post("/CREATE_ROUTE", urlencodedParser,jsonParser, async function(req,res){
   
 })

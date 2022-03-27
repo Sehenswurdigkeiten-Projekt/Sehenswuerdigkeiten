@@ -1,4 +1,4 @@
-exports.generateToken = async function generateToken(length) 
+exports.generateToken = function generateToken(length) 
 {
     var result           = '';
     var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
