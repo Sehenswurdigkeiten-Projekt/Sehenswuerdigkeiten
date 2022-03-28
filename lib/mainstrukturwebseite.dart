@@ -256,7 +256,7 @@ class _Page2State extends State<Page2> {
 
         mapboxmapcontroller.updateSymbol(friendListSymbols[i], SymbolOptions(
           iconSize: 0.4,
-          iconImage: "assets/icons/friendTestIcon.png",
+          iconImage: "assets/gps_images/${friendLocationListLatLng[i]['Image']}",
           iconOpacity: 0.8,
           textField: "${friendLocationListLatLng[i]["Username"]}",
           textOpacity: 0.8,
@@ -323,7 +323,7 @@ class _Page2State extends State<Page2> {
             await controller.addSymbol(
                 SymbolOptions(
                     iconSize: 0.4,
-                    iconImage: "assets/icons/friendTestIcon.png",
+                    iconImage: "assets/gps_images/${friendLocationListLatLng[i]['Image']}",
                     iconOpacity: 0.8,
                     textField: "${friendLocationListLatLng[i]["Username"]}",
                     textOpacity: 0.8,
