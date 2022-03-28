@@ -368,9 +368,9 @@ class _Page2State extends State<Page2> {
                 SymbolOptions(
                     iconSize: 0.4,
                     iconImage: "assets/gps_images/${friendLocationListLatLng[i]['Image']}",
-                    iconOpacity: 0.8,
+                    iconOpacity: anzeigen,
                     textField: "${friendLocationListLatLng[i]["Username"]}",
-                    textOpacity: 0.8,
+                    textOpacity: anzeigen,
                     textOffset: Offset(0,1),
                     geometry: geo,
                     draggable: false,
