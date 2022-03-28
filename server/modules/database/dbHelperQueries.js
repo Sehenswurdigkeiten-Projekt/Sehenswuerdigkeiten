@@ -77,7 +77,7 @@ exports.updatePOS = async function (lon, lat, userID) {
     return;   
 }
 exports.getFriendPOS = async function (userID) {
-    const query2 = "select c.Lon, c.Lat,c.Username from User join User_Friends as b on User.UserID = b.UserID and User.UserID = ? join User as c on FriendID = c.UserID;"
+    const query2 = "select c.Lon, c.Lat,c.Username, c.Image from User join User_Friends as b on User.UserID = b.UserID and User.UserID = ? join User as c on FriendID = c.UserID;"
     const [rows, fields] = await promisePool.execute(query2, [userID])
     return rows;
 }
