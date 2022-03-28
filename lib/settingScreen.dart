@@ -126,6 +126,8 @@ class _MySettingWidget extends State<MySettingWidget> {
               ),
               onPressed: (){
                 Future.delayed(const Duration(milliseconds: 1000), () {
+                  MyLoginWidget2.token = "";
+                  MyLoginWidget2.username = "";
                   Navigator.pop(context);
                   Navigator.push(context, CupertinoPageRoute(builder: (context) => MyApp1()));
                   //Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyApp1()));
