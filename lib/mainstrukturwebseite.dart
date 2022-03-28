@@ -36,6 +36,9 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int pageIndex = 0;
 
+  Icon customIcon = const Icon(Icons.search);
+  Widget customSearchBar = Text("One Trip");
+
   final pages = [
     MyFriendsWidget(),
     Page2(),
@@ -44,23 +47,64 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    /*
+    customSearchBar = Text (
+      "One Trip",
+      style: TextStyle(
+        color: Theme.of(context).primaryColor,
+        fontSize: 25,
+        fontWeight: FontWeight.w600,
+      ),);
+
+     */
     return Scaffold(
-      backgroundColor: const Color(0xffC4DFCB),
+      //backgroundColor: const Color(0xffC4DFCB),
       appBar: AppBar(
         // leading: Icon(
         //  Icons.menu,
         //   color: Theme.of(context).primaryColor,
         // ),
-        title: Text(
-          "Chefs",
-          style: TextStyle(
-            color: Theme.of(context).primaryColor,
-            fontSize: 25,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+        title: customSearchBar,
+        automaticallyImplyLeading: false,
+        actions: pageIndex == 1 ? [
+          IconButton(
+            onPressed: () {
+              setState(() {
+                if (customIcon.icon == Icons.search) {
+                  customIcon = const Icon(Icons.cancel);
+                  customSearchBar = ListTile(
+                    leading: Icon(
+                      Icons.search,
+                      color: Colors.white,
+                      size: 28,
+                    ),
+                    title: TextField(
+                      decoration: InputDecoration(
+                        hintText: 'type in city name...',
+                        hintStyle: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontStyle: FontStyle.italic,
+                        ),
+                        border: InputBorder.none,
+                      ),
+                      style: TextStyle(
+                          color: Colors.white,
+                      ),
+                    ),
+                  );
+                }  else {
+                  customIcon = const Icon(Icons.search);
+                  customSearchBar = const Text('One Trip');
+                }
+              });
+            },
+            icon: customIcon,
+
+          )
+        ] : null,
         centerTitle: true,
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).primaryColor,
       ),
       body: pages[pageIndex],
       bottomNavigationBar: buildMyNavBar(context),
