@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:untitled/addFriendScreen.dart';
 import 'package:untitled/settingScreen.dart'; import 'locationstuff.dart';
 
 
@@ -36,7 +37,7 @@ class _HomePageState extends State<HomePage> {
   int pageIndex = 0;
 
   final pages = [
-    const Page1(),
+    MyFriendsWidget(),
     Page2(),
     MySettingWidget(),
   ];
