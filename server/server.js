@@ -27,7 +27,6 @@ app.post("/GET_FRIENDREQUESTS", urlencodedParser, jsonParser, request.getFriendR
 app.post("/CHANGE_PASSWORD", urlencodedParser, jsonParser, request.changePassword)
 app.post("/DELETE_GROUP", urlencodedParser, jsonParser, request.delteGroup)
 app.post("/LEAVE_GROUP", urlencodedParser, jsonParser, request.leaveGroup)
-
 app.post("/CREATE_ROUTE", urlencodedParser,jsonParser, async function(req,res){
   
 })
