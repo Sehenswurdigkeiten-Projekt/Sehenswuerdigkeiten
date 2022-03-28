@@ -60,8 +60,14 @@ exports.updateGPS = async function(req, res){
     let lat = parseFloat(req.body.lat)
 
     await db.updatePOS(lon, lat, userID)
-    rows = await db.getFriendPOS(userID)
-    res.status(200).send(rows);
+    if(toNotify == "-"){
+      rows = await db.getFriendPOS(userID)
+      res.status(200).send(rows);
+    }
+    else{
+      let ids = toNotify.split(",")
+    }
+
   }
   else{
     console.log("[SERVER %s]: not a valid token for user("+username+")", dateTime());
