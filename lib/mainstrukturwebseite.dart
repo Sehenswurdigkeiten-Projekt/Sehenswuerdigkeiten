@@ -4,9 +4,9 @@ import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:untitled/settingScreen.dart'; import 'locationstuff.dart';
 
 
-class MyApp extends StatelessWidget {
+class MyApp2 extends StatelessWidget {
 
-  MyApp({Key? key}) : super(key: key);
+  MyApp2({Key? key}) : super(key: key);
 
 // This widget is the root of your application.
   @override

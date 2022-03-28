@@ -226,7 +226,7 @@ class MySignupWidget2 extends State<MySignupWidget> {
     Navigator.pop(context);
   }
   void _navigateToMap(BuildContext context) {
-    Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyApp()));
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyApp2()));
   }
 
   static String get token => _token;

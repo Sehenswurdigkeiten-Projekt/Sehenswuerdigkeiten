@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:untitled/loginScreen.dart';
 import 'package:untitled/main.dart';
+import 'package:untitled/mainstrukturwebseite.dart';
 import 'package:untitled/mapboxAnzeige.dart';
 import 'package:untitled/signUpScreen.dart';
 import 'package:http/http.dart' as http;
@@ -126,6 +127,7 @@ class _MySettingWidget extends State<MySettingWidget> {
               onPressed: (){
                 Future.delayed(const Duration(milliseconds: 1000), () {
                   Navigator.pop(context);
+                  //Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyApp1()));
                 });
               },
               child: const Text(

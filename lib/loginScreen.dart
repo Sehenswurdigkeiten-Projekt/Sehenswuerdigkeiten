@@ -192,7 +192,7 @@ class MyLoginWidget2 extends State<MyLoginWidget> {
     Navigator.of(context).push(MaterialPageRoute(builder: (context) => NewScreen()));
   }
   void _navigateToMap(BuildContext context) {
-    Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyApp()));
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyApp2()));
   }
 
   static String get token => _token;
