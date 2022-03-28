@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:mapbox_gl/mapbox_gl.dart'; import 'locationstuff.dart';
+import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:untitled/settingScreen.dart'; import 'locationstuff.dart';
 
 
 class MyApp extends StatelessWidget {
@@ -37,7 +38,7 @@ class _HomePageState extends State<HomePage> {
   final pages = [
     const Page1(),
     Page2(),
-    const Page3(),
+    MySettingWidget(),
   ];
 
   @override

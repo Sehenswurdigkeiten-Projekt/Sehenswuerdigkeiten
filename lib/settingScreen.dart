@@ -1,16 +1,19 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:untitled/loginScreen.dart';
 import 'package:untitled/main.dart';
 import 'package:untitled/mapboxAnzeige.dart';
 import 'package:untitled/signUpScreen.dart';
+import 'package:http/http.dart' as http;
 
 class MySettingWidget extends StatefulWidget {
   MySettingWidget({Key? key}) : super(key: key);
 
-  final TextEditingController themeController = TextEditingController();
 
   @override
   State<MySettingWidget> createState() => _MySettingWidget();
@@ -19,6 +22,10 @@ class MySettingWidget extends StatefulWidget {
 final settings = MySettingWidget();
 
 class _MySettingWidget extends State<MySettingWidget> {
+
+  TextEditingController changePass = TextEditingController();
+  TextEditingController changePassConf = TextEditingController();
+
   bool valNotify1 = true;
   bool valNotify2 = false;
   bool valNotify3 = false;
@@ -80,7 +87,7 @@ class _MySettingWidget extends State<MySettingWidget> {
           ),
           Divider(height: 20, thickness: 1, color: Colors.grey[400]),
           SizedBox(height: 10),
-          buildAccountOption(context, "Change Password"),
+          buildAccountOptionPwd(context, "Change Password"),
           buildAccountOption(context, "Language"),
           buildAccountOption(context, "Privacy and Security"),
           SizedBox(height: 40),
@@ -103,9 +110,9 @@ class _MySettingWidget extends State<MySettingWidget> {
           ),
           Divider(height: 20, thickness: 1, color: Colors.grey[400]),
           SizedBox(height: 49),
-          buildNotificationOption("Theme Dark", valNotify1, onChangeFunction1),
-          buildNotificationOption("Text 1", valNotify2, onChangeFunction2),
-          buildNotificationOption("Text 2", valNotify3, onChangeFunction3),
+          buildNotificationOption("Text 1", valNotify1, onChangeFunction1),
+          buildNotificationOption("Text 2", valNotify2, onChangeFunction2),
+          buildNotificationOption("Text 3", valNotify3, onChangeFunction3),
           SizedBox(height: 50),
           Center(
             child: OutlinedButton(
@@ -118,7 +125,7 @@ class _MySettingWidget extends State<MySettingWidget> {
               ),
               onPressed: (){
                 Future.delayed(const Duration(milliseconds: 1000), () {
-                  Navigator.pop(context, MyLoginWidget());
+                  Navigator.pop(context);
                 });
               },
               child: const Text(
@@ -183,7 +190,11 @@ class _MySettingWidget extends State<MySettingWidget> {
                   onPressed: (){
                     Navigator.of(context).pop();
                   },
-                  child: Text("Close")
+                  child: const Text(
+                      "Close",
+                      style: TextStyle(
+                        color: Color(0xff2F8D46),
+                      ))
               )
             ],
           );
@@ -205,4 +216,187 @@ class _MySettingWidget extends State<MySettingWidget> {
       ),
     );
   }
+
+  GestureDetector buildAccountOptionPwd(BuildContext context, String title){
+
+    return GestureDetector(
+      onTap: (){
+        showDialog(context: context, builder: (BuildContext context){
+          return AlertDialog(
+            title: Text(title),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  autofocus: false,
+                  obscureText: true,
+                  cursorColor: const Color(0xff9a9a9a),
+                  //maxLength: 20,
+
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.allow(RegExp("[A-Za-zÀÁÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿÆÐƎƏƐƔĲŊŒẞÞǷȜæðǝəɛɣĳŋœĸſßþƿȝĄƁÇĐƊĘĦĮƘŁØƠŞȘŢȚŦŲƯY̨Ƴąɓçđɗęħįƙłøơşșţțŧųưy̨ƴÁÀÂÄǍĂĀÃÅǺĄÆǼǢƁĆĊĈČÇĎḌĐƊÐÉÈĖÊËĚĔĒĘẸƎƏƐĠĜǦĞĢƔáàâäǎăāãåǻąæǽǣɓćċĉčçďḍđɗðéèėêëěĕēęẹǝəɛġĝǧğģɣĤḤĦIÍÌİÎÏǏĬĪĨĮỊĲĴĶƘĹĻŁĽĿʼNŃN̈ŇÑŅŊÓÒÔÖǑŎŌÕŐỌØǾƠŒĥḥħıíìiîïǐĭīĩįịĳĵķƙĸĺļłľŀŉńn̈ňñņŋóòôöǒŏōõőọøǿơœŔŘŖŚŜŠŞȘṢẞŤŢṬŦÞÚÙÛÜǓŬŪŨŰŮŲỤƯẂẀŴẄǷÝỲŶŸȲỸƳŹŻŽẒŕřŗſśŝšşșṣßťţṭŧþúùûüǔŭūũűůųụưẃẁŵẅƿýỳŷÿȳỹƴźżžẓ0-9\$!#%&'*+,-./:;<=>?@^_`|~]")),
+                  ],
+
+                  controller: changePass,
+
+                  decoration: const InputDecoration(
+                    suffixIcon: Icon(
+                      Icons.password,
+                      color: Color(0xff9a9a9a),
+                    ),
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xff2F8D46)),
+                    ),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xff2F8D46)),
+                    ),
+                    labelText: 'Password',
+                    labelStyle: TextStyle(
+                      color: Color(0xff9a9a9a),
+                    ),
+                  ),
+                ),
+
+                TextField(
+                  autofocus: false,
+                  obscureText: true,
+                  cursorColor: const Color(0xff9a9a9a),
+                  maxLength: 20,
+
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.allow(RegExp("[A-Za-zÀÁÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿÆÐƎƏƐƔĲŊŒẞÞǷȜæðǝəɛɣĳŋœĸſßþƿȝĄƁÇĐƊĘĦĮƘŁØƠŞȘŢȚŦŲƯY̨Ƴąɓçđɗęħįƙłøơşșţțŧųưy̨ƴÁÀÂÄǍĂĀÃÅǺĄÆǼǢƁĆĊĈČÇĎḌĐƊÐÉÈĖÊËĚĔĒĘẸƎƏƐĠĜǦĞĢƔáàâäǎăāãåǻąæǽǣɓćċĉčçďḍđɗðéèėêëěĕēęẹǝəɛġĝǧğģɣĤḤĦIÍÌİÎÏǏĬĪĨĮỊĲĴĶƘĹĻŁĽĿʼNŃN̈ŇÑŅŊÓÒÔÖǑŎŌÕŐỌØǾƠŒĥḥħıíìiîïǐĭīĩįịĳĵķƙĸĺļłľŀŉńn̈ňñņŋóòôöǒŏōõőọøǿơœŔŘŖŚŜŠŞȘṢẞŤŢṬŦÞÚÙÛÜǓŬŪŨŰŮŲỤƯẂẀŴẄǷÝỲŶŸȲỸƳŹŻŽẒŕřŗſśŝšşșṣßťţṭŧþúùûüǔŭūũűůųụưẃẁŵẅƿýỳŷÿȳỹƴźżžẓ0-9\$!#%&'*+,-./:;<=>?@^_`|~]")),
+                  ],
+
+                  controller: changePassConf,
+
+                  decoration: const InputDecoration(
+                    suffixIcon: Icon(
+                      Icons.password,
+                      color: Color(0xff9a9a9a),
+                    ),
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xff2F8D46)),
+                    ),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xff2F8D46)),
+                    ),
+                    labelText: 'Confirm Password',
+                    labelStyle: TextStyle(
+                      color: Color(0xff9a9a9a),
+                    ),
+                  ),
+                )
+              ],
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () async{
+                    bool isCorrect = await checkIfCorrect(changePass.text, changePassConf.text);
+                    if (isCorrect == false){
+                      Alert(
+                        type: AlertType.warning,
+                        context: context,
+                        title: "Something is wrong!",
+                        desc: "Please correct it!",
+                      ).show();
+                    }
+                    else{
+                      print(changePass.text);
+                      print(changePassConf.text);
+
+                      changePass.text = "";
+                      changePassConf.text = "";
+
+                      Navigator.of(context).pop();
+                    }
+                  },
+                  child: const Text(
+                      "Save",
+                      style: TextStyle(
+                        color: Color(0xff2F8D46),
+                      ))
+              ),
+              TextButton(
+                  onPressed: (){
+                    changePass.text = "";
+                    changePassConf.text = "";
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text(
+                    "Close",
+                    style: TextStyle(
+                      color: Color(0xff2F8D46),
+                    ))
+              )
+            ],
+          );
+        });
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(title, style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey[600]
+            )),
+            Icon(Icons.arrow_forward_ios, color: Colors.grey)
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+Future<bool> checkIfCorrect (String pass, String passConf) async {
+  bool isCorrect = false;
+  late Object token;
+  late Object statusCode;
+
+  if (pass != "" && passConf != "" && pass == passConf){
+    var resArray = await requestServer(pass, passConf);
+    token = resArray[0];
+    statusCode = resArray[1].toString();
+
+    if(statusCode == "200"){
+      isCorrect = true;
+    }
+    print("DA!");
+    print("TOKEN OBJ: $token");
+    print("STATUSCODE: $statusCode");
+  }
+
+  return isCorrect;
+}
+
+Future<List<Object>> requestServer(String name, String pass) async{
+  String username = MyLoginWidget2.username;
+  String token = MyLoginWidget2.token;
+
+  print("Jetzt in der requestServer");
+  print(MyLoginWidget2.token);
+  print(MyLoginWidget2.username);
+
+  if(token == "") token = MySignupWidget2.token;
+  if(username == "") username = MySignupWidget2.username;
+
+  var body = {
+    "username":username,
+    "token":token,
+    "pwd":pass
+  };
+
+  var address = 'http://185.5.199.33:30000';
+
+  var client = new http.Client();
+  var uri = Uri.parse("$address/change_password");
+  http.Response res = await client.post(uri, body: body);
+
+  var resArray = [res.body, res.statusCode];
+
+  print("RESARRAY: $resArray");
+
+  return resArray;
 }
