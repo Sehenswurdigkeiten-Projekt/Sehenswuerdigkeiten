@@ -330,11 +330,12 @@ class _Page2State extends State<Page2> {
           }
 
           await controller.addSymbol(SymbolOptions(
-            iconSize: 1,
-            iconImage: "assets/icons/logo3.jpg",
-            iconOpacity: 1,
-            textField: "SymbolTest",
-            textOpacity: 1,
+            iconSize: 0.4,
+            iconImage: "assets/icons/friendTestIcon.png",
+            iconOpacity: 0.8,
+            textField: "Friend1",
+            textOpacity: 0.8,
+            textOffset: Offset(0,1),
             geometry: ownLocationLatLng
           ));
 
