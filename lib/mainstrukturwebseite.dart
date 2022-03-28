@@ -1,12 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:untitled/addFriendScreen.dart';
 import 'package:untitled/settingScreen.dart'; import 'locationstuff.dart';
 
 
-class MyApp extends StatelessWidget {
+class MyApp2 extends StatelessWidget {
 
-  MyApp({Key? key}) : super(key: key);
+  MyApp2({Key? key}) : super(key: key);
 
 // This widget is the root of your application.
   @override
@@ -36,7 +37,7 @@ class _HomePageState extends State<HomePage> {
   int pageIndex = 0;
 
   final pages = [
-    const Page1(),
+    MyFriendsWidget(),
     Page2(),
     MySettingWidget(),
   ];
@@ -221,7 +222,7 @@ class _Page2State extends State<Page2> {
   var myColorCircle = '#006992';
   var otherColorCircle = '#009229';
   late Circle userCircle;
-  late List friendListCircle = [];
+  late List friendListSymbols = [];
   final String token = 'pk.eyJ1Ijoic2VoZW5zd3VlcmRpZ2tlaXRlbi1wcm9qIiwiYSI6ImNsMTBuY2E4djAwNjkzYm5zdjIwY3RpY3cifQ.blnV9_r4xomVn57TX0-i_g';
   final String style = 'mapbox://styles/sehenswuerdigkeiten-proj/cl11y8pv5000f14m4pbcb826y';
 
@@ -250,13 +251,16 @@ class _Page2State extends State<Page2> {
       if(mapboxmapcontroller == null) return;
       print("Other Location Loading");
       friendLocationListLatLng = (await acquireOthersLocation(ownLocationLatLng));
-      for(var i=0; i<friendListCircle.length; i++){
+      for(var i=0; i<friendListSymbols.length; i++){
         if(friendLocationListLatLng[i]['Lon'] == null || friendLocationListLatLng[i]['Lat'] == null) continue;
 
-        mapboxmapcontroller.updateCircle(friendListCircle[i], CircleOptions(
-          circleRadius: 8.0,
-          circleColor:  otherColorCircle,
-          circleOpacity: 0.8,
+        mapboxmapcontroller.updateSymbol(friendListSymbols[i], SymbolOptions(
+          iconSize: 0.4,
+          iconImage: "assets/icons/friendTestIcon.png",
+          iconOpacity: 0.8,
+          textField: "${friendLocationListLatLng[i]["Username"]}",
+          textOpacity: 0.8,
+          textOffset: Offset(0,1),
           geometry: LatLng(friendLocationListLatLng[i]['Lat'], friendLocationListLatLng[i]['Lon']),
           draggable: false,
         ));
@@ -316,29 +320,21 @@ class _Page2State extends State<Page2> {
             (friendLocationListLatLng[i]['Lat'] == null) ? geo = LatLng(0, 0) : geo = LatLng(friendLocationListLatLng[i]['Lat'], friendLocationListLatLng[i]['Lon']);
             (friendLocationListLatLng[i]['Lat'] == null) ? anzeigen = 0.0 : anzeigen = 0.8;
 
-            await controller.addCircle(
-              CircleOptions(
-                circleRadius: 8.0,
-                circleColor: otherColorCircle,
-                circleOpacity: anzeigen,
-                geometry: geo,
-                draggable: false,
-              ),
+            await controller.addSymbol(
+                SymbolOptions(
+                    iconSize: 0.4,
+                    iconImage: "assets/icons/friendTestIcon.png",
+                    iconOpacity: 0.8,
+                    textField: "${friendLocationListLatLng[i]["Username"]}",
+                    textOpacity: 0.8,
+                    textOffset: Offset(0,1),
+                    geometry: geo,
+                    draggable: false,
+                )
             );
 
-            friendListCircle.add(controller.circles.last);
+            friendListSymbols.add(controller.symbols.last);
           }
-
-          await controller.addSymbol(SymbolOptions(
-            iconSize: 1,
-            iconImage: "assets/icons/logo3.jpg",
-            iconOpacity: 1,
-            textField: "SymbolTest",
-            textOpacity: 1,
-            geometry: ownLocationLatLng
-          ));
-
-
 
           print("JETZT IST DIE oinMAPLOADIng function fertig");
           mapboxmapcontroller = controller;
