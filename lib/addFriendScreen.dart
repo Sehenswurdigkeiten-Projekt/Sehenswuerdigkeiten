@@ -1,9 +1,11 @@
-import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
+import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:untitled/loginScreen.dart';
+import 'package:untitled/signUpScreen.dart';
 
 class MyFriendsWidget extends StatefulWidget {
   MyFriendsWidget({Key? key}) : super(key: key);
@@ -14,6 +16,9 @@ class MyFriendsWidget extends StatefulWidget {
 }
 
 class _MyFriendsWidget extends State<MyFriendsWidget> {
+
+  TextEditingController friendsName = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -51,6 +56,7 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
           Divider(height: 20, thickness: 1, color: Colors.grey[400]),
           SizedBox(height: 10),
           buildFriendOptionAdd(context, "Add Friends"),
+          buildFriendOptionRequests(context, "Show Friend Requests"),
           buildFriendOptionShow(context, "Show Friends"),
           SizedBox(height: 40),
         ]
@@ -70,7 +76,9 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
                 TextField(
                   autofocus: false,
                   cursorColor: const Color(0xff9a9a9a),
-                  //maxLength: 20,
+                  maxLength: 20,
+
+                  controller: friendsName,
 
                   inputFormatters: <TextInputFormatter>[
                     FilteringTextInputFormatter.allow(RegExp('[A-Za-zÀÁÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿÆÐƎƏƐƔĲŊŒẞÞǷȜæðǝəɛɣĳŋœĸſßþƿȝĄƁÇĐƊĘĦĮƘŁØƠŞȘŢȚŦŲƯY̨Ƴąɓçđɗęħįƙłøơşșţțŧųưy̨ƴÁÀÂÄǍĂĀÃÅǺĄÆǼǢƁĆĊĈČÇĎḌĐƊÐÉÈĖÊËĚĔĒĘẸƎƏƐĠĜǦĞĢƔáàâäǎăāãåǻąæǽǣɓćċĉčçďḍđɗðéèėêëěĕēęẹǝəɛġĝǧğģɣĤḤĦIÍÌİÎÏǏĬĪĨĮỊĲĴĶƘĹĻŁĽĿʼNŃN̈ŇÑŅŊÓÒÔÖǑŎŌÕŐỌØǾƠŒĥḥħıíìiîïǐĭīĩįịĳĵķƙĸĺļłľŀŉńn̈ňñņŋóòôöǒŏōõőọøǿơœŔŘŖŚŜŠŞȘṢẞŤŢṬŦÞÚÙÛÜǓŬŪŨŰŮŲỤƯẂẀŴẄǷÝỲŶŸȲỸƳŹŻŽẒŕřŗſśŝšşșṣßťţṭŧþúùûüǔŭūũűůųụưẃẁŵẅƿýỳŷÿȳỹƴźżžẓ0-9_.-]')),
@@ -79,7 +87,7 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
 
                   decoration: const InputDecoration(
                     suffixIcon: Icon(
-                      Icons.add,
+                      Icons.person_add,
                       color: Color(0xff9a9a9a),
                     ),
                     enabledBorder: UnderlineInputBorder(
@@ -88,18 +96,43 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
                     focusedBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: Color(0xff2F8D46)),
                     ),
-                    labelText: 'Password',
+                    labelText: 'Friend Name',
                     labelStyle: TextStyle(
                       color: Color(0xff9a9a9a),
                     ),
                   ),
                 ),
-                Text("Option 2")
               ],
             ),
             actions: [
               TextButton(
+                  onPressed: () async {
+                    bool isCorrect = await checkIfCorrect(friendsName.text);
+                    if(isCorrect == false){
+                      Alert(
+                        type: AlertType.warning,
+                        context: context,
+                        title: "Something is wrong!",
+                        desc: "Please correct it!",
+                      ).show();
+                    }
+                    else{
+                      print(friendsName.text);
+
+                      friendsName.text = "";
+
+                      Navigator.of(context).pop();
+                    }
+                  },
+                  child: const Text(
+                      "Add",
+                      style: TextStyle(
+                        color: Color(0xff2F8D46),
+                      ))
+              ),
+              TextButton(
                   onPressed: (){
+                    friendsName.text = "";
                     Navigator.of(context).pop();
                   },
                   child: const Text(
@@ -173,4 +206,186 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
       ),
     );
   }
+
+  GestureDetector buildFriendOptionRequests(BuildContext context, String title){
+    return GestureDetector(
+      onTap: (){
+        showDialog(context: context, builder: (BuildContext context){
+          return AlertDialog(
+            title: Text(title),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "Friends",
+                  textAlign: TextAlign.left,
+                  style: TextStyle(
+                    fontSize: 18,
+                  ),
+                ),
+                TextButton(
+                    onPressed: (){},
+                    child: Text(
+                      "Add"
+                    )
+                ),
+                TextButton(
+                    onPressed: (){},
+                    child: Text(
+                        "Decline"
+                    )
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () async {
+                    bool isCorrect = await checkIfCorrectRequest();
+                    if(isCorrect == false){
+                      Alert(
+                        type: AlertType.warning,
+                        context: context,
+                        title: "Something is wrong!",
+                        desc: "Please correct it!",
+                      ).show();
+                    }
+                    else{
+                      print(friendsName.text);
+
+                      friendsName.text = "";
+
+                      Navigator.of(context).pop();
+                    }
+                  },
+                  child: const Text(
+                      "Add",
+                      style: TextStyle(
+                        color: Color(0xff2F8D46),
+                      ))
+              ),
+              TextButton(
+                  onPressed: (){
+                    friendsName.text = "";
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text(
+                      "Close",
+                      style: TextStyle(
+                        color: Color(0xff2F8D46),
+                      ))
+              )
+            ],
+          );
+        });
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(title, style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey[600]
+            )),
+            Icon(Icons.arrow_forward_ios, color: Colors.grey)
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+Future<bool> checkIfCorrect (String friend) async {
+  bool isCorrect = false;
+  late Object token;
+
+  print("Friend: $friend");
+  if(friend != "") {
+    var resArray = await requestServer(friend);
+    token = resArray[0];
+    Object statusCode = resArray[1].toString();
+
+    if(statusCode != "403"){
+      isCorrect = true;
+    }
+  }
+  print(isCorrect);
+
+  return isCorrect;
+}
+
+Future<List<Object>> requestServer(String friend) async{
+  String username = MyLoginWidget2.username;
+  String token = MyLoginWidget2.token;
+
+  print("Jetzt in der requestServer");
+  print(MyLoginWidget2.token);
+  print(MyLoginWidget2.username);
+
+  if(token == "") token = MySignupWidget2.token;
+  if(username == "") username = MySignupWidget2.username;
+
+  var body = {
+    "username":username,
+    "friend":friend,
+    "token":token,
+  };
+
+  var address = 'http://185.5.199.33:30000';
+
+  var client = new http.Client();
+  var uri = Uri.parse("$address/add_friend");
+  http.Response res = await client.post(uri, body: body);
+
+  var resArray = [res.body, res.statusCode];
+
+  print("RESARRAY: $resArray");
+
+  return resArray;
+}
+
+Future<bool> checkIfCorrectRequest () async {
+  bool isCorrect = false;
+  late Object token;
+
+  var resArray = await requestServerRequests();
+  token = resArray[0];
+  Object statusCode = resArray[1].toString();
+
+  if(statusCode != "404"){
+    isCorrect = true;
+  }
+  print(isCorrect);
+
+  return isCorrect;
+}
+
+Future<List<Object>> requestServerRequests() async{
+  String username = MyLoginWidget2.username;
+  String token = MyLoginWidget2.token;
+
+  print("Jetzt in der requestServer");
+  print(MyLoginWidget2.token);
+  print(MyLoginWidget2.username);
+
+  if(token == "") token = MySignupWidget2.token;
+  if(username == "") username = MySignupWidget2.username;
+
+  var body = {
+    "username":username,
+    "token":token,
+  };
+
+  var address = 'http://185.5.199.33:30000';
+
+  var client = new http.Client();
+  var uri = Uri.parse("$address/get_requests");
+  http.Response res = await client.post(uri, body: body);
+
+  var resArray = [res.body, res.statusCode];
+
+  print("RESARRAY: $resArray");
+
+  return resArray;
 }
