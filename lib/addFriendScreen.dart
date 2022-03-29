@@ -111,13 +111,14 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
                   onPressed: () async {
                     String username = MyLoginWidget2.username;
                     bool isCorrect = await checkIfCorrect(friendsName.text);
-                    if(isCorrect == false || friendsName.text != username){
+                    if(isCorrect == false || friendsName.text == username){
                       Alert(
                         type: AlertType.warning,
                         context: context,
                         title: "Something is wrong!",
                         desc: "Please correct it!",
                       ).show();
+                      friendsName.text = "";
                     }
                     else{
                       print(friendsName.text);
@@ -214,6 +215,10 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
     return GestureDetector(
       onTap: () async {
         var friendReqName = await checkIfCorrectRequest();
+        print("IST NULL? = ${friendReqName[1]}");
+        if(friendReqName[1] == null){
+          friendReqName[1] = "No new friend requests!";
+        }
         showDialog(context: context, builder: (BuildContext context){
           return AlertDialog(
             title: Text(title),
@@ -297,9 +302,10 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
 Future<bool> checkIfCorrect (String friend) async {
   bool isCorrect = false;
   late Object token;
+  String username = MyLoginWidget2.username;
 
   print("Friend: $friend");
-  if(friend != "") {
+  if(friend != "" && friend != username) {
     var resArray = await requestServer(friend);
     token = resArray[0];
     Object statusCode = resArray[1].toString();
