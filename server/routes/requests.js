@@ -4,16 +4,33 @@ const dateTime = require('../modules/dateHelper').getDateTime;
 const db = require("../modules/database/dbHelperQueries");
 const {generateToken, checkIfValidInput} = require('./requestHelper')
 
+exports.updateImage = async function(req, res){
+  let username = req.body.username
+  let token = req.body.token;
+  let imageStr = req.body.image;
+
+  if(await db.validateToken(token, username)){
+    let rows = await db.updateImage(await db.getUseridFromUsername(username), imageStr)
+    res.status(200).send("Updated")
+    console.log("[SERVER %s]: Updated Image for user:" + username, dateTime());
+    return;
+  }
+  console.log("[SERVER %s]: Failed to Update Image for user:" + username, dateTime());
+  res.statusMessage = "Failed to update image";
+  res.status(411).end()
+}
+
 exports.getFriends = async function(req, res){
   let username = req.body.username
   let token = req.body.token;
   if(await db.validateToken(token, username)){
-    let rows = db.getFriends(await db.getUseridFromUsername(username))
+    let rows = await db.getFriends(await db.getUseridFromUsername(username))
+    console.log(rows);
     res.status(200).send(rows)
-    console.log("[SERVER %s]: Sending Friends to user:" + user, dateTime());
+    console.log("[SERVER %s]: Sending Friends to user:" + username, dateTime());
     return;
   }
-  console.log("[SERVER %s]: Failed to get Friends for user:" + user, dateTime());
+  console.log("[SERVER %s]: Failed to get Friends for user:" + username, dateTime());
   res.statusMessage = "Failed to get Friends";
   res.status(410).end()
 }

@@ -1,12 +1,17 @@
 const promisePool = require("./db").getPromisePool();
 
 exports.getFriends = async function getFriends(userID){
-    const query = "Select b.Username from User_Friends as a join User as b on UserID = UserID and UserID = ?"
-    const[rows, friends] = await promisePool.execute(query, [userID])
+    const query = "Select b.Username from User_Friends as a join User as b on b.UserID = a.FriendID and a.UserID = ?;"
+    const[rows, fields] = await promisePool.execute(query, [userID])
 
     return rows;
 }      
 
+exports.updateImage = async function updateImage(userID, imageStr){
+    const query = "Update User set Image = ? where UserID = ?"
+    const[rows, fields] = await promisePool.execute(query, [imageStr, userID]);
+    return rows;
+}
 exports.checkGroupCode = async function check_group_code(code)
 {
     const query = "Select count(*) as i from UserGroup where GroupCode = ?"

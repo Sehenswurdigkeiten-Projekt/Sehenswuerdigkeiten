@@ -31,6 +31,7 @@ app.post("/CREATE_ROUTE", urlencodedParser,jsonParser, async function(req,res){
   
 })
 app.post("/GET_FRIENDS", urlencodedParser, jsonParser, request.getFriends)
+app.post("/UPDATE_IMAGE", urlencodedParser, jsonParser, request.updateImage)
 app.post("/SET_GROUP_ROUTE", urlencodedParser, jsonParser, async function(req, res){
 
 })
