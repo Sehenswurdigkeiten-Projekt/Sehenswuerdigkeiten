@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:untitled/ImageGpsViewer.dart';
 import 'package:untitled/loginScreen.dart';
 import 'package:untitled/main.dart';
 import 'package:untitled/mainstrukturwebseite.dart';
@@ -94,12 +96,12 @@ class _MySettingWidget extends State<MySettingWidget> {
           Row(
             children: const [
               Icon(
-                  Icons.volume_up_outlined,
+                  Icons.image,
                   color: Color(0xff2F8D46)
               ),
               SizedBox(width: 10),
               Text(
-                "Notifications",
+                "Profile Picture",
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
@@ -110,10 +112,28 @@ class _MySettingWidget extends State<MySettingWidget> {
           ),
           Divider(height: 20, thickness: 1, color: Colors.grey[400]),
           SizedBox(height: 49),
-          buildNotificationOption("Text 1", valNotify1, onChangeFunction1),
-          buildNotificationOption("Text 2", valNotify2, onChangeFunction2),
-          buildNotificationOption("Text 3", valNotify3, onChangeFunction3),
-          SizedBox(height: 50),
+          Center(
+            child: OutlinedButton(
+              style: OutlinedButton.styleFrom(
+                  side: BorderSide(color: Color(0xffBDBDBD)),
+                  padding: const EdgeInsets.symmetric(horizontal: 40),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20)
+                  )
+              ),
+              onPressed: (){
+                Navigator.push(context, CupertinoPageRoute(builder: (context) => MyApp3()));
+              },
+              child: const Text(
+                  "Add Profile Picture",
+                  style: TextStyle(
+                    fontSize: 16,
+                    letterSpacing: 2.2,
+                    color: Colors.black,
+                  )),
+            ),
+          ),
+          SizedBox(height: 150),
           Center(
             child: OutlinedButton(
               style: OutlinedButton.styleFrom(

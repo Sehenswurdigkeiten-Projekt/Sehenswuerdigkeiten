@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:untitled/mainstrukturwebseite.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(MyApp3());
 
-class MyApp extends StatelessWidget {
+class MyApp3 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -14,7 +15,7 @@ class MyApp extends StatelessWidget {
 }
 
 class DisplayPage extends StatelessWidget {
-  var final_index=0;
+  static var _final_index=0;
 
   final List<String> images = [
     "assets/gps_images/gps_image0.png",
@@ -42,7 +43,7 @@ class DisplayPage extends StatelessWidget {
                 size: Size.fromHeight(550.0),
                 child: PageView.builder(
                   onPageChanged: (var page){
-                    final_index = page;
+                    _final_index = page;
                   },
                   controller: PageController(viewportFraction: 0.8),
                   itemCount: images.length,
@@ -91,10 +92,11 @@ class DisplayPage extends StatelessWidget {
                     )
                 ),
                 onPressed: (){
-                  print(final_index);
+                  Navigator.pop(context);
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => MyApp2()));
                 },
                 child: const Text(
-                    "Dieses Auswaehlen",
+                    "Select this Image",
                     style: TextStyle(
                       fontSize: 16,
                       letterSpacing: 2.2,
@@ -106,4 +108,6 @@ class DisplayPage extends StatelessWidget {
       ),
     );
   }
+
+  static get final_index => _final_index;
 }
