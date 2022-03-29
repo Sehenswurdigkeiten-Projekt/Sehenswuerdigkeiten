@@ -1,4 +1,6 @@
 
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -107,8 +109,9 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
             actions: [
               TextButton(
                   onPressed: () async {
+                    String username = MyLoginWidget2.username;
                     bool isCorrect = await checkIfCorrect(friendsName.text);
-                    if(isCorrect == false){
+                    if(isCorrect == false || friendsName.text != username){
                       Alert(
                         type: AlertType.warning,
                         context: context,
@@ -209,7 +212,8 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
 
   GestureDetector buildFriendOptionRequests(BuildContext context, String title){
     return GestureDetector(
-      onTap: (){
+      onTap: () async {
+        var friendReqName = await checkIfCorrectRequest();
         showDialog(context: context, builder: (BuildContext context){
           return AlertDialog(
             title: Text(title),
@@ -217,31 +221,27 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  "Friends",
+                  "Friends:",
                   textAlign: TextAlign.left,
                   style: TextStyle(
                     fontSize: 18,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-                TextButton(
-                    onPressed: (){},
-                    child: Text(
-                      "Add"
-                    )
-                ),
-                TextButton(
-                    onPressed: (){},
-                    child: Text(
-                        "Decline"
-                    )
+                Text(
+                  "${friendReqName[1]}",
+                  textAlign: TextAlign.left,
+                  style: TextStyle(
+                    fontSize: 18
+                  ),
                 ),
               ],
             ),
             actions: [
               TextButton(
                   onPressed: () async {
-                    bool isCorrect = await checkIfCorrectRequest();
-                    if(isCorrect == false){
+                    List isCorrect = await checkIfCorrectRequest();
+                    if(isCorrect[0] == false){
                       Alert(
                         type: AlertType.warning,
                         context: context,
@@ -250,9 +250,7 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
                       ).show();
                     }
                     else{
-                      print(friendsName.text);
-
-                      friendsName.text = "";
+                      //checkIfCorrect();
 
                       Navigator.of(context).pop();
                     }
@@ -345,20 +343,29 @@ Future<List<Object>> requestServer(String friend) async{
   return resArray;
 }
 
-Future<bool> checkIfCorrectRequest () async {
+Future<List> checkIfCorrectRequest () async {
   bool isCorrect = false;
-  late Object token;
+  var friends;
+  var friend;
 
   var resArray = await requestServerRequests();
-  token = resArray[0];
+  friends = resArray[0];
+  var length = jsonDecode(friends).length;
+
+
+  for(var i = 0; i<length; i++){
+    friend = jsonDecode(friends)[i]["Username"].toString();
+    requestServer(friend);
+  }
+
   Object statusCode = resArray[1].toString();
 
-  if(statusCode != "404"){
+  if(statusCode != "404" || statusCode != "403"){
     isCorrect = true;
   }
-  print(isCorrect);
+  var ifCorrectArr = [isCorrect, friend];
 
-  return isCorrect;
+  return ifCorrectArr;
 }
 
 Future<List<Object>> requestServerRequests() async{
@@ -380,12 +387,12 @@ Future<List<Object>> requestServerRequests() async{
   var address = 'http://185.5.199.33:30000';
 
   var client = new http.Client();
-  var uri = Uri.parse("$address/get_requests");
+  var uri = Uri.parse("$address/get_friendrequests");
   http.Response res = await client.post(uri, body: body);
 
   var resArray = [res.body, res.statusCode];
 
-  print("RESARRAY: $resArray");
+  print("RESARRAY2: ${resArray}");
 
   return resArray;
 }
