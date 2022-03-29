@@ -36,6 +36,9 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int pageIndex = 0;
 
+  Icon customIcon = const Icon(Icons.search);
+  Widget customSearchBar = Text("One Trip");
+
   final pages = [
     MyFriendsWidget(),
     Page2(),
@@ -44,23 +47,64 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    /*
+    customSearchBar = Text (
+      "One Trip",
+      style: TextStyle(
+        color: Theme.of(context).primaryColor,
+        fontSize: 25,
+        fontWeight: FontWeight.w600,
+      ),);
+
+     */
     return Scaffold(
-      backgroundColor: const Color(0xffC4DFCB),
+      //backgroundColor: const Color(0xffC4DFCB),
       appBar: AppBar(
         // leading: Icon(
         //  Icons.menu,
         //   color: Theme.of(context).primaryColor,
         // ),
-        title: Text(
-          "Chefs",
-          style: TextStyle(
-            color: Theme.of(context).primaryColor,
-            fontSize: 25,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+        title: customSearchBar,
+        automaticallyImplyLeading: false,
+        actions: pageIndex == 1 ? [
+          IconButton(
+            onPressed: () {
+              setState(() {
+                if (customIcon.icon == Icons.search) {
+                  customIcon = const Icon(Icons.cancel);
+                  customSearchBar = ListTile(
+                    leading: Icon(
+                      Icons.search,
+                      color: Colors.white,
+                      size: 28,
+                    ),
+                    title: TextField(
+                      decoration: InputDecoration(
+                        hintText: 'type in city name...',
+                        hintStyle: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontStyle: FontStyle.italic,
+                        ),
+                        border: InputBorder.none,
+                      ),
+                      style: TextStyle(
+                          color: Colors.white,
+                      ),
+                    ),
+                  );
+                }  else {
+                  customIcon = const Icon(Icons.search);
+                  customSearchBar = const Text('One Trip');
+                }
+              });
+            },
+            icon: customIcon,
+
+          )
+        ] : null,
         centerTitle: true,
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).primaryColor,
       ),
       body: pages[pageIndex],
       bottomNavigationBar: buildMyNavBar(context),
@@ -256,7 +300,7 @@ class _Page2State extends State<Page2> {
 
         mapboxmapcontroller.updateSymbol(friendListSymbols[i], SymbolOptions(
           iconSize: 0.4,
-          iconImage: "assets/icons/friendTestIcon.png",
+          iconImage: "assets/gps_images/${friendLocationListLatLng[i]['Image']}",
           iconOpacity: 0.8,
           textField: "${friendLocationListLatLng[i]["Username"]}",
           textOpacity: 0.8,
@@ -323,10 +367,10 @@ class _Page2State extends State<Page2> {
             await controller.addSymbol(
                 SymbolOptions(
                     iconSize: 0.4,
-                    iconImage: "assets/icons/friendTestIcon.png",
-                    iconOpacity: 0.8,
+                    iconImage: "assets/gps_images/${friendLocationListLatLng[i]['Image']}",
+                    iconOpacity: anzeigen,
                     textField: "${friendLocationListLatLng[i]["Username"]}",
-                    textOpacity: 0.8,
+                    textOpacity: anzeigen,
                     textOffset: Offset(0,1),
                     geometry: geo,
                     draggable: false,
