@@ -168,15 +168,34 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
 
   GestureDetector buildFriendOptionShow(BuildContext context, String title){
     return GestureDetector(
-      onTap: (){
+      onTap: () async {
+        var friends = await checkIfCorrectShow();
+        String friendStr = "";
+        for(var i = 0; i<friends.length; i++){
+          friendStr += friends[i].toString() + "\n";
+        }
+
         showDialog(context: context, builder: (BuildContext context){
           return AlertDialog(
             title: Text(title),
             content: Column(
               mainAxisSize: MainAxisSize.min,
-              children: const [
-                Text("Option 1"),
-                Text("Option 2")
+              children: [
+                Text(
+                  "Friends:",
+                  textAlign: TextAlign.left,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                Text(
+                  "$friendStr",
+                  textAlign: TextAlign.left,
+                  style: TextStyle(
+                      fontSize: 18
+                  ),
+                ),
               ],
             ),
             actions: [
@@ -394,6 +413,59 @@ Future<List<Object>> requestServerRequests() async{
 
   var client = new http.Client();
   var uri = Uri.parse("$address/get_friendrequests");
+  http.Response res = await client.post(uri, body: body);
+
+  var resArray = [res.body, res.statusCode];
+
+  print("RESARRAY2: ${resArray}");
+
+  return resArray;
+}
+
+Future<List> checkIfCorrectShow () async {
+  var friends;
+  var friend;
+
+  var resArray = await requestServerShow();
+  friends = resArray[0];
+  var length = jsonDecode(friends).length;
+  print(length);
+  List<String> ifCorrectArr = [];
+
+  print(resArray);
+
+  for(var i = 0; i<length; i++){
+    friend = jsonDecode(friends)[i]["Username"].toString();
+    //requestServer(friend);
+    print("BIIIIITE: $friend");
+    ifCorrectArr.add(friend);
+  }
+
+  print(ifCorrectArr);
+
+  return ifCorrectArr;
+}
+
+Future<List<Object>> requestServerShow() async{
+  String username = MyLoginWidget2.username;
+  String token = MyLoginWidget2.token;
+
+  print("Jetzt in der requestServer");
+  print(MyLoginWidget2.token);
+  print(MyLoginWidget2.username);
+
+  if(token == "") token = MySignupWidget2.token;
+  if(username == "") username = MySignupWidget2.username;
+
+  var body = {
+    "username":username,
+    "token":token,
+  };
+
+  var address = 'http://185.5.199.33:30000';
+
+  var client = new http.Client();
+  var uri = Uri.parse("$address/get_friends");
   http.Response res = await client.post(uri, body: body);
 
   var resArray = [res.body, res.statusCode];
