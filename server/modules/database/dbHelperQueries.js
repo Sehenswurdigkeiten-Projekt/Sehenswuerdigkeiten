@@ -1,5 +1,12 @@
 const promisePool = require("./db").getPromisePool();
 
+exports.getFriends = async function getFriends(userID){
+    const query = "Select b.Username from User_Friends as a join User as b on UserID = UserID and UserID = ?"
+    const[rows, friends] = await promisePool.execute(query, [userID])
+
+    return rows;
+}      
+
 exports.checkGroupCode = async function check_group_code(code)
 {
     const query = "Select count(*) as i from UserGroup where GroupCode = ?"

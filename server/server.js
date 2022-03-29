@@ -30,6 +30,7 @@ app.post("/LEAVE_GROUP", urlencodedParser, jsonParser, request.leaveGroup)
 app.post("/CREATE_ROUTE", urlencodedParser,jsonParser, async function(req,res){
   
 })
+app.post("/GET_FRIENDS", urlencodedParser, jsonParser, request.getFriends)
 app.post("/SET_GROUP_ROUTE", urlencodedParser, jsonParser, async function(req, res){
 
 })

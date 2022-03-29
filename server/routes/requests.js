@@ -4,6 +4,20 @@ const dateTime = require('../modules/dateHelper').getDateTime;
 const db = require("../modules/database/dbHelperQueries");
 const {generateToken, checkIfValidInput} = require('./requestHelper')
 
+exports.getFriends = async function(req, res){
+  let username = req.body.username
+  let token = req.body.token;
+  if(await db.validateToken(token, username)){
+    let rows = db.getFriends(await db.getUseridFromUsername(username))
+    res.status(200).send(rows)
+    console.log("[SERVER %s]: Sending Friends to user:" + user, dateTime());
+    return;
+  }
+  console.log("[SERVER %s]: Failed to get Friends for user:" + user, dateTime());
+  res.statusMessage = "Failed to get Friends";
+  res.status(410).end()
+}
+
 exports.login = async function(req, res)
 {
   let user = req.body.username;
