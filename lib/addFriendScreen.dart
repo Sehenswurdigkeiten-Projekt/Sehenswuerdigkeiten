@@ -233,7 +233,7 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
   GestureDetector buildFriendOptionRequests(BuildContext context, String title){
     return GestureDetector(
       onTap: () async {
-        var friendReqName = await checkIfCorrectRequest();
+        var friendReqName = await checkIfCorrectRequest(false);
         print("IST NULL? = ${friendReqName[1]}");
         if(friendReqName[1] == null){
           friendReqName[1] = "No new friend requests!";
@@ -264,7 +264,7 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
             actions: [
               TextButton(
                   onPressed: () async {
-                    List isCorrect = await checkIfCorrectRequest();
+                    List isCorrect = await checkIfCorrectRequest(true);
                     if(isCorrect[0] == false){
                       Alert(
                         type: AlertType.warning,
@@ -368,7 +368,7 @@ Future<List<Object>> requestServer(String friend) async{
   return resArray;
 }
 
-Future<List> checkIfCorrectRequest () async {
+Future<List> checkIfCorrectRequest (bool adden) async {
   bool isCorrect = false;
   var friends;
   var friend;
@@ -380,7 +380,9 @@ Future<List> checkIfCorrectRequest () async {
 
   for(var i = 0; i<length; i++){
     friend = jsonDecode(friends)[i]["Username"].toString();
-    requestServer(friend);
+    if (adden == true){
+      requestServer(friend);
+    }
   }
 
   Object statusCode = resArray[1].toString();
