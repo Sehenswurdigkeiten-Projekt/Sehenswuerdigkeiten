@@ -6,6 +6,18 @@
 
 #import "GeneratedPluginRegistrant.h"
 
+#if __has_include(<flutter_mapbox_navigation/FlutterMapboxNavigationPlugin.h>)
+#import <flutter_mapbox_navigation/FlutterMapboxNavigationPlugin.h>
+#else
+@import flutter_mapbox_navigation;
+#endif
+
+#if __has_include(<hexcolor/HexcolorPlugin.h>)
+#import <hexcolor/HexcolorPlugin.h>
+#else
+@import hexcolor;
+#endif
+
 #if __has_include(<location/LocationPlugin.h>)
 #import <location/LocationPlugin.h>
 #else
@@ -21,6 +33,8 @@
 @implementation GeneratedPluginRegistrant
 
 + (void)registerWithRegistry:(NSObject<FlutterPluginRegistry>*)registry {
+  [FlutterMapboxNavigationPlugin registerWithRegistrar:[registry registrarForPlugin:@"FlutterMapboxNavigationPlugin"]];
+  [HexcolorPlugin registerWithRegistrar:[registry registrarForPlugin:@"HexcolorPlugin"]];
   [LocationPlugin registerWithRegistrar:[registry registrarForPlugin:@"LocationPlugin"]];
   [MapboxMapsPlugin registerWithRegistrar:[registry registrarForPlugin:@"MapboxMapsPlugin"]];
 }
