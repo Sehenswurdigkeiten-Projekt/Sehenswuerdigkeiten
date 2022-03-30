@@ -1,8 +1,16 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter_mapbox_navigation/library.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:untitled/addFriendScreen.dart';
+import 'package:untitled/http_service.dart';
 import 'package:untitled/settingScreen.dart'; import 'locationstuff.dart';
+
+class Suggestions{
+  var _suggestions = [''];
+}
 
 
 class MyApp2 extends StatelessWidget {
@@ -23,6 +31,43 @@ class MyApp2 extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       home: const HomePage(),
     );
+  }
+}
+
+class AutocompleteBar extends StatelessWidget{
+  AutocompleteBar({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Autocomplete<String>(
+      optionsBuilder: (TextEditingValue textEditingValue) async {
+        if (textEditingValue.text == '') {
+          return const Iterable<String>.empty();
+        }
+        Suggestions()._suggestions.clear();
+        final res = await http.get(Uri.parse('https://public.opendatasoft.com/api/records/1.0/search/?dataset=geonames-all-cities-with-a-population-1000&q=&sort=name&facet=name&facet=cou_name_en&refine.alternate_names=${textEditingValue.text}'));
+
+        if (res == '') {
+          return Suggestions()._suggestions;
+        }
+        else {
+          Map<String, dynamic> values = jsonDecode(res.body);
+          for (var word in values['records']) {
+            var field = word['fields'];
+            Suggestions()._suggestions.add(field['name']);
+            print(field['cou_name_en']);
+            print(field['name']);
+          }
+
+          return Suggestions()._suggestions.where((String option) {
+            return option.contains(textEditingValue.text.toLowerCase());
+          });
+        }
+        },
+        onSelected: (String selection){
+        print('You just selected $selection');
+        }
+      );
   }
 }
 
@@ -78,20 +123,7 @@ class _HomePageState extends State<HomePage> {
                       color: Colors.white,
                       size: 28,
                     ),
-                    title: TextField(
-                      decoration: InputDecoration(
-                        hintText: 'type in city name...',
-                        hintStyle: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontStyle: FontStyle.italic,
-                        ),
-                        border: InputBorder.none,
-                      ),
-                      style: TextStyle(
-                          color: Colors.white,
-                      ),
-                    ),
+                    title: AutocompleteBar(),
                   );
                 }  else {
                   customIcon = const Icon(Icons.search);
@@ -110,6 +142,8 @@ class _HomePageState extends State<HomePage> {
       bottomNavigationBar: buildMyNavBar(context),
     );
   }
+
+
 
   Container buildMyNavBar(BuildContext context) {
     return Container(
@@ -262,6 +296,7 @@ class _Page2State extends State<Page2> {
   late Timer timerFriendLocation;
   late LatLng ownLocationLatLng;
   late List<dynamic> friendLocationListLatLng;
+
   late MapboxMapController mapboxmapcontroller; //Der controller für die Circles etc.
   var myColorCircle = '#006992';
   var otherColorCircle = '#009229';
@@ -276,7 +311,7 @@ class _Page2State extends State<Page2> {
     super.initState();
     timerOwnLocation = Timer.periodic(Duration(seconds: 1), (timer) async { //Hier der Timer zum updaten der eigenen Location!
       if(mapboxmapcontroller == null) return;
-      print("Eigene Location loading");
+      //print("Eigene Location loading");
 
       ownLocationLatLng = (await acquireCurrentLocation())!;
 
@@ -293,7 +328,7 @@ class _Page2State extends State<Page2> {
 
     timerFriendLocation = Timer.periodic(Duration(seconds: 5), (timer) async { //Hier der Timer zum updaten der Freunde Location!
       if(mapboxmapcontroller == null) return;
-      print("Other Location Loading");
+      //print("Other Location Loading");
       friendLocationListLatLng = (await acquireOthersLocation(ownLocationLatLng));
       for(var i=0; i<friendListSymbols.length; i++){
         if(friendLocationListLatLng[i]['Lon'] == null || friendLocationListLatLng[i]['Lat'] == null) continue;
@@ -332,7 +367,7 @@ class _Page2State extends State<Page2> {
         ),
 
         onMapCreated: (MapboxMapController controller) async {
-          print("jetzt in der onMapCreated");
+          //print("jetzt in der onMapCreated");
           //Acquire current location (returns the LatLong instance)
           ownLocationLatLng = (await acquireCurrentLocation())!;
 
@@ -355,8 +390,8 @@ class _Page2State extends State<Page2> {
           userCircle = controller.circles.first;
           friendLocationListLatLng = await acquireOthersLocation(ownLocationLatLng);
 
-          print("JEtzt locations");
-          print(friendLocationListLatLng);
+          //print("JEtzt locations");
+          //print(friendLocationListLatLng);
           var geo;
           var anzeigen;
 
@@ -380,10 +415,43 @@ class _Page2State extends State<Page2> {
             friendListSymbols.add(controller.symbols.last);
           }
 
-          print("JETZT IST DIE oinMAPLOADIng function fertig");
-          mapboxmapcontroller = controller;
-        },
 
+          //print("JETZT IST DIE oinMAPLOADIng function fertig");
+          mapboxmapcontroller = controller;
+          },
+
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async{
+            final res = await http.get(Uri.parse('https://public.opendatasoft.com/api/records/1.0/search/?dataset=geonames-all-cities-with-a-population-1000&q=&sort=name&facet=name&facet=cou_name_en&refine.alternate_names=Rom'));
+
+            Map<String, dynamic> values = jsonDecode(res.body);
+            for(var word in values['records']){
+              var field = word['fields'];
+              print(field['cou_name_en']);
+              print(field['name']);
+
+            }
+            //print(values['records']);
+            /*
+            if(values.length > 0){
+              for(var i = 0; i< values.length; i++){
+                if(values[i]!=null){
+                  Map<String, dynamic> map = values[i];
+                  _postList.add(Post.fromJson(map));
+                  print(map['name']);
+                }
+              }
+            }
+
+             */
+            print("CITIES!");
+            //print(cities);
+
+
+          },
+        backgroundColor: Colors.green,
+        child: const Icon(Icons.navigation),
       ),
     );
 
