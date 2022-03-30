@@ -79,10 +79,10 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  var imageString = "assets/gps_images/gps_image0";
   int pageIndex = 0;
 
   Icon customIcon = const Icon(Icons.search);
-  Widget customSearchBar = Text("One Trip");
 
   final pages = [
     MyFriendsWidget(),
@@ -90,26 +90,30 @@ class _HomePageState extends State<HomePage> {
     MySettingWidget(),
   ];
 
+  //GET_USERINFO:30000
+  //body .> username, token -> res ist Bild auch.
+  void updateProfilePicture(var name){
+    imageString = name;
+
+  }
+
   @override
   Widget build(BuildContext context) {
-    /*
-    customSearchBar = Text (
-      "One Trip",
-      style: TextStyle(
-        color: Theme.of(context).primaryColor,
-        fontSize: 25,
-        fontWeight: FontWeight.w600,
-      ),);
+    Widget customSearchBar = Row(
+      children: [
+        Container(
+            width: 50,
+            height: 50,
+            child: Image.asset(imageString)),
+        SizedBox(width: 50),
+        Text("One Trip"),
+      ],
+    );
 
-     */
     return Scaffold(
-      //backgroundColor: const Color(0xffC4DFCB),
       appBar: AppBar(
-        // leading: Icon(
-        //  Icons.menu,
-        //   color: Theme.of(context).primaryColor,
-        // ),
         title: customSearchBar,
+
         automaticallyImplyLeading: false,
         actions: pageIndex == 1 ? [
           IconButton(
@@ -127,7 +131,19 @@ class _HomePageState extends State<HomePage> {
                   );
                 }  else {
                   customIcon = const Icon(Icons.search);
-                  customSearchBar = const Text('One Trip');
+                  customSearchBar = Row(
+                    children: [
+                      Container(
+                        width: 50,
+                        height: 50,
+                        child: Image.asset(
+                            imageString,
+                        ),
+                      ),
+                      SizedBox(width: 50),
+                      Text("One Trip"),
+                    ],
+                  );
                 }
               });
             },
