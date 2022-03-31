@@ -173,19 +173,7 @@ class HomePageState extends State<HomePage> {
                   normalSearchBar = false;
                 }  else {
                   customIcon = const Icon(Icons.search);
-                  customSearchBar = Row(
-                    children: [
-                      Container(
-                        width: 50,
-                        height: 50,
-                        child: Image.asset(
-                            imageString,
-                        ),
-                      ),
-                      SizedBox(width: 50),
-                      Text("One Trip"),
-                    ],
-                  );
+                  normalSearchBar = true;
                 }
               });
             },
