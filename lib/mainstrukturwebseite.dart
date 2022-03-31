@@ -83,10 +83,12 @@ class AutocompleteBar extends StatelessWidget{
           focusNode: fieldFocusNode,
           style: const TextStyle(color: Colors.white),
           decoration: InputDecoration(
+            labelStyle: TextStyle(color: Colors.white),
             labelText: ("Search a city"),
             fillColor: Colors.white,
             focusColor: Colors.white,
             hoverColor: Colors.white,
+
           ),
 
         );
