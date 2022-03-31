@@ -8,11 +8,6 @@ import 'package:untitled/addFriendScreen.dart';
 import 'package:untitled/http_service.dart';
 import 'package:untitled/settingScreen.dart'; import 'locationstuff.dart';
 
-class Suggestions{
-  var _suggestions = [''];
-}
-
-
 class MyApp2 extends StatelessWidget {
 
   MyApp2({Key? key}) : super(key: key);
@@ -37,38 +32,71 @@ class MyApp2 extends StatelessWidget {
 class AutocompleteBar extends StatelessWidget{
   AutocompleteBar({Key? key}) : super(key: key);
 
+  //var _suggestions = [''];
+
   @override
   Widget build(BuildContext context) {
     return Autocomplete<String>(
-      optionsBuilder: (TextEditingValue textEditingValue) async {
+
+      optionsBuilder: (TextEditingValue textEditingValue) async{
         if (textEditingValue.text == '') {
           return const Iterable<String>.empty();
         }
-        Suggestions()._suggestions.clear();
-        final res = await http.get(Uri.parse('https://public.opendatasoft.com/api/records/1.0/search/?dataset=geonames-all-cities-with-a-population-1000&q=&sort=name&facet=name&facet=cou_name_en&refine.alternate_names=${textEditingValue.text}'));
+
+        //Suggestions()._suggestions.clear();
+        final res = await http.get(Uri.parse('https://public.opendatasoft.com/api/records/1.0/search/?dataset=geonames-all-cities-with-a-population-1000&q=&sort=population&facet=name&facet=cou_name_en&refine.alternate_names=${textEditingValue.text}'));
+        //print(res);
+
+        List<String> list = [];
+        //print(Suggestions()._suggestions);
 
         if (res == '') {
-          return Suggestions()._suggestions;
+          list.add('No result');
         }
         else {
           Map<String, dynamic> values = jsonDecode(res.body);
           for (var word in values['records']) {
             var field = word['fields'];
-            Suggestions()._suggestions.add(field['name']);
-            print(field['cou_name_en']);
             print(field['name']);
+            list.add(field['name']+ ' - ' + field['cou_name_en']);
           }
+          list = list.toSet().toList();
+          print(list);
+          print(textEditingValue.text);
 
-          return Suggestions()._suggestions.where((String option) {
-            return option.contains(textEditingValue.text.toLowerCase());
-          });
+
+          //return list.where((String option) {
+            //return option.toLowerCase().contains(textEditingValue.text.toLowerCase());
+          //});
         }
-        },
+        return list;
+
+      },
+      fieldViewBuilder: (
+          BuildContext context,
+          TextEditingController fieldTextEditingController,
+          FocusNode fieldFocusNode,
+          VoidCallback onFieldSubmitted
+          ){
+        return TextField(
+          controller: fieldTextEditingController,
+          focusNode: fieldFocusNode,
+          style: const TextStyle(color: Colors.white),
+          decoration: InputDecoration(
+            labelText: ("Search a city"),
+            fillColor: Colors.white,
+            focusColor: Colors.white,
+            hoverColor: Colors.white,
+          ),
+
+        );
+      },
         onSelected: (String selection){
-        print('You just selected $selection');
-        }
+          print('You just selected $selection');
+        },
       );
   }
+
 }
 
 class HomePage extends StatefulWidget {
@@ -83,6 +111,8 @@ class _HomePageState extends State<HomePage> {
   int pageIndex = 0;
 
   Icon customIcon = const Icon(Icons.search);
+  Widget customSearchBar = Text("One Trip");
+
 
   final pages = [
     MyFriendsWidget(),
@@ -99,16 +129,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    Widget customSearchBar = Row(
-      children: [
-        Container(
-            width: 50,
-            height: 50,
-            child: Image.asset(imageString)),
-        SizedBox(width: 50),
-        Text("One Trip"),
-      ],
-    );
 
     return Scaffold(
       appBar: AppBar(
@@ -131,19 +151,8 @@ class _HomePageState extends State<HomePage> {
                   );
                 }  else {
                   customIcon = const Icon(Icons.search);
-                  customSearchBar = Row(
-                    children: [
-                      Container(
-                        width: 50,
-                        height: 50,
-                        child: Image.asset(
-                            imageString,
-                        ),
-                      ),
-                      SizedBox(width: 50),
-                      Text("One Trip"),
-                    ],
-                  );
+                  customSearchBar = const Text('One Trip');
+
                 }
               });
             },
