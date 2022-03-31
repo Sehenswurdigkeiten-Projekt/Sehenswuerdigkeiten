@@ -103,15 +103,22 @@ class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
   @override
-  _HomePageState createState() => _HomePageState();
+  HomePageState createState() => HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
-  var imageString = "assets/gps_images/gps_image0";
+class HomePageState extends State<HomePage> {
+  static var imageString = "assets/gps_images/gps_image0.png";
   int pageIndex = 0;
+  static late HomePageState _homePageState;
 
+  HomePageState(){
+    _homePageState = this;
+  }
+  static HomePageState get homePageState => _homePageState;
   Icon customIcon = const Icon(Icons.search);
-  Widget customSearchBar = Text("One Trip");
+  bool normalSearchBar = true;
+  late Widget customSearchBar;
+
 
 
   final pages = [
@@ -122,13 +129,35 @@ class _HomePageState extends State<HomePage> {
 
   //GET_USERINFO:30000
   //body .> username, token -> res ist Bild auch.
-  void updateProfilePicture(var name){
-    imageString = name;
-
+   void updateProfilePicture(var name){
+    print("JETZT IMAGE GEUPDATED");
+    setState(() {imageString = name;});
   }
 
   @override
   Widget build(BuildContext context) {
+     if(normalSearchBar){
+       customSearchBar = Row(
+         children: [
+           Container(
+               width: 50,
+               height: 50,
+               child: Image.asset(imageString)),
+           SizedBox(width: 50),
+           Text("One Trip"),
+         ],
+       );
+     }else{
+       customSearchBar = ListTile(
+         leading: Icon(
+           Icons.search,
+           color: Colors.white,
+           size: 28,
+         ),
+         title: AutocompleteBar(),
+       );
+     }
+
 
     return Scaffold(
       appBar: AppBar(
@@ -141,18 +170,22 @@ class _HomePageState extends State<HomePage> {
               setState(() {
                 if (customIcon.icon == Icons.search) {
                   customIcon = const Icon(Icons.cancel);
-                  customSearchBar = ListTile(
-                    leading: Icon(
-                      Icons.search,
-                      color: Colors.white,
-                      size: 28,
-                    ),
-                    title: AutocompleteBar(),
-                  );
+                  normalSearchBar = false;
                 }  else {
                   customIcon = const Icon(Icons.search);
-                  customSearchBar = const Text('One Trip');
-
+                  customSearchBar = Row(
+                    children: [
+                      Container(
+                        width: 50,
+                        height: 50,
+                        child: Image.asset(
+                            imageString,
+                        ),
+                      ),
+                      SizedBox(width: 50),
+                      Text("One Trip"),
+                    ],
+                  );
                 }
               });
             },
@@ -167,8 +200,6 @@ class _HomePageState extends State<HomePage> {
       bottomNavigationBar: buildMyNavBar(context),
     );
   }
-
-
 
   Container buildMyNavBar(BuildContext context) {
     return Container(
@@ -188,6 +219,7 @@ class _HomePageState extends State<HomePage> {
             enableFeedback: false,
             onPressed: () {
               setState(() {
+                normalSearchBar = true;
                 pageIndex = 0;
               });
             },
@@ -207,6 +239,7 @@ class _HomePageState extends State<HomePage> {
             enableFeedback: false,
             onPressed: () {
               setState(() {
+                normalSearchBar = true;
                 pageIndex = 1;
               });
             },
@@ -226,6 +259,7 @@ class _HomePageState extends State<HomePage> {
             enableFeedback: false,
             onPressed: () {
               setState(() {
+                normalSearchBar = true;
                 pageIndex = 2;
               });
             },
@@ -321,7 +355,6 @@ class _Page2State extends State<Page2> {
   late Timer timerFriendLocation;
   late LatLng ownLocationLatLng;
   late List<dynamic> friendLocationListLatLng;
-
   late MapboxMapController mapboxmapcontroller; //Der controller für die Circles etc.
   var myColorCircle = '#006992';
   var otherColorCircle = '#009229';
@@ -336,7 +369,7 @@ class _Page2State extends State<Page2> {
     super.initState();
     timerOwnLocation = Timer.periodic(Duration(seconds: 1), (timer) async { //Hier der Timer zum updaten der eigenen Location!
       if(mapboxmapcontroller == null) return;
-      //print("Eigene Location loading");
+      print("Eigene Location loading");
 
       ownLocationLatLng = (await acquireCurrentLocation())!;
 
@@ -353,7 +386,7 @@ class _Page2State extends State<Page2> {
 
     timerFriendLocation = Timer.periodic(Duration(seconds: 5), (timer) async { //Hier der Timer zum updaten der Freunde Location!
       if(mapboxmapcontroller == null) return;
-      //print("Other Location Loading");
+      print("Other Location Loading");
       friendLocationListLatLng = (await acquireOthersLocation(ownLocationLatLng));
       for(var i=0; i<friendListSymbols.length; i++){
         if(friendLocationListLatLng[i]['Lon'] == null || friendLocationListLatLng[i]['Lat'] == null) continue;

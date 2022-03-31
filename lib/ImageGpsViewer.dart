@@ -22,7 +22,7 @@ class MyApp3 extends StatelessWidget {
 }
 
 class DisplayPage extends StatelessWidget {
-  static var _final_index=0;
+  static var _final_page_index=0;
 
   final List<String> images = [
     "assets/gps_images/gps_image0.png",
@@ -50,7 +50,7 @@ class DisplayPage extends StatelessWidget {
                 size: Size.fromHeight(550.0),
                 child: PageView.builder(
                   onPageChanged: (var page){
-                    _final_index = page;
+                    _final_page_index = page;
                   },
                   controller: PageController(viewportFraction: 0.8),
                   itemCount: images.length,
@@ -100,6 +100,8 @@ class DisplayPage extends StatelessWidget {
                 ),
                 onPressed: () async {
                   await requestServerSendNewPic("http://185.5.199.33:30000/UPDATE_IMAGE");
+                  HomePageState.homePageState.updateProfilePicture("assets/gps_images/gps_image${final_index}.png");
+
                   Navigator.pop(context);
                   Navigator.push(context, MaterialPageRoute(builder: (context) => MyApp2()));
                 },
@@ -127,7 +129,7 @@ class DisplayPage extends StatelessWidget {
     var body = {
       "username":"${username}",
       "token":"${token}",
-      "image": "gps_image${_final_index}.png",
+      "image": "gps_image${_final_page_index}.png",
     };
 
     var client = new http.Client();
@@ -141,5 +143,5 @@ class DisplayPage extends StatelessWidget {
   }
 
 
-  static get final_index => _final_index;
+  static get final_index => _final_page_index;
 }
