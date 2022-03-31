@@ -164,3 +164,19 @@ exports.leaveGroup = async function(userid, groupid){
     await promisePool.execute(query, [userid, groupid]);
 
 }
+exports.getGroupsForUser = async function(userID){
+    const query = "Select GroupCode from User_UserGroup as a join UserGroup as b on GroupID = GroupID and UserID = ?"
+    const [rows, fields] = await promisePool.execute(query, [userID])
+    return rows;
+}
+exports.getGroupmembers = async function(groupID){
+    const query = "Select Username, Image from User_UserGroup as a join User as b on a.UserID = b.UserID and GroupID = ?"
+    const[rows, fields] = promisePool.execute(query, [groupID]);
+    return rows;
+}
+
+exports.getUserInfo = async function(userID){
+    const query = "Select Username, UserID, Image, Authtoken, Lon, Lat from User where UserID = ?"
+    const [rows, fields] = await promisePool.execute(query, [userID])
+    return rows;
+}

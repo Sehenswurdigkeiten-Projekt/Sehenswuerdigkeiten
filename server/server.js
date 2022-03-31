@@ -27,13 +27,16 @@ app.post("/GET_FRIENDREQUESTS", urlencodedParser, jsonParser, request.getFriendR
 app.post("/CHANGE_PASSWORD", urlencodedParser, jsonParser, request.changePassword)
 app.post("/DELETE_GROUP", urlencodedParser, jsonParser, request.delteGroup)
 app.post("/LEAVE_GROUP", urlencodedParser, jsonParser, request.leaveGroup)
-app.post("/CREATE_ROUTE", urlencodedParser,jsonParser, async function(req,res){
-  
-})
+app.post("/GET_GROUPS", urlencodedParser, jsonParser, request.getGroups);
 app.post("/GET_FRIENDS", urlencodedParser, jsonParser, request.getFriends)
 app.post("/UPDATE_IMAGE", urlencodedParser, jsonParser, request.updateImage)
+app.post("/GET_GROUPMEMBERS", urlencodedParser, jsonParser, request.getGroupmembers)
+app.post("/GET_USERINFO", urlencodedParser, jsonParser, request.getUserInfo)
+
 app.post("/SET_GROUP_ROUTE", urlencodedParser, jsonParser, async function(req, res){
 
 })
-
+app.post("/CREATE_ROUTE", urlencodedParser,jsonParser, async function(req,res){
+  
+})
 app.listen(30000, () => console.log(`Hello world app listening on port ${port}!`))

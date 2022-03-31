@@ -94,6 +94,7 @@ exports.updateGPS = async function(req, res){
     if(toNotify == "-"){
       rows = await db.getFriendPOS(userID)
       res.status(200).send(rows);
+      return;
     }
     else{
       let ids = toNotify.split(",")
@@ -266,9 +267,10 @@ exports.leaveGroup = async function(req, res){
   let groupid = await db.getGroupidFromGroupcode(code);
   if(valid && groupid){
     await db.leaveGroup(await db.getUseridFromUsername(username), groupid);
+    res.status(200).send("Left Group");
   }
   else{
-    res.statusMessage = "Failed to get Friendrequests"
+    res.statusMessage = "Failed to get Failed to leabe"
     res.status(409).end();
   }
 }
@@ -276,6 +278,33 @@ exports.leaveGroup = async function(req, res){
 exports.delteGroup = async function(req, res){
 
 }
+
+exports.getGroups = async function (req, res) {
+  let username = req.body.username
+  let token = req.body.token
+  
+  if(await db.validateToken(token, username)){
+    rows = await db.getGroupsForUser(await db.getUseridFromUsername(username))
+    res.status(200).send(rows)
+    return;
+  }
+  res.statusMessage = "Failed to get Groups"
+  res.status(412).end()
+  
+}
+exports.getUserInfo = async function(req, res){
+  let username = req.body.username
+  let token = req.body.token
+
+  if(await db.validateToken(token, username)){
+    rows = await db.getUserInfo(await db.getUseridFromUsername(username))
+    res.status(200).send(rows)
+    return
+  }
+  res.statusMessage = "Failed to get info";
+  res.status(414).end;
+}
+
 
 exports.getFriendRequests = async function(req, res) {
   let username = req.body.username;
@@ -291,4 +320,19 @@ exports.getFriendRequests = async function(req, res) {
   }
   res.statusMessage = "Failed to get Friendrequests"
   res.status(407).end();
+}
+exports.getGroupmembers = async function(req, res){
+  let username = req.body.username;
+  let token = req.body.token;
+  let groupCode = req.body.code;
+  if(await db.validateToken(token, username)){
+
+    let groupID = await db.getGroupidFromGroupcode(groupCode)
+    rows = await db.getGroupmembers(groupID)
+    res.status(200).send(rows);
+    return;
+    
+  }
+  res.statusMessage = "Failed to get GroupMembers"
+  res.status(413).end();
 }
