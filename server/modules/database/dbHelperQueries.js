@@ -170,8 +170,8 @@ exports.getGroupsForUser = async function(userID){
     return rows;
 }
 exports.getGroupmembers = async function(groupID){
-    const query = "Select Username, Image from User_UserGroup as a join User as b on a.UserID = b.UserID and GroupID = ?"
-    const[rows, fields] = promisePool.execute(query, [groupID]);
+    const query = "Select t.Username, Image,count(Username)-1 as isLeader from (Select Username, Image from User_UserGroup as a join User as b on a.UserID = b.UserID and GroupID = ? Union ALL Select Username, Image from UserGroup as a join User as b on LeaderID = UserID and GroupID = ?) as t group by Username, Image;"
+    const[rows, fields] = promisePool.execute(query, [groupID, groupID]);
     return rows;
 }
 
@@ -180,3 +180,5 @@ exports.getUserInfo = async function(userID){
     const [rows, fields] = await promisePool.execute(query, [userID])
     return rows;
 }
+
+const test = "Select count(*) from (Select Username, Image from User_UserGroup as a join User as b on a.UserID = b.UserID and GroupID = 11 Union ALL Select Username, Image from UserGroup as a join User as b on LeaderID = UserID and GroupID = 11) as t"

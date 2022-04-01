@@ -43,7 +43,7 @@ exports.login = async function(req, res)
 
   if(rows[0] && bcrypt.compareSync(pwd, rows[0].Password)){
     console.log("[SERVER %s]: Login succesful sending token:" + rows[0].AuthToken, dateTime());
-    res.status(200).send({token : rows[0].AuthToken})
+    res.status(200).send(await db.getUserInfo(await db.getUseridFromUsername(user)))
   }
   else{
     console.log("[SERVER %s]: Login Failed for user:" + user, dateTime());
@@ -158,6 +158,7 @@ exports.joinGroup = async function(req,res)
 
   if(!await db.validateToken(token, username)){
     res.statusMessage = "Failed to join group"
+    console.log("[SERVER %s]: User(%s) failed to join Group(%s)", dateTime(), username, groupCode);
     res.status(405).end();
     return
   }
@@ -167,11 +168,13 @@ exports.joinGroup = async function(req,res)
   userID = await db.getUseridFromUsername(username);
 
   if(await db.checkIfUserIsInGroup(userID, groupID)){
+    console.log("[SERVER %s]: User(%s) failed to join Group(%s)", dateTime(), username, groupCode);
     res.statusMessage = "Failed to join group"
     res.status(405).end();
     return
   }
 
+  console.log("[SERVER %s]: User(%s) joined Group(%s)", dateTime(), username, groupCode);
   await db.joinUserGroup(userID, groupID);
   res.status(200).end("Joined Group")
 
@@ -326,12 +329,11 @@ exports.getGroupmembers = async function(req, res){
   let token = req.body.token;
   let groupCode = req.body.code;
   if(await db.validateToken(token, username)){
-
     let groupID = await db.getGroupidFromGroupcode(groupCode)
     rows = await db.getGroupmembers(groupID)
     res.status(200).send(rows);
     return;
-    
+
   }
   res.statusMessage = "Failed to get GroupMembers"
   res.status(413).end();
