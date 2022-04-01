@@ -1,9 +1,12 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter_mapbox_navigation/library.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:untitled/addFriendScreen.dart';
+import 'package:untitled/http_service.dart';
 import 'package:untitled/settingScreen.dart'; import 'locationstuff.dart';
-
 
 class MyApp2 extends StatelessWidget {
 
@@ -26,18 +29,99 @@ class MyApp2 extends StatelessWidget {
   }
 }
 
+class AutocompleteBar extends StatelessWidget{
+  AutocompleteBar({Key? key}) : super(key: key);
+
+  //var _suggestions = [''];
+
+  @override
+  Widget build(BuildContext context) {
+    return Autocomplete<String>(
+
+      optionsBuilder: (TextEditingValue textEditingValue) async{
+        if (textEditingValue.text == '') {
+          return const Iterable<String>.empty();
+        }
+
+        //Suggestions()._suggestions.clear();
+        final res = await http.get(Uri.parse('https://public.opendatasoft.com/api/records/1.0/search/?dataset=geonames-all-cities-with-a-population-1000&q=&sort=population&facet=name&facet=cou_name_en&refine.alternate_names=${textEditingValue.text}'));
+        //print(res);
+
+        List<String> list = [];
+        //print(Suggestions()._suggestions);
+
+        if (res == '') {
+          list.add('No result');
+        }
+        else {
+          Map<String, dynamic> values = jsonDecode(res.body);
+          for (var word in values['records']) {
+            var field = word['fields'];
+            print(field['name']);
+            list.add(field['name']+ ' - ' + field['cou_name_en']);
+          }
+          list = list.toSet().toList();
+          print(list);
+          print(textEditingValue.text);
+
+
+          //return list.where((String option) {
+            //return option.toLowerCase().contains(textEditingValue.text.toLowerCase());
+          //});
+        }
+        return list;
+
+      },
+      fieldViewBuilder: (
+          BuildContext context,
+          TextEditingController fieldTextEditingController,
+          FocusNode fieldFocusNode,
+          VoidCallback onFieldSubmitted
+          ){
+        return TextField(
+          controller: fieldTextEditingController,
+          focusNode: fieldFocusNode,
+          style: const TextStyle(color: Colors.white),
+          decoration: InputDecoration(
+            labelStyle: TextStyle(color: Colors.white),
+            labelText: ("Search a city"),
+            fillColor: Colors.white,
+            focusColor: Colors.white,
+            hoverColor: Colors.white,
+
+          ),
+
+        );
+      },
+        onSelected: (String selection){
+          print('You just selected $selection');
+        },
+      );
+  }
+
+}
+
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
   @override
-  _HomePageState createState() => _HomePageState();
+  HomePageState createState() => HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class HomePageState extends State<HomePage> {
+  static var imageString = "assets/gps_images/gps_image0.png";
   int pageIndex = 0;
+  static late HomePageState _homePageState;
 
+  HomePageState(){
+    _homePageState = this;
+  }
+  static HomePageState get homePageState => _homePageState;
   Icon customIcon = const Icon(Icons.search);
-  Widget customSearchBar = Text("One Trip");
+  bool normalSearchBar = true;
+  late Widget customSearchBar;
+
+
 
   final pages = [
     MyFriendsWidget(),
@@ -45,26 +129,42 @@ class _HomePageState extends State<HomePage> {
     MySettingWidget(),
   ];
 
+  //GET_USERINFO:30000
+  //body .> username, token -> res ist Bild auch.
+   void updateProfilePicture(var name){
+    print("JETZT IMAGE GEUPDATED");
+    setState(() {imageString = name;});
+  }
+
   @override
   Widget build(BuildContext context) {
-    /*
-    customSearchBar = Text (
-      "One Trip",
-      style: TextStyle(
-        color: Theme.of(context).primaryColor,
-        fontSize: 25,
-        fontWeight: FontWeight.w600,
-      ),);
+     if(normalSearchBar){
+       customSearchBar = Row(
+         children: [
+           Container(
+               width: 50,
+               height: 50,
+               child: Image.asset(imageString)),
+           SizedBox(width: 50),
+           Text("One Trip"),
+         ],
+       );
+     }else{
+       customSearchBar = ListTile(
+         leading: Icon(
+           Icons.search,
+           color: Colors.white,
+           size: 28,
+         ),
+         title: AutocompleteBar(),
+       );
+     }
 
-     */
+
     return Scaffold(
-      //backgroundColor: const Color(0xffC4DFCB),
       appBar: AppBar(
-        // leading: Icon(
-        //  Icons.menu,
-        //   color: Theme.of(context).primaryColor,
-        // ),
         title: customSearchBar,
+
         automaticallyImplyLeading: false,
         actions: pageIndex == 1 ? [
           IconButton(
@@ -72,30 +172,10 @@ class _HomePageState extends State<HomePage> {
               setState(() {
                 if (customIcon.icon == Icons.search) {
                   customIcon = const Icon(Icons.cancel);
-                  customSearchBar = ListTile(
-                    leading: Icon(
-                      Icons.search,
-                      color: Colors.white,
-                      size: 28,
-                    ),
-                    title: TextField(
-                      decoration: InputDecoration(
-                        hintText: 'type in city name...',
-                        hintStyle: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontStyle: FontStyle.italic,
-                        ),
-                        border: InputBorder.none,
-                      ),
-                      style: TextStyle(
-                          color: Colors.white,
-                      ),
-                    ),
-                  );
+                  normalSearchBar = false;
                 }  else {
                   customIcon = const Icon(Icons.search);
-                  customSearchBar = const Text('One Trip');
+                  normalSearchBar = true;
                 }
               });
             },
@@ -129,6 +209,7 @@ class _HomePageState extends State<HomePage> {
             enableFeedback: false,
             onPressed: () {
               setState(() {
+                normalSearchBar = true;
                 pageIndex = 0;
               });
             },
@@ -148,6 +229,7 @@ class _HomePageState extends State<HomePage> {
             enableFeedback: false,
             onPressed: () {
               setState(() {
+                normalSearchBar = true;
                 pageIndex = 1;
               });
             },
@@ -167,6 +249,7 @@ class _HomePageState extends State<HomePage> {
             enableFeedback: false,
             onPressed: () {
               setState(() {
+                normalSearchBar = true;
                 pageIndex = 2;
               });
             },
@@ -332,7 +415,7 @@ class _Page2State extends State<Page2> {
         ),
 
         onMapCreated: (MapboxMapController controller) async {
-          print("jetzt in der onMapCreated");
+          //print("jetzt in der onMapCreated");
           //Acquire current location (returns the LatLong instance)
           ownLocationLatLng = (await acquireCurrentLocation())!;
 
@@ -355,8 +438,8 @@ class _Page2State extends State<Page2> {
           userCircle = controller.circles.first;
           friendLocationListLatLng = await acquireOthersLocation(ownLocationLatLng);
 
-          print("JEtzt locations");
-          print(friendLocationListLatLng);
+          //print("JEtzt locations");
+          //print(friendLocationListLatLng);
           var geo;
           var anzeigen;
 
@@ -380,10 +463,43 @@ class _Page2State extends State<Page2> {
             friendListSymbols.add(controller.symbols.last);
           }
 
-          print("JETZT IST DIE oinMAPLOADIng function fertig");
-          mapboxmapcontroller = controller;
-        },
 
+          //print("JETZT IST DIE oinMAPLOADIng function fertig");
+          mapboxmapcontroller = controller;
+          },
+
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async{
+            final res = await http.get(Uri.parse('https://public.opendatasoft.com/api/records/1.0/search/?dataset=geonames-all-cities-with-a-population-1000&q=&sort=name&facet=name&facet=cou_name_en&refine.alternate_names=Rom'));
+
+            Map<String, dynamic> values = jsonDecode(res.body);
+            for(var word in values['records']){
+              var field = word['fields'];
+              print(field['cou_name_en']);
+              print(field['name']);
+
+            }
+            //print(values['records']);
+            /*
+            if(values.length > 0){
+              for(var i = 0; i< values.length; i++){
+                if(values[i]!=null){
+                  Map<String, dynamic> map = values[i];
+                  _postList.add(Post.fromJson(map));
+                  print(map['name']);
+                }
+              }
+            }
+
+             */
+            print("CITIES!");
+            //print(cities);
+
+
+          },
+        backgroundColor: Colors.green,
+        child: const Icon(Icons.navigation),
       ),
     );
 

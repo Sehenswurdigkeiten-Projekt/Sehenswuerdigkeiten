@@ -1,8 +1,16 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:untitled/loginScreen.dart';
+import 'package:untitled/mainstrukturwebseite.dart';
+import 'package:http/http.dart' as http;
+import 'package:untitled/signUpScreen.dart';
 
-void main() => runApp(MyApp());
 
-class MyApp extends StatelessWidget {
+
+void main() => runApp(MyApp3());
+
+class MyApp3 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -14,7 +22,7 @@ class MyApp extends StatelessWidget {
 }
 
 class DisplayPage extends StatelessWidget {
-  var final_index=0;
+  static var _final_page_index=0;
 
   final List<String> images = [
     "assets/gps_images/gps_image0.png",
@@ -42,7 +50,7 @@ class DisplayPage extends StatelessWidget {
                 size: Size.fromHeight(550.0),
                 child: PageView.builder(
                   onPageChanged: (var page){
-                    final_index = page;
+                    _final_page_index = page;
                   },
                   controller: PageController(viewportFraction: 0.8),
                   itemCount: images.length,
@@ -90,11 +98,15 @@ class DisplayPage extends StatelessWidget {
                         borderRadius: BorderRadius.circular(20)
                     )
                 ),
-                onPressed: (){
-                  print(final_index);
+                onPressed: () async {
+                  await requestServerSendNewPic("http://185.5.199.33:30000/UPDATE_IMAGE");
+                  HomePageState.homePageState.updateProfilePicture("assets/gps_images/gps_image${final_index}.png");
+
+                  Navigator.pop(context);
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => MyApp2()));
                 },
                 child: const Text(
-                    "Dieses Auswaehlen",
+                    "Select this Image",
                     style: TextStyle(
                       fontSize: 16,
                       letterSpacing: 2.2,
@@ -106,4 +118,30 @@ class DisplayPage extends StatelessWidget {
       ),
     );
   }
+
+  Future<void> requestServerSendNewPic(String name) async{
+    String username = MyLoginWidget2.username;
+    String token = MyLoginWidget2.token;
+
+    if(token == "") token = MySignupWidget2.token;
+    if(username == "") username = MySignupWidget2.username;
+
+    var body = {
+      "username":"${username}",
+      "token":"${token}",
+      "image": "gps_image${_final_page_index}.png",
+    };
+
+    var client = new http.Client();
+    var uri = Uri.parse(name);
+    http.Response res = await client.post(uri, body: body);
+
+    print("JETZT FERTIG");
+    print(res);
+
+    return;
+  }
+
+
+  static get final_index => _final_page_index;
 }
