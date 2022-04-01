@@ -40,7 +40,7 @@ class DisplayPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.red,
+      backgroundColor: Color(0xff2F8D46),
       body: Center(
           child: ListView(
             padding: EdgeInsets.only(top: 150),
