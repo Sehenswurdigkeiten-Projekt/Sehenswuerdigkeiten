@@ -351,6 +351,15 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
         code = isCorrect[1];
         var code2;
         code2 = jsonDecode(code)["code"].toString();
+        if(isCorrect[0] == false){
+          Alert(
+            type: AlertType.warning,
+            context: context,
+            title: "Something is wrong!",
+            desc: "Please correct it!",
+          ).show();
+          code2 = "";
+        }
         showDialog(context: context, builder: (BuildContext context){
           return AlertDialog(
             title: Text(title),
@@ -363,26 +372,6 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
               ],
             ),
             actions: [
-              TextButton(
-                  onPressed: () async {
-                    if(isCorrect[0] == false){
-                      Alert(
-                        type: AlertType.warning,
-                        context: context,
-                        title: "Something is wrong!",
-                        desc: "Please correct it!",
-                      ).show();
-                    }
-                    else{
-                      Navigator.of(context).pop();
-                    }
-                  },
-                  child: const Text(
-                      "Add",
-                      style: TextStyle(
-                        color: Color(0xff2F8D46),
-                      ))
-              ),
               TextButton(
                   onPressed: (){
                     Navigator.of(context).pop();
@@ -700,7 +689,7 @@ Future<bool> checkIfCorrectJoinGroup (groupCode) async {
   var statusCode = resArray[1].toString();
   print("STAT: $statusCode");
 
-  if(statusCode == "Joined Group"){
+  if(statusCode != "405"){
     isCorrect = true;
   }
   print("COOR: $isCorrect");
