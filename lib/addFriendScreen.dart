@@ -500,7 +500,13 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
 
   GestureDetector buildGroupOptionShow(BuildContext context, String title){
     return GestureDetector(
-      onTap: (){
+      onTap: () async {
+        var groups = await checkIfCorrectGroupShow();
+        String groupsStr = "";
+        for(var i = 0; i<groups.length; i++){
+          groupsStr += groups[i].toString() + "\n";
+        }
+
         showDialog(context: context, builder: (BuildContext context){
           return AlertDialog(
             title: Text(title),
@@ -508,35 +514,23 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                    "TEXT - Groups"
+                  "Groups:",
+                  textAlign: TextAlign.left,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                Text(
+                  "$groupsStr",
+                  textAlign: TextAlign.left,
+                  style: TextStyle(
+                      fontSize: 18
+                  ),
                 ),
               ],
             ),
             actions: [
-              TextButton(
-                  onPressed: () async {
-                    /*
-                    var isCorrect = await checkIfCorrectJoinGroup();
-                    if(isCorrect == false){
-                      Alert(
-                        type: AlertType.warning,
-                        context: context,
-                        title: "Something is wrong!",
-                        desc: "Please correct it!",
-                      ).show();
-                    }
-                    else{
-                      Navigator.of(context).pop();
-                    }
-                     */
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text(
-                      "Add",
-                      style: TextStyle(
-                        color: Color(0xff2F8D46),
-                      ))
-              ),
               TextButton(
                   onPressed: (){
                     Navigator.of(context).pop();
@@ -546,7 +540,7 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
                       style: TextStyle(
                         color: Color(0xff2F8D46),
                       ))
-              )
+              ),
             ],
           );
         });
@@ -583,8 +577,6 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
               ],
             ),
             actions: [
-              TextButton(
-                  onPressed: () async {
                     /*
                     var isCorrect = await checkIfCorrectJoinGroup();
                     if(isCorrect == false){
@@ -599,14 +591,6 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
                       Navigator.of(context).pop();
                     }
                      */
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text(
-                      "Add",
-                      style: TextStyle(
-                        color: Color(0xff2F8D46),
-                      ))
-              ),
               TextButton(
                   onPressed: (){
                     Navigator.of(context).pop();
@@ -637,6 +621,56 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
       ),
     );
   }
+}
+
+Future<List> checkIfCorrectGroupShow () async {
+  var groups;
+  var group;
+
+  var resArray = await requestServerGroupShow();
+  groups = resArray[0];
+  var length = jsonDecode(groups).length;
+  print(length);
+  List<String> ifCorrectArr = [];
+
+  print("Hello $resArray");
+
+  for(var i = 0; i<length; i++){
+    group = jsonDecode(groups)[i]["GroupCode"].toString();
+    //requestServer(friend);
+    print("BIIIIITE: $group");
+    ifCorrectArr.add(group);
+  }
+
+  print(ifCorrectArr);
+
+  return ifCorrectArr;
+}
+
+Future<List<Object>> requestServerGroupShow() async{
+  String username = MyLoginWidget2.username;
+  String token = MyLoginWidget2.token;
+
+  print("Jetzt in der requestServer");
+
+  if(token == "") token = MySignupWidget2.token;
+  if(username == "") username = MySignupWidget2.username;
+
+  var body = {
+    "username":username,
+    "token":token,
+  };
+  var address = 'http://185.5.199.33:30000';
+  print("!");
+  var client = new http.Client();
+  var uri = Uri.parse("$address/get_groups");
+  http.Response res = await client.post(uri, body: body);
+  print("!");
+  var resArray = [res.body, res.statusCode];
+
+  print("RESARRAY2: ${resArray}");
+
+  return resArray;
 }
 
 Future<List<Object>> checkIfCorrectNewGroup () async {
