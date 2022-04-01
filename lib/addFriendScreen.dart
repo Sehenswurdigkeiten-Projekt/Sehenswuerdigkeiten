@@ -20,6 +20,7 @@ class MyFriendsWidget extends StatefulWidget {
 class _MyFriendsWidget extends State<MyFriendsWidget> {
 
   TextEditingController friendsName = TextEditingController();
+  TextEditingController groupName = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +43,7 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
           Row(
               children: const [
                 Icon(
-                  Icons.people,
+                  Icons.emoji_people,
                   color: Color(0xff2F8D46),
                 ),
                 SizedBox(width: 10),
@@ -60,6 +61,29 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
           buildFriendOptionAdd(context, "Add Friends"),
           buildFriendOptionRequests(context, "Show Friend Requests"),
           buildFriendOptionShow(context, "Show Friends"),
+          SizedBox(height: 40),
+          Row(
+              children: const [
+                Icon(
+                  Icons.people,
+                  color: Color(0xff2F8D46),
+                ),
+                SizedBox(width: 10),
+                Text(
+                    "Groups",
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ))
+              ]
+          ),
+          Divider(height: 20, thickness: 1, color: Colors.grey[400]),
+          SizedBox(height: 10),
+          buildGroupOptionCreate(context, "Create Group"),
+          buildGroupOptionJoin(context, "Join Group"),
+          buildGroupOptionShow(context, "Show Groups"),
+          buildGroupOptionMembers(context, "Show Group members"),
           SizedBox(height: 40),
         ]
       )
@@ -316,7 +340,400 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
       ),
     );
   }
+
+/////////////////////////////////////////////////////////
+
+  GestureDetector buildGroupOptionCreate(BuildContext context, String title){
+    return GestureDetector(
+      onTap: () async {
+        var isCorrect = await checkIfCorrectNewGroup();
+        var code;
+        code = isCorrect[1];
+        var code2;
+        code2 = jsonDecode(code)["code"].toString();
+        showDialog(context: context, builder: (BuildContext context){
+          return AlertDialog(
+            title: Text(title),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "$code2"
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () async {
+                    if(isCorrect[0] == false){
+                      Alert(
+                        type: AlertType.warning,
+                        context: context,
+                        title: "Something is wrong!",
+                        desc: "Please correct it!",
+                      ).show();
+                    }
+                    else{
+                      Navigator.of(context).pop();
+                    }
+                  },
+                  child: const Text(
+                      "Add",
+                      style: TextStyle(
+                        color: Color(0xff2F8D46),
+                      ))
+              ),
+              TextButton(
+                  onPressed: (){
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text(
+                      "Close",
+                      style: TextStyle(
+                        color: Color(0xff2F8D46),
+                      ))
+              )
+            ],
+          );
+        });
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(title, style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey[600]
+            )),
+            Icon(Icons.arrow_forward_ios, color: Colors.grey)
+          ],
+        ),
+      ),
+    );
+  }
+
+  GestureDetector buildGroupOptionJoin(BuildContext context, String title){
+    return GestureDetector(
+      onTap: (){
+        showDialog(context: context, builder: (BuildContext context){
+          return AlertDialog(
+            title: Text(title),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  autofocus: false,
+                  cursorColor: const Color(0xff9a9a9a),
+                  maxLength: 20,
+
+                  controller: groupName,
+
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.allow(RegExp('[A-Za-zÀÁÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿÆÐƎƏƐƔĲŊŒẞÞǷȜæðǝəɛɣĳŋœĸſßþƿȝĄƁÇĐƊĘĦĮƘŁØƠŞȘŢȚŦŲƯY̨Ƴąɓçđɗęħįƙłøơşșţțŧųưy̨ƴÁÀÂÄǍĂĀÃÅǺĄÆǼǢƁĆĊĈČÇĎḌĐƊÐÉÈĖÊËĚĔĒĘẸƎƏƐĠĜǦĞĢƔáàâäǎăāãåǻąæǽǣɓćċĉčçďḍđɗðéèėêëěĕēęẹǝəɛġĝǧğģɣĤḤĦIÍÌİÎÏǏĬĪĨĮỊĲĴĶƘĹĻŁĽĿʼNŃN̈ŇÑŅŊÓÒÔÖǑŎŌÕŐỌØǾƠŒĥḥħıíìiîïǐĭīĩįịĳĵķƙĸĺļłľŀŉńn̈ňñņŋóòôöǒŏōõőọøǿơœŔŘŖŚŜŠŞȘṢẞŤŢṬŦÞÚÙÛÜǓŬŪŨŰŮŲỤƯẂẀŴẄǷÝỲŶŸȲỸƳŹŻŽẒŕřŗſśŝšşșṣßťţṭŧþúùûüǔŭūũűůųụưẃẁŵẅƿýỳŷÿȳỹƴźżžẓ0-9_.-]')),
+                    //FilteringTextInputFormatter.allow(RegExp('[A-Za-zÀÁÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿÆÐƎƏƐƔĲŊŒẞÞǷȜæðǝəɛɣĳŋœĸſßþƿȝĄƁÇĐƊĘĦĮƘŁØƠŞȘŢȚŦŲƯY̨Ƴąɓçđɗęħįƙłøơşșţțŧųưy̨ƴÁÀÂÄǍĂĀÃÅǺĄÆǼǢƁĆĊĈČÇĎḌĐƊÐÉÈĖÊËĚĔĒĘẸƎƏƐĠĜǦĞĢƔáàâäǎăāãåǻąæǽǣɓćċĉčçďḍđɗðéèėêëěĕēęẹǝəɛġĝǧğģɣĤḤĦIÍÌİÎÏǏĬĪĨĮỊĲĴĶƘĹĻŁĽĿʼNŃN̈ŇÑŅŊÓÒÔÖǑŎŌÕŐỌØǾƠŒĥḥħıíìiîïǐĭīĩįịĳĵķƙĸĺļłľŀŉńn̈ňñņŋóòôöǒŏōõőọøǿơœŔŘŖŚŜŠŞȘṢẞŤŢṬŦÞÚÙÛÜǓŬŪŨŰŮŲỤƯẂẀŴẄǷÝỲŶŸȲỸƳŹŻŽẒŕřŗſśŝšşșṣßťţṭŧþúùûüǔŭūũűůųụưẃẁŵẅƿýỳŷÿȳỹƴźżžẓ0-9_.-]')),
+                  ],
+
+                  decoration: const InputDecoration(
+                    suffixIcon: Icon(
+                      Icons.person_add,
+                      color: Color(0xff9a9a9a),
+                    ),
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xff2F8D46)),
+                    ),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xff2F8D46)),
+                    ),
+                    labelText: 'Group Code',
+                    labelStyle: TextStyle(
+                      color: Color(0xff9a9a9a),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () async {
+                    var isCorrect = await checkIfCorrectJoinGroup(groupName.text);
+                    if(isCorrect == false){
+                      Alert(
+                        type: AlertType.warning,
+                        context: context,
+                        title: "Something is wrong!",
+                        desc: "Please correct it!",
+                      ).show();
+                    }
+                    else{
+                      groupName.text = "";
+                      Navigator.of(context).pop();
+                    }
+                  },
+                  child: const Text(
+                      "Add",
+                      style: TextStyle(
+                        color: Color(0xff2F8D46),
+                      ))
+              ),
+              TextButton(
+                  onPressed: (){
+                    groupName.text = "";
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text(
+                      "Close",
+                      style: TextStyle(
+                        color: Color(0xff2F8D46),
+                      ))
+              )
+            ],
+          );
+        });
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(title, style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey[600]
+            )),
+            Icon(Icons.arrow_forward_ios, color: Colors.grey)
+          ],
+        ),
+      ),
+    );
+  }
+
+  GestureDetector buildGroupOptionShow(BuildContext context, String title){
+    return GestureDetector(
+      onTap: (){
+        showDialog(context: context, builder: (BuildContext context){
+          return AlertDialog(
+            title: Text(title),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                    "TEXT - Groups"
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () async {
+                    /*
+                    var isCorrect = await checkIfCorrectJoinGroup();
+                    if(isCorrect == false){
+                      Alert(
+                        type: AlertType.warning,
+                        context: context,
+                        title: "Something is wrong!",
+                        desc: "Please correct it!",
+                      ).show();
+                    }
+                    else{
+                      Navigator.of(context).pop();
+                    }
+                     */
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text(
+                      "Add",
+                      style: TextStyle(
+                        color: Color(0xff2F8D46),
+                      ))
+              ),
+              TextButton(
+                  onPressed: (){
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text(
+                      "Close",
+                      style: TextStyle(
+                        color: Color(0xff2F8D46),
+                      ))
+              )
+            ],
+          );
+        });
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(title, style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey[600]
+            )),
+            Icon(Icons.arrow_forward_ios, color: Colors.grey)
+          ],
+        ),
+      ),
+    );
+  }
+
+  GestureDetector buildGroupOptionMembers(BuildContext context, String title){
+    return GestureDetector(
+      onTap: (){
+        showDialog(context: context, builder: (BuildContext context){
+          return AlertDialog(
+            title: Text(title),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                    "TEXT - Members"
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () async {
+                    /*
+                    var isCorrect = await checkIfCorrectJoinGroup();
+                    if(isCorrect == false){
+                      Alert(
+                        type: AlertType.warning,
+                        context: context,
+                        title: "Something is wrong!",
+                        desc: "Please correct it!",
+                      ).show();
+                    }
+                    else{
+                      Navigator.of(context).pop();
+                    }
+                     */
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text(
+                      "Add",
+                      style: TextStyle(
+                        color: Color(0xff2F8D46),
+                      ))
+              ),
+              TextButton(
+                  onPressed: (){
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text(
+                      "Close",
+                      style: TextStyle(
+                        color: Color(0xff2F8D46),
+                      ))
+              )
+            ],
+          );
+        });
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(title, style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey[600]
+            )),
+            Icon(Icons.arrow_forward_ios, color: Colors.grey)
+          ],
+        ),
+      ),
+    );
+  }
 }
+
+Future<List<Object>> checkIfCorrectNewGroup () async {
+  bool isCorrect = false;
+
+  var resArray = await requestServerNewGroup();
+  var statusCode = resArray[1].toString();
+  var groupCode = resArray[0].toString();
+
+  if(statusCode != "404"){
+    isCorrect = true;
+  }
+
+  var ifCorrectArr = [isCorrect, groupCode];
+  print("ARR: $groupCode");
+  //code = jsonDecode(ifCorrectArr)[i]["Username"].toString();
+  return ifCorrectArr;
+}
+
+Future<List<Object>> requestServerNewGroup() async{
+  String username = MyLoginWidget2.username;
+  String token = MyLoginWidget2.token;
+
+  print("Jetzt in der requestServer");
+  if(token == "") token = MySignupWidget2.token;
+  if(username == "") username = MySignupWidget2.username;
+
+  var body = {
+    "username":username,
+    "token":token,
+    "routeID":"hello" //(do amol uanfoch null übergeben)
+  };
+
+  var address = 'http://185.5.199.33:30000';
+  var client = new http.Client();
+  var uri = Uri.parse("$address/create_group");
+  http.Response res = await client.post(uri, body: body);
+  var resArray = [res.body, res.statusCode];
+
+  print("RESARRAY2: ${resArray}");
+
+  return resArray;
+}
+
+Future<bool> checkIfCorrectJoinGroup (groupCode) async {
+  bool isCorrect = false;
+
+  var resArray = await requestServerJoinGroup(groupCode);
+  print(resArray);
+  var statusCode = resArray[1].toString();
+  print("STAT: $statusCode");
+
+  if(statusCode == "Joined Group"){
+    isCorrect = true;
+  }
+  print("COOR: $isCorrect");
+  //code = jsonDecode(ifCorrectArr)[i]["Username"].toString();
+  return isCorrect;
+}
+
+Future<List<Object>> requestServerJoinGroup(String groupCode) async{
+  String username = MyLoginWidget2.username;
+  String token = MyLoginWidget2.token;
+
+  print("Jetzt in der requestServer");
+  if(token == "") token = MySignupWidget2.token;
+  if(username == "") username = MySignupWidget2.username;
+
+  var body = {
+    "username":username,
+    "token":token,
+    "code":groupCode
+  };
+
+  var address = 'http://185.5.199.33:30000';
+  var client = new http.Client();
+  var uri = Uri.parse("$address/join_group");
+  http.Response res = await client.post(uri, body: body);
+  var resArray = [res.body, res.statusCode];
+
+  print("RESARRAY2: ${resArray}");
+
+  return resArray;
+}
+
+/////////////////////////////////////////////////////
 
 Future<bool> checkIfCorrect (String friend) async {
   bool isCorrect = false;
