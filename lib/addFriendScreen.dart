@@ -556,7 +556,7 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
                 color: Colors.grey[600]
             )),
             Icon(Icons.arrow_forward_ios, color: Colors.grey)
-          ],
+          ],  //hehe
         ),
       ),
     );
