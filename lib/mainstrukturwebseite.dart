@@ -6,6 +6,7 @@ import 'package:flutter_mapbox_navigation/library.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:untitled/addFriendScreen.dart';
 import 'package:untitled/http_service.dart';
+import 'package:untitled/loginScreen.dart';
 import 'package:untitled/settingScreen.dart'; import 'locationstuff.dart';
 
 class MyApp2 extends StatelessWidget {
@@ -113,6 +114,8 @@ class HomePageState extends State<HomePage> {
   int pageIndex = 0;
   static late HomePageState _homePageState;
 
+
+
   HomePageState(){
     _homePageState = this;
   }
@@ -131,9 +134,16 @@ class HomePageState extends State<HomePage> {
 
   //GET_USERINFO:30000
   //body .> username, token -> res ist Bild auch.
+
+  initState(){
+    super.initState();
+    imageString = MyLoginWidget2.imgString;
+  }
+
    void updateProfilePicture(var name){
     print("JETZT IMAGE GEUPDATED");
     setState(() {imageString = name;});
+    print("Der imageString ist jetzt: ${imageString} __ der name der uebergeben wurde ist ${name}");
   }
 
   @override
@@ -209,6 +219,7 @@ class HomePageState extends State<HomePage> {
             enableFeedback: false,
             onPressed: () {
               setState(() {
+                print(imageString);
                 normalSearchBar = true;
                 pageIndex = 0;
               });

@@ -22,6 +22,7 @@ class MyLoginWidget2 extends State<MyLoginWidget> {
 
   static String _username="";
   static String _token="";
+  static String _imgString="assets/gps_images/gps_image0.png";
 
   @override
   Widget build(BuildContext context) {
@@ -139,7 +140,7 @@ class MyLoginWidget2 extends State<MyLoginWidget> {
                   ),
                   child: const Text('Login'),
                   onPressed: () async {
-                    List<Object> resArray = await checkIfCorrect(nameController.text, passwordController.text); //checkt ob überall etwas eingegeben wurde und es richtig ist
+                    List resArray = await checkIfCorrect(nameController.text, passwordController.text); //checkt ob überall etwas eingegeben wurde und es richtig ist
                     if (resArray[0] == false){
                       Alert(
                         type: AlertType.warning,
@@ -153,9 +154,13 @@ class MyLoginWidget2 extends State<MyLoginWidget> {
                       print(passwordController.text);
 
                       String jsonString = '{"username":"${nameController.text}","pwd":"${passwordController.text}"}';
-                      var token = resArray[1].toString();
-                      _token = jsonDecode(token)['token'].toString();
+                      var json = resArray[1].toString();
+
+                      //print(jsonDecode(json));
+
+                      _token = jsonDecode(json)[0]['Authtoken'].toString();
                       _username = nameController.text;
+                      _imgString = "assets/gps_images/"+jsonDecode(json)[0]['Image'].toString();
 
                       print(jsonString); // Dart
 
@@ -207,6 +212,11 @@ class MyLoginWidget2 extends State<MyLoginWidget> {
     _username = value;
   }
 
+  static String get imgString => _imgString;
+
+  static set imgString(String value) {
+    _imgString = value;
+  }
 }
 
 class NewScreen extends StatelessWidget {
@@ -219,26 +229,27 @@ class NewScreen extends StatelessWidget {
   }
 }
 
-Future<List<Object>> checkIfCorrect (String name, String pass) async {
+Future<List> checkIfCorrect (String name, String pass) async {
   bool isCorrect = false;
-  late Object token;
+  late Object json;
+  var resArray = [];
 
   if (name != "" && pass != ""){
-    var resArray = await requestServer(name, pass);
-    token = resArray[0];
+    resArray = await requestServer(name, pass);
+    json = resArray[0];
     Object statusCode = resArray[1].toString();
 
     if(statusCode != "401"){
       isCorrect = true;
     }
 
-    print("TOKEN OBJ: $token");
+    print("TOKEN OBJ: $json");
     print("STATUSCODE: $statusCode");
   }
-  var resArray = [isCorrect, token];
+  var returnArray = [isCorrect, json];
 
 
-  return resArray;
+  return returnArray;
 }
 
 Future<List<Object>> requestServer(String name, String pass) async{
