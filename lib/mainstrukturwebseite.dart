@@ -7,7 +7,8 @@ import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:untitled/addFriendScreen.dart';
 import 'package:untitled/http_service.dart';
 import 'package:untitled/loginScreen.dart';
-import 'package:untitled/settingScreen.dart'; import 'locationstuff.dart';
+import 'package:untitled/settingScreen.dart';
+import 'package:untitled/signUpScreen.dart'; import 'locationstuff.dart';
 
 class MyApp2 extends StatelessWidget {
 
@@ -141,9 +142,7 @@ class HomePageState extends State<HomePage> {
   }
 
    void updateProfilePicture(var name){
-    print("JETZT IMAGE GEUPDATED");
     setState(() {imageString = name;});
-    print("Der imageString ist jetzt: ${imageString} __ der name der uebergeben wurde ist ${name}");
   }
 
   @override
@@ -151,11 +150,21 @@ class HomePageState extends State<HomePage> {
      if(normalSearchBar){
        customSearchBar = Row(
          children: [
-           Container(
-               width: 50,
-               height: 50,
-               child: Image.asset(imageString)),
-           SizedBox(width: 50),
+           Column(
+             children: [
+               Container(
+                   width: 50,
+                   height: 50,
+                   child: Image.asset(imageString)),
+             Text(
+                 "${(MyLoginWidget2.username == "" ? MySignupWidget2.username : MyLoginWidget2.username)}",
+               style: TextStyle(
+                 fontSize: 13,
+               ),
+             )
+             ],
+           ),
+           SizedBox(width: 60),
            Text("One Trip"),
          ],
        );
@@ -174,7 +183,7 @@ class HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: customSearchBar,
-
+        toolbarHeight: 80,
         automaticallyImplyLeading: false,
         actions: pageIndex == 1 ? [
           IconButton(
