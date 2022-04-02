@@ -37,8 +37,10 @@ exports.getFriends = async function(req, res){
 
 exports.login = async function(req, res)
 {
+  console.log("LOGIN");
   let user = req.body.username;
   let pwd = req.body.pwd;
+  console.log(user, pwd);
   rows = await db.getTokenAndPasswordFromUsername(user);
 
   if(rows[0] && bcrypt.compareSync(pwd, rows[0].Password)){
@@ -112,7 +114,7 @@ exports.createGroup = async function(req,res)
 {
   let leader = req.body.username
   let token = req.body.token
-  let routeID = isNaN(req.body.routeID) ? null : req.body.routeID; 
+  let routeID = null; 
   
   if(!await db.validateToken(token, leader)){
     res.statusMessage = "Failed to create Group"

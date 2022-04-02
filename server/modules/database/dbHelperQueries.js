@@ -165,7 +165,7 @@ exports.leaveGroup = async function(userid, groupid){
 
 }
 exports.getGroupsForUser = async function(userID){
-    const query = "Select GroupCode from User_UserGroup as a join UserGroup as b on GroupID = GroupID and UserID = ?"
+    const query = "Select GroupCode from User_UserGroup as a join UserGroup as b on a.GroupID = b.GroupID and a.UserID = ?"
     const [rows, fields] = await promisePool.execute(query, [userID])
     return rows;
 }

@@ -15,7 +15,7 @@ const request = require("./routes/requests");
 const { application } = require("express");
 
 //TODO: should probably return Friends and Groups or maybe make new Post requests
-
+app.get("/", urlencodedParser, jsonParser, (req, res)=>{res.send("hallo")})
 app.post("/LOGIN", urlencodedParser,jsonParser,request.login)
 app.post("/CREATE_ACCOUNT/", urlencodedParser,jsonParser, request.createAccount)
 app.post("/UPDATE_GPS/",urlencodedParser,jsonParser,request.updateGPS)
@@ -39,4 +39,4 @@ app.post("/SET_GROUP_ROUTE", urlencodedParser, jsonParser, async function(req, r
 app.post("/CREATE_ROUTE", urlencodedParser,jsonParser, async function(req,res){
   
 })
-app.listen(30000, () => console.log(`Hello world app listening on port ${port}!`))
+app.listen(port, () => console.log(`Hello world app listening on port ${port}!`))
