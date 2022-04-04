@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_mapbox_navigation/library.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
@@ -227,6 +228,7 @@ class HomePageState extends State<HomePage> {
           IconButton(
             enableFeedback: false,
             onPressed: () {
+              HapticFeedback.vibrate();
               setState(() {
                 print(imageString);
                 normalSearchBar = true;
@@ -248,6 +250,7 @@ class HomePageState extends State<HomePage> {
           IconButton(
             enableFeedback: false,
             onPressed: () {
+              HapticFeedback.vibrate();
               setState(() {
                 normalSearchBar = true;
                 pageIndex = 1;
@@ -268,6 +271,7 @@ class HomePageState extends State<HomePage> {
           IconButton(
             enableFeedback: false,
             onPressed: () {
+              HapticFeedback.vibrate();
               setState(() {
                 normalSearchBar = true;
                 pageIndex = 2;
@@ -365,7 +369,8 @@ class _Page2State extends State<Page2> {
   late Timer timerFriendLocation;
   late LatLng ownLocationLatLng;
   late List<dynamic> friendLocationListLatLng;
-  late MapboxMapController mapboxmapcontroller; //Der controller für die Circles etc.
+  //late MapboxMapController mapboxmapcontroller; //Der controller für die Circles etc.
+  MapboxMapController? mapboxmapcontroller = null; //Der controller für die Circles etc.
   var myColorCircle = '#006992';
   var otherColorCircle = '#009229';
   late Circle userCircle;
@@ -383,7 +388,7 @@ class _Page2State extends State<Page2> {
 
       ownLocationLatLng = (await acquireCurrentLocation())!;
 
-      mapboxmapcontroller.updateCircle(userCircle, CircleOptions(
+      mapboxmapcontroller!.updateCircle(userCircle, CircleOptions(
         circleRadius: 8.0,
         circleColor:  myColorCircle,
         circleOpacity: 0.8,
@@ -401,7 +406,7 @@ class _Page2State extends State<Page2> {
       for(var i=0; i<friendListSymbols.length; i++){
         if(friendLocationListLatLng[i]['Lon'] == null || friendLocationListLatLng[i]['Lat'] == null) continue;
 
-        mapboxmapcontroller.updateSymbol(friendListSymbols[i], SymbolOptions(
+        mapboxmapcontroller!.updateSymbol(friendListSymbols[i], SymbolOptions(
           iconSize: 0.4,
           iconImage: "assets/gps_images/${friendLocationListLatLng[i]['Image']}",
           iconOpacity: 0.8,
@@ -435,7 +440,7 @@ class _Page2State extends State<Page2> {
         ),
 
         onMapCreated: (MapboxMapController controller) async {
-          //print("jetzt in der onMapCreated");
+          print("jetzt in der onMapCreated");
           //Acquire current location (returns the LatLong instance)
           ownLocationLatLng = (await acquireCurrentLocation())!;
 
@@ -484,7 +489,7 @@ class _Page2State extends State<Page2> {
           }
 
 
-          //print("JETZT IST DIE oinMAPLOADIng function fertig");
+          print("Jetzt ist die OnMapCreated function fertig!");
           mapboxmapcontroller = controller;
           },
 
