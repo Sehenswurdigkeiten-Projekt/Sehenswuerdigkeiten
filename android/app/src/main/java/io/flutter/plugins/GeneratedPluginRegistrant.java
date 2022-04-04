@@ -16,6 +16,16 @@ public final class GeneratedPluginRegistrant {
   private static final String TAG = "GeneratedPluginRegistrant";
   public static void registerWith(@NonNull FlutterEngine flutterEngine) {
     try {
+      flutterEngine.getPlugins().add(new com.dormmom.flutter_mapbox_navigation.FlutterMapboxNavigationPlugin());
+    } catch(Exception e) {
+      Log.e(TAG, "Error registering plugin flutter_mapbox_navigation, com.dormmom.flutter_mapbox_navigation.FlutterMapboxNavigationPlugin", e);
+    }
+    try {
+      flutterEngine.getPlugins().add(new com.ggichure.github.hexcolor.HexcolorPlugin());
+    } catch(Exception e) {
+      Log.e(TAG, "Error registering plugin hexcolor, com.ggichure.github.hexcolor.HexcolorPlugin", e);
+    }
+    try {
       flutterEngine.getPlugins().add(new com.lyokone.location.LocationPlugin());
     } catch(Exception e) {
       Log.e(TAG, "Error registering plugin location, com.lyokone.location.LocationPlugin", e);
