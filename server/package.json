@@ -4,22 +4,31 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "kill $(ps aux | grep /usr/bin/node | grep -v grep | awk '{print $2}');nodemon server.js",
-    "go": "kill $(ps aux | grep /usr/bin/node | grep -v grep | awk '{print $2}'); node server.js",
-    "forever": "forever -o out.log -e err.log server.js",
+    "test": "jest",
+    "start": "kill $(ps aux | grep /usr/bin/node | grep -v grep | awk '{print $2}');nodemon server.js 30000",
+    "go": "kill $(ps aux | grep /usr/bin/node | grep -v grep | awk '{print $2}'); node server.js 30000",
+    "forever": "forever -o out.log -e err.log server.js 30000",
     "kill": "kill $(ps aux | grep /usr/bin/node | grep -v grep | awk '{print $2}');"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.26.1",
     "bcryptjs": "^2.4.3",
     "bluebird": "^3.7.2",
     "body-parser": "^1.19.2",
     "express": "^4.17.3",
     "forever": "^4.0.3",
+    "jest": "^27.5.1",
+    "jest-fetch-mock": "^3.0.3",
     "mysql2": "^2.3.3",
     "nodemon": "^2.0.15"
+  },
+  "jest": {
+    "automock": false,
+    "setupFiles": [
+      "./tests/setupJest.js"
+    ]
   }
 }

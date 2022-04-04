@@ -1,3 +1,4 @@
+// @dart=2.9
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,7 +14,7 @@ void main() async{
 }
 
 class MyApp1 extends StatelessWidget {
-  const MyApp1({Key? key}) : super(key: key);
+  const MyApp1({Key key}) : super(key: key);
 
   static const String _title = 'Login';
   // This widget is the root of your application.

@@ -1,0 +1,30 @@
+services:
+  loadbalancer_server:
+    image: loadbalancer_server
+    ports:
+      - 3001:3001
+
+  server1:
+    image: server
+    container_name: server1
+    environment:
+      - PORT=30001
+    ports:
+      - 30000:30000
+
+  server2:
+    image: server
+    container_name: server2
+    environment:
+      - PORT=30001
+    ports:
+      - 30001:30001
+
+#  database:
+#    image: mysql/mysql-server
+#    container_name: mysql_server
+#    environment:
+#      - MYSQL_ROOT_PASSWORD=12345678
+#    ports:
+#     -3306:3306
+#    command:

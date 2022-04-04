@@ -5,6 +5,8 @@ import 'package:untitled/loginScreen.dart';
 import 'package:untitled/mainstrukturwebseite.dart';
 import 'package:http/http.dart' as http;
 import 'package:untitled/signUpScreen.dart';
+import 'package:flutter/services.dart';
+
 
 
 
@@ -40,7 +42,7 @@ class DisplayPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.red,
+      backgroundColor: Color(0xff2F8D46),
       body: Center(
           child: ListView(
             padding: EdgeInsets.only(top: 150),
@@ -100,8 +102,9 @@ class DisplayPage extends StatelessWidget {
                 ),
                 onPressed: () async {
                   await requestServerSendNewPic("http://185.5.199.33:30000/UPDATE_IMAGE");
-                  HomePageState.homePageState.updateProfilePicture("assets/gps_images/gps_image${final_index}.png");
-
+                  HomePageState.homePageState.updateProfilePicture("assets/gps_images/gps_image${_final_page_index}.png");
+                  MyLoginWidget2.imgString = "assets/gps_images/gps_image${_final_page_index}.png";
+                  HapticFeedback.vibrate();
                   Navigator.pop(context);
                   Navigator.push(context, MaterialPageRoute(builder: (context) => MyApp2()));
                 },
@@ -143,5 +146,5 @@ class DisplayPage extends StatelessWidget {
   }
 
 
-  static get final_index => _final_page_index;
+  static get final_page_index => _final_page_index;
 }

@@ -60,8 +60,8 @@ flutter_icons:
   image_path: "assets/icons/logo3.jpg"
   android: true # can specify file name here e.g. "ic_launcher"
   ios: true # can specify file name here e.g. "My-Launcher-Icon"
-  adaptive_icon_background: "assets/icons/logo3.jpg" # only available for Android 8.0 devices and above
-  adaptive_icon_foreground: "assets/icons/logo3.jpg" # only available for Android 8.0 devices and above
+  adaptive_icon_background: "assets/icons/logo3gross.png" # only available for Android 8.0 devices and above
+  adaptive_icon_foreground: "assets/icons/logo3gross.png" # only available for Android 8.0 devices and above
 
 dev_dependencies:
   flutter_test:
@@ -91,6 +91,7 @@ flutter:
     - assets/icons/
     - assets/gps_images/
     - assets/config/
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

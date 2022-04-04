@@ -3,11 +3,13 @@ import 'dart:convert';
 //import 'dart:html';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_mapbox_navigation/library.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:untitled/addFriendScreen.dart';
 import 'package:untitled/http_service.dart';
+
 import 'package:untitled/settingScreen.dart'; import 'locationstuff.dart';
 import 'nav/screens/prepare_ride.dart';
 import 'package:flutter/cupertino.dart';
@@ -18,6 +20,11 @@ import 'package:mapbox_gl/mapbox_gl.dart';
 import '../../mainstrukturwebseite.dart';
 import 'package:untitled/nav/helpers/mapbox_handler.dart';
 import 'package:untitled/main.dart';
+
+import 'package:untitled/loginScreen.dart';
+import 'package:untitled/settingScreen.dart';
+import 'package:untitled/signUpScreen.dart'; import 'locationstuff.dart';
+
 
 class MyApp2 extends StatelessWidget {
 
@@ -125,6 +132,8 @@ class HomePageState extends State<HomePage> {
   int pageIndex = 0;
   static late HomePageState _homePageState;
 
+
+
   HomePageState(){
     _homePageState = this;
   }
@@ -141,8 +150,13 @@ class HomePageState extends State<HomePage> {
 
   //GET_USERINFO:30000
   //body .> username, token -> res ist Bild auch.
+
+  initState(){
+    super.initState();
+    imageString = MyLoginWidget2.imgString;
+  }
+
    void updateProfilePicture(var name){
-    print("JETZT IMAGE GEUPDATED");
     setState(() {imageString = name;});
   }
 
@@ -151,11 +165,21 @@ class HomePageState extends State<HomePage> {
      if(normalSearchBar){
        customSearchBar = Row(
          children: [
-           Container(
-               width: 50,
-               height: 50,
-               child: Image.asset(imageString)),
-           SizedBox(width: 50),
+           Column(
+             children: [
+               Container(
+                   width: 50,
+                   height: 50,
+                   child: Image.asset(imageString)),
+             Text(
+                 "${(MyLoginWidget2.username == "" ? MySignupWidget2.username : MyLoginWidget2.username)}",
+               style: TextStyle(
+                 fontSize: 13,
+               ),
+             )
+             ],
+           ),
+           SizedBox(width: 60),
            Text("One Trip"),
          ],
        );
@@ -174,7 +198,7 @@ class HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: customSearchBar,
-
+        toolbarHeight: 80,
         automaticallyImplyLeading: false,
         actions: pageIndex == 1 ? [
           IconButton(
@@ -218,7 +242,9 @@ class HomePageState extends State<HomePage> {
           IconButton(
             enableFeedback: false,
             onPressed: () {
+              HapticFeedback.vibrate();
               setState(() {
+                print(imageString);
                 normalSearchBar = true;
                 pageIndex = 0;
               });
@@ -238,6 +264,7 @@ class HomePageState extends State<HomePage> {
           IconButton(
             enableFeedback: false,
             onPressed: () {
+              HapticFeedback.vibrate();
               setState(() {
                 normalSearchBar = true;
                 pageIndex = 1;
@@ -258,6 +285,7 @@ class HomePageState extends State<HomePage> {
           IconButton(
             enableFeedback: false,
             onPressed: () {
+              HapticFeedback.vibrate();
               setState(() {
                 normalSearchBar = true;
                 pageIndex = 2;
@@ -358,7 +386,8 @@ class _Page2State extends State<Page2> {
   late Timer timerFriendLocation;
   late LatLng ownLocationLatLng;
   late List<dynamic> friendLocationListLatLng;
-  late MapboxMapController mapboxmapcontroller; //Der controller für die Circles etc.
+  //late MapboxMapController mapboxmapcontroller; //Der controller für die Circles etc.
+  MapboxMapController? mapboxmapcontroller = null; //Der controller für die Circles etc.
   var myColorCircle = '#006992';
   var otherColorCircle = '#009229';
   late Circle userCircle;
@@ -378,7 +407,7 @@ class _Page2State extends State<Page2> {
 
       ownLocationLatLng = (await acquireCurrentLocation())!;
 
-      mapboxmapcontroller.updateCircle(userCircle, CircleOptions(
+      mapboxmapcontroller!.updateCircle(userCircle, CircleOptions(
         circleRadius: 8.0,
         circleColor:  myColorCircle,
         circleOpacity: 0.8,
@@ -396,7 +425,7 @@ class _Page2State extends State<Page2> {
       for(var i=0; i<friendListSymbols.length; i++){
         if(friendLocationListLatLng[i]['Lon'] == null || friendLocationListLatLng[i]['Lat'] == null) continue;
 
-        mapboxmapcontroller.updateSymbol(friendListSymbols[i], SymbolOptions(
+        mapboxmapcontroller!.updateSymbol(friendListSymbols[i], SymbolOptions(
           iconSize: 0.4,
           iconImage: "assets/gps_images/${friendLocationListLatLng[i]['Image']}",
           iconOpacity: 0.8,
@@ -460,7 +489,7 @@ class _Page2State extends State<Page2> {
         ),
 
         onMapCreated: (MapboxMapController controller) async {
-          //print("jetzt in der onMapCreated");
+          print("jetzt in der onMapCreated");
           //Acquire current location (returns the LatLong instance)
           ownLocationLatLng = (await acquireCurrentLocation())!;
 
@@ -509,7 +538,7 @@ class _Page2State extends State<Page2> {
           }
 
 
-          //print("JETZT IST DIE oinMAPLOADIng function fertig");
+          print("Jetzt ist die OnMapCreated function fertig!");
           mapboxmapcontroller = controller;
           },
 
