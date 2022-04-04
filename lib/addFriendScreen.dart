@@ -21,6 +21,7 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
 
   TextEditingController friendsName = TextEditingController();
   TextEditingController groupName = TextEditingController();
+  TextEditingController groupCode = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -564,22 +565,64 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
 
   GestureDetector buildGroupOptionMembers(BuildContext context, String title){
     return GestureDetector(
-      onTap: (){
+      onTap: () async{
         showDialog(context: context, builder: (BuildContext context){
           return AlertDialog(
             title: Text(title),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                TextField(
+                  autofocus: false,
+                  cursorColor: const Color(0xff9a9a9a),
+                  maxLength: 20,
+
+                  controller: groupCode,
+
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.allow(RegExp('[A-Za-zÀÁÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿÆÐƎƏƐƔĲŊŒẞÞǷȜæðǝəɛɣĳŋœĸſßþƿȝĄƁÇĐƊĘĦĮƘŁØƠŞȘŢȚŦŲƯY̨Ƴąɓçđɗęħįƙłøơşșţțŧųưy̨ƴÁÀÂÄǍĂĀÃÅǺĄÆǼǢƁĆĊĈČÇĎḌĐƊÐÉÈĖÊËĚĔĒĘẸƎƏƐĠĜǦĞĢƔáàâäǎăāãåǻąæǽǣɓćċĉčçďḍđɗðéèėêëěĕēęẹǝəɛġĝǧğģɣĤḤĦIÍÌİÎÏǏĬĪĨĮỊĲĴĶƘĹĻŁĽĿʼNŃN̈ŇÑŅŊÓÒÔÖǑŎŌÕŐỌØǾƠŒĥḥħıíìiîïǐĭīĩįịĳĵķƙĸĺļłľŀŉńn̈ňñņŋóòôöǒŏōõőọøǿơœŔŘŖŚŜŠŞȘṢẞŤŢṬŦÞÚÙÛÜǓŬŪŨŰŮŲỤƯẂẀŴẄǷÝỲŶŸȲỸƳŹŻŽẒŕřŗſśŝšşșṣßťţṭŧþúùûüǔŭūũűůųụưẃẁŵẅƿýỳŷÿȳỹƴźżžẓ0-9_.-]')),
+                    //FilteringTextInputFormatter.allow(RegExp('[A-Za-zÀÁÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿÆÐƎƏƐƔĲŊŒẞÞǷȜæðǝəɛɣĳŋœĸſßþƿȝĄƁÇĐƊĘĦĮƘŁØƠŞȘŢȚŦŲƯY̨Ƴąɓçđɗęħįƙłøơşșţțŧųưy̨ƴÁÀÂÄǍĂĀÃÅǺĄÆǼǢƁĆĊĈČÇĎḌĐƊÐÉÈĖÊËĚĔĒĘẸƎƏƐĠĜǦĞĢƔáàâäǎăāãåǻąæǽǣɓćċĉčçďḍđɗðéèėêëěĕēęẹǝəɛġĝǧğģɣĤḤĦIÍÌİÎÏǏĬĪĨĮỊĲĴĶƘĹĻŁĽĿʼNŃN̈ŇÑŅŊÓÒÔÖǑŎŌÕŐỌØǾƠŒĥḥħıíìiîïǐĭīĩįịĳĵķƙĸĺļłľŀŉńn̈ňñņŋóòôöǒŏōõőọøǿơœŔŘŖŚŜŠŞȘṢẞŤŢṬŦÞÚÙÛÜǓŬŪŨŰŮŲỤƯẂẀŴẄǷÝỲŶŸȲỸƳŹŻŽẒŕřŗſśŝšşșṣßťţṭŧþúùûüǔŭūũűůųụưẃẁŵẅƿýỳŷÿȳỹƴźżžẓ0-9_.-]')),
+                  ],
+
+                  decoration: const InputDecoration(
+                    suffixIcon: Icon(
+                      Icons.people,
+                      color: Color(0xff9a9a9a),
+                    ),
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xff2F8D46)),
+                    ),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xff2F8D46)),
+                    ),
+                    labelText: 'Group Code',
+                    labelStyle: TextStyle(
+                      color: Color(0xff9a9a9a),
+                    ),
+                  ),
+                ),
                 Text(
-                    "TEXT - Members"
+                  "Members:",
+                  textAlign: TextAlign.left,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                Text(
+                  "FOGdddG",
+                  textAlign: TextAlign.left,
+                  style: TextStyle(
+                    fontSize: 18,
+                  ),
                 ),
               ],
             ),
             actions: [
-                    /*
-                    var isCorrect = await checkIfCorrectJoinGroup();
-                    if(isCorrect == false){
+              TextButton(
+                  onPressed: () async {
+                    var isCorrect = await checkIfCorrectGroupMembersShow(groupCode.text);
+                    if(isCorrect[0] == "false"){
                       Alert(
                         type: AlertType.warning,
                         context: context,
@@ -588,11 +631,19 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
                       ).show();
                     }
                     else{
+                      groupCode.text = "";
                       Navigator.of(context).pop();
                     }
-                     */
+                  },
+                  child: const Text(
+                      "Show",
+                      style: TextStyle(
+                        color: Color(0xff2F8D46),
+                      ))
+              ),
               TextButton(
                   onPressed: (){
+                    groupCode.text = "";
                     Navigator.of(context).pop();
                   },
                   child: const Text(
@@ -621,6 +672,61 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
       ),
     );
   }
+}
+Future<List> checkIfCorrectGroupMembersShow (String groupCode) async {
+  var groups;
+  var group;
+  var isCorrect = false;
+
+  var resArray = await requestServerGroupMembersShow(groupCode);
+  groups = resArray[0];
+  var length = jsonDecode(groups).length;
+  print(length);
+  var ifCorrectArr = [];
+
+  print("Hello $length");
+
+  if(resArray[1] != "415" || groupCode == ""){
+    isCorrect = true;
+  }
+
+  ifCorrectArr.add(isCorrect);
+  for(var i = 0; i<length; i++){
+    group = jsonDecode(groups)[i]["Username"].toString();
+    //requestServer(friend);
+    print("BIIIIITE: $group");
+    ifCorrectArr.add(group);
+  }
+
+  print(ifCorrectArr);
+  return ifCorrectArr;
+}
+
+Future<List<Object>> requestServerGroupMembersShow(String groupCode) async{
+  String username = MyLoginWidget2.username;
+  String token = MyLoginWidget2.token;
+
+  print("Jetzt in der requestServer");
+
+  if(token == "") token = MySignupWidget2.token;
+  if(username == "") username = MySignupWidget2.username;
+
+  var body = {
+    "username":username,
+    "token":token,
+    "code":groupCode
+  };
+  var address = 'http://185.5.199.33:30000';
+  print("!");
+  var client = new http.Client();
+  var uri = Uri.parse("$address/get_groupmembers");
+  http.Response res = await client.post(uri, body: body);
+  print("!");
+  var resArray = [res.body, res.statusCode];
+
+  print("RESARRAY2: ${resArray}");
+
+  return resArray;
 }
 
 Future<List> checkIfCorrectGroupShow () async {
