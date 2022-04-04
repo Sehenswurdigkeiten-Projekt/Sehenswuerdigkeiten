@@ -147,9 +147,9 @@ exports.checkForFriendrequest = async function(userID1, userID2){
     return rows;
 }
 exports.getFriendRequestsForUserID = async function(userID){
-  const query = "Select b.Username from User_Friendrequests as a join User as b using(UserID) where a.FriendID = ?;";
-  const [rows, fields] = await promisePool.execute(query, [userID]);
-  return rows;
+    const query = "Select b.Username from User_Friendrequests as a join User as b using(UserID) where a.FriendID = ?;";
+    const [rows, fields] = await promisePool.execute(query, [userID]);
+    return rows;
 }
 exports.checkIfUserIsInGroup = async function(userID, groupID){
     const query = "Select count(*) as i from User_UserGroup where UserID = ? and GroupID = ?"
@@ -169,9 +169,12 @@ exports.getGroupsForUser = async function(userID){
     const [rows, fields] = await promisePool.execute(query, [userID])
     return rows;
 }
-exports.getGroupmembers = async function(groupID){
-    const query = "Select t.Username, Image,count(Username)-1 as isLeader from (Select Username, Image from User_UserGroup as a join User as b on a.UserID = b.UserID and GroupID = ? Union ALL Select Username, Image from UserGroup as a join User as b on LeaderID = UserID and GroupID = ?) as t group by Username, Image;"
-    const[rows, fields] = promisePool.execute(query, [groupID, groupID]);
+exports.getGroupmembers = async function(groupID, groupID2){
+    console.log(groupID);
+    const query = "Select t.Username, Image,count(Username)-1 as isLeader from (Select b.Username, b.Image from User_UserGroup as a join User as b on a.UserID = b.UserID and GroupID = ? Union ALL Select d.Username, d.Image from UserGroup as c join User as d on c.LeaderID = d.UserID and c.GroupID = ?) as t group by t.Username, t.Image;"
+    
+    const [rows, fields] = await promisePool.execute(query, [groupID, groupID2]);
+    console.log(rows);
     return rows;
 }
 

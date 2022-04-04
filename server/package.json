@@ -5,9 +5,9 @@
   "main": "server.js",
   "scripts": {
     "test": "jest",
-    "start": "kill $(ps aux | grep /usr/bin/node | grep -v grep | awk '{print $2}');nodemon server.js",
-    "go": "kill $(ps aux | grep /usr/bin/node | grep -v grep | awk '{print $2}'); node server.js",
-    "forever": "forever -o out.log -e err.log server.js",
+    "start": "kill $(ps aux | grep /usr/bin/node | grep -v grep | awk '{print $2}');nodemon server.js 30000",
+    "go": "kill $(ps aux | grep /usr/bin/node | grep -v grep | awk '{print $2}'); node server.js 30000",
+    "forever": "forever -o out.log -e err.log server.js 30000",
     "kill": "kill $(ps aux | grep /usr/bin/node | grep -v grep | awk '{print $2}');"
   },
   "keywords": [],

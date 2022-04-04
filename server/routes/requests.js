@@ -326,13 +326,24 @@ exports.getFriendRequests = async function(req, res) {
   res.statusMessage = "Failed to get Friendrequests"
   res.status(407).end();
 }
+
 exports.getGroupmembers = async function(req, res){
   let username = req.body.username;
   let token = req.body.token;
   let groupCode = req.body.code;
-  if(await db.validateToken(token, username)){
-    let groupID = await db.getGroupidFromGroupcode(groupCode)
-    rows = await db.getGroupmembers(groupID)
+
+  if(await db.validateToken(token, username))
+  {
+    let groupID;
+    groupID = await db.getGroupidFromGroupcode(groupCode);
+
+    if(Object.keys(groupID).length == 0){
+      res.statusMessage = "Failed to get Groupmembers"
+      res.status(415).end();
+      return;
+    }
+
+    let rows = await db.getGroupmembers(groupID[0].GroupID, groupID[0].GroupID)
     res.status(200).send(rows);
     return;
 
