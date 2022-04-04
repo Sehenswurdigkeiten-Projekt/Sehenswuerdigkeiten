@@ -5,8 +5,10 @@ var bodyParser = require('body-parser')
 var jsonParser = bodyParser.json()
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
 
-const port = process.env.PORT
+let port = process.env.PORT
 
+if(port == undefined)
+    port = 30000;
 
 
 
