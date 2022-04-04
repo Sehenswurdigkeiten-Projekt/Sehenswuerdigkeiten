@@ -89,12 +89,12 @@ Future<List<dynamic>> requestServerFriendPos(String name, LatLng myLocation) asy
   http.Response res = await client.post(uri, body: body);
   print("DA2");
   print(res.body);
+  if(res.body.length == 0){
+    return [];
+  }
 
   var list = jsonDecode(res.body);
   //Da steht dann drinnen: lon, lat
-
-
-
 
   return list;
 }
