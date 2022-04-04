@@ -46,6 +46,13 @@ dependencies:
   web_socket_channel: ^2.1.0
   convert: ^3.0.1
   flutter_mapbox_navigation: ^0.0.26
+  shared_preferences: ^2.0.13
+  dio: ^4.0.4
+  flutter_native_splash: ^2.0.4
+  flutter_dotenv: ^5.0.2
+  flutter_rating_bar: ^4.0.0
+
+
 
   #path_provider: ^2.0.9
 
@@ -83,6 +90,7 @@ flutter:
     - assets/images/
     - assets/icons/
     - assets/gps_images/
+    - assets/config/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
+//import 'dart:html';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_mapbox_navigation/library.dart';
@@ -7,6 +9,15 @@ import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:untitled/addFriendScreen.dart';
 import 'package:untitled/http_service.dart';
 import 'package:untitled/settingScreen.dart'; import 'locationstuff.dart';
+import 'nav/screens/prepare_ride.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:location/location.dart';
+import 'package:mapbox_gl/mapbox_gl.dart';
+
+import '../../mainstrukturwebseite.dart';
+import 'package:untitled/nav/helpers/mapbox_handler.dart';
+import 'package:untitled/main.dart';
 
 class MyApp2 extends StatelessWidget {
 
@@ -28,55 +39,53 @@ class MyApp2 extends StatelessWidget {
     );
   }
 }
+class MapEntries{
+  static Map<String, dynamic> placesMap = {};
+}
 
 class AutocompleteBar extends StatelessWidget{
   AutocompleteBar({Key? key}) : super(key: key);
 
-  //var _suggestions = [''];
-
   @override
   Widget build(BuildContext context) {
     return Autocomplete<String>(
-
       optionsBuilder: (TextEditingValue textEditingValue) async{
         if (textEditingValue.text == '') {
           return const Iterable<String>.empty();
         }
-
-        //Suggestions()._suggestions.clear();
         final res = await http.get(Uri.parse('https://public.opendatasoft.com/api/records/1.0/search/?dataset=geonames-all-cities-with-a-population-1000&q=&sort=population&facet=name&facet=cou_name_en&refine.alternate_names=${textEditingValue.text}'));
-        //print(res);
 
-        List<String> list = [];
+        //List<String> list = [];
+        //var placesList = List.generate(10, (i) => List.filled(2, '', growable: false));
         //print(Suggestions()._suggestions);
-
+        MapEntries.placesMap.clear();
         if (res == '') {
-          list.add('No result');
+          MapEntries.placesMap['No entries found'] = [''];
         }
+
         else {
           Map<String, dynamic> values = jsonDecode(res.body);
           for (var word in values['records']) {
             var field = word['fields'];
-            print(field['name']);
-            list.add(field['name']+ ' - ' + field['cou_name_en']);
+            MapEntries.placesMap['${field['name']} - ${field['cou_name_en']}'] = field['coordinates'].toString().substring(1, field['coordinates'].toString().length -1);
           }
-          list = list.toSet().toList();
-          print(list);
-          print(textEditingValue.text);
-
-
-          //return list.where((String option) {
+          //print('LENGTH: ${list.length}');
+          //list = list.toSet().toList();
+          //placesList = placesList.toSet().toList();
+          //print(placesMap.keys);
+          //return MapEntries.placesMap.keys.where((String option) {
             //return option.toLowerCase().contains(textEditingValue.text.toLowerCase());
           //});
+          print(MapEntries.placesMap.values);
         }
-        return list;
+        return MapEntries.placesMap.keys;
 
       },
       fieldViewBuilder: (
           BuildContext context,
           TextEditingController fieldTextEditingController,
           FocusNode fieldFocusNode,
-          VoidCallback onFieldSubmitted
+          ui.VoidCallback onFieldSubmitted
           ){
         return TextField(
           controller: fieldTextEditingController,
@@ -94,7 +103,10 @@ class AutocompleteBar extends StatelessWidget{
         );
       },
         onSelected: (String selection){
-          print('You just selected $selection');
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => PrepareRide(MapEntries.placesMap[selection])));
         },
       );
   }
@@ -120,8 +132,6 @@ class HomePageState extends State<HomePage> {
   Icon customIcon = const Icon(Icons.search);
   bool normalSearchBar = true;
   late Widget customSearchBar;
-
-
 
   final pages = [
     MyFriendsWidget(),
@@ -316,6 +326,7 @@ class Page21 extends StatelessWidget {
 class Page3 extends StatelessWidget {
   const Page3({Key? key}) : super(key: key);
 
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -332,6 +343,8 @@ class Page3 extends StatelessWidget {
       ),
     );
   }
+
+
 }
 
 
@@ -357,6 +370,8 @@ class _Page2State extends State<Page2> {
   void initState() {
     //10.10.30.96:3000
     super.initState();
+    initializeLocationAndSave();
+
     timerOwnLocation = Timer.periodic(Duration(seconds: 1), (timer) async { //Hier der Timer zum updaten der eigenen Location!
       if(mapboxmapcontroller == null) return;
       print("Eigene Location loading");
@@ -393,6 +408,36 @@ class _Page2State extends State<Page2> {
         ));
       }
     });
+  }
+
+  void initializeLocationAndSave() async {
+    Location _location = Location();
+    bool? _serviceEnabled;
+    PermissionStatus? _permissionGranted;
+
+    _serviceEnabled = await _location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await _location.requestService();
+    }
+
+    _permissionGranted = await _location.hasPermission();
+    if (_permissionGranted == PermissionStatus.denied) {
+      _permissionGranted = await _location.requestPermission();
+    }
+
+    // Get the current user location
+    LocationData _locationData = await _location.getLocation();
+    LatLng currentLocation =
+    LatLng(_locationData.latitude!, _locationData.longitude!);
+
+    // Get the current user address
+    String currentAddress =
+    (await getParsedReverseGeocoding(currentLocation))['place'];
+
+    // Store the user location in sharedPreferences
+    sharedPreferences.setDouble('latitude', _locationData.latitude!);
+    sharedPreferences.setDouble('longitude', _locationData.longitude!);
+    sharedPreferences.setString('current-address', currentAddress);
   }
 
 
@@ -470,7 +515,11 @@ class _Page2State extends State<Page2> {
 
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async{
+        onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (_) => const PrepareRide('Paris')))
+/*
             final res = await http.get(Uri.parse('https://public.opendatasoft.com/api/records/1.0/search/?dataset=geonames-all-cities-with-a-population-1000&q=&sort=name&facet=name&facet=cou_name_en&refine.alternate_names=Rom'));
 
             Map<String, dynamic> values = jsonDecode(res.body);
@@ -480,6 +529,8 @@ class _Page2State extends State<Page2> {
               print(field['name']);
 
             }
+
+ */
             //print(values['records']);
             /*
             if(values.length > 0){
@@ -493,11 +544,10 @@ class _Page2State extends State<Page2> {
             }
 
              */
-            print("CITIES!");
             //print(cities);
 
 
-          },
+          ,
         backgroundColor: Colors.green,
         child: const Icon(Icons.navigation),
       ),
