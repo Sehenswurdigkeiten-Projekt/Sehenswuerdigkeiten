@@ -7,8 +7,8 @@ var urlencodedParser = bodyParser.urlencoded({ extended: false })
 
 
 const servers = [
-	"http://10.10.30.69:30000",
-	"http://10.10.30.69:30001"
+	"http://10.10.30.21:30000",
+	"http://10.10.30.21:30001"
 ]
 
 let current = 0;

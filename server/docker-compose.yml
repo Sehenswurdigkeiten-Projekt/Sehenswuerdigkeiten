@@ -8,7 +8,7 @@ services:
     image: server
     container_name: server1
     environment:
-      - PORT=30001
+      - PORT=30000
     ports:
       - 30000:30000
 
@@ -20,11 +20,9 @@ services:
     ports:
       - 30001:30001
 
-#  database:
-#    image: mysql/mysql-server
-#    container_name: mysql_server
-#    environment:
-#      - MYSQL_ROOT_PASSWORD=12345678
-#    ports:
-#     -3306:3306
-#    command:
+
+  database:
+    image: db
+    container_name: mysql_server
+    ports:
+      - 3306:3306

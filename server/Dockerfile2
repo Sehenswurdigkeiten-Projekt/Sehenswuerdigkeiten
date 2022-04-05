@@ -4,6 +4,5 @@ RUN npm ci --only=production
 COPY . .
 ENV PORT=30000
 
-EXPOSE $PORT
 
 CMD ["node", "server.js"]
