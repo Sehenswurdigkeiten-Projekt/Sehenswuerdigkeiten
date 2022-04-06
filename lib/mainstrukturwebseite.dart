@@ -46,8 +46,10 @@ class MyApp2 extends StatelessWidget {
     );
   }
 }
+
 class MapEntries{
   static Map<String, dynamic> placesMap = {};
+  static String selectedCoordinates = '';
 }
 
 class AutocompleteBar extends StatelessWidget{
@@ -110,6 +112,7 @@ class AutocompleteBar extends StatelessWidget{
         );
       },
         onSelected: (String selection){
+          MapEntries.selectedCoordinates = MapEntries.placesMap[selection];
           Navigator.push(
               context,
               MaterialPageRoute(
