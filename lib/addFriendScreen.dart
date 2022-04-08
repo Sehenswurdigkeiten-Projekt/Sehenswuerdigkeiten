@@ -9,6 +9,8 @@ import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:untitled/loginScreen.dart';
 import 'package:untitled/signUpScreen.dart';
 
+import 'friendRequestWidget.dart';
+
 class MyFriendsWidget extends StatefulWidget {
   MyFriendsWidget({Key? key}) : super(key: key);
 
@@ -260,6 +262,12 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
       onTap: () async {
         String friendNameStr = "";
         var friendReqName = await checkIfCorrectRequest(false);
+        Column friendsColumn = Column(
+          children: [
+
+          ],
+        );
+
         print("IST NULL? = ${friendReqName} + ${friendReqName.length}");
         if(friendReqName.length == 1){
           friendNameStr = "No new friend requests!";
@@ -269,6 +277,10 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
             print("$i");
             friendNameStr += friendReqName[i].toString() + "\n";
             print("$friendNameStr");
+
+            friendsColumn.children.add(
+              friendRequestWidget("${friendReqName[i]}", i-1)
+            );
           }
         }
 
@@ -286,13 +298,8 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                Text(
-                  "${friendNameStr}",
-                  textAlign: TextAlign.left,
-                  style: TextStyle(
-                    fontSize: 18
-                  ),
-                ),
+                //Text("${friendNameStr}", textAlign: TextAlign.left, style: TextStyle(fontSize: 18),),
+                friendsColumn,
               ],
             ),
             actions: [
@@ -308,13 +315,11 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
                       ).show();
                     }
                     else{
-                      //checkIfCorrect();
-
                       Navigator.of(context).pop();
                     }
                   },
                   child: const Text(
-                      "Add",
+                      "Add all",
                       style: TextStyle(
                         color: Color(0xff2F8D46),
                       ))
