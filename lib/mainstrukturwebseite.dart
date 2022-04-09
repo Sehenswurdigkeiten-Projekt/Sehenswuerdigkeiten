@@ -525,44 +525,7 @@ class _Page2State extends State<Page2> {
           mapboxmapcontroller = controller;
           },
 
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (_) => const PrepareRide('Paris')))
-/*
-            final res = await http.get(Uri.parse('https://public.opendatasoft.com/api/records/1.0/search/?dataset=geonames-all-cities-with-a-population-1000&q=&sort=name&facet=name&facet=cou_name_en&refine.alternate_names=Rom'));
-
-            Map<String, dynamic> values = jsonDecode(res.body);
-            for(var word in values['records']){
-              var field = word['fields'];
-              print(field['cou_name_en']);
-              print(field['name']);
-
-            }
-
- */
-            //print(values['records']);
-            /*
-            if(values.length > 0){
-              for(var i = 0; i< values.length; i++){
-                if(values[i]!=null){
-                  Map<String, dynamic> map = values[i];
-                  _postList.add(Post.fromJson(map));
-                  print(map['name']);
-                }
-              }
-            }
-
-             */
-            //print(cities);
-
-
-          ,
-        backgroundColor: Colors.green,
-        child: const Icon(Icons.navigation),
-      ),
+      )
     );
 
 
