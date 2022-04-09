@@ -5,24 +5,20 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_mapbox_navigation/library.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:untitled/addFriendScreen.dart';
-import 'package:untitled/http_service.dart';
+import 'package:untitled/nav/helpers/shared_prefs.dart';
 
 import 'package:untitled/settingScreen.dart'; import 'locationstuff.dart';
 import 'nav/screens/prepare_ride.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:location/location.dart';
-import 'package:mapbox_gl/mapbox_gl.dart';
 
-import '../../mainstrukturwebseite.dart';
 import 'package:untitled/nav/helpers/mapbox_handler.dart';
 import 'package:untitled/main.dart';
 
 import 'package:untitled/loginScreen.dart';
-import 'package:untitled/settingScreen.dart';
 import 'package:untitled/signUpScreen.dart'; import 'locationstuff.dart';
 
 
@@ -111,8 +107,11 @@ class AutocompleteBar extends StatelessWidget{
 
         );
       },
-        onSelected: (String selection){
+        onSelected: (String selection) {
           MapEntries.selectedCoordinates = MapEntries.placesMap[selection];
+          LatLng destination = new LatLng(double.parse(MapEntries.selectedCoordinates.split(',')[0]), double.parse(MapEntries.selectedCoordinates.split(',')[1]));
+          sharedPreferences.setDouble('destLat', destination.latitude);
+          sharedPreferences.setDouble('destLong', destination.longitude);
           Navigator.push(
               context,
               MaterialPageRoute(
@@ -247,7 +246,7 @@ class HomePageState extends State<HomePage> {
             onPressed: () {
               HapticFeedback.vibrate();
               setState(() {
-                print(imageString);
+                //print(imageString);
                 normalSearchBar = true;
                 pageIndex = 0;
               });
@@ -402,13 +401,21 @@ class _Page2State extends State<Page2> {
   void initState() {
     //10.10.30.96:3000
     super.initState();
-    initializeLocationAndSave();
 
     timerOwnLocation = Timer.periodic(Duration(seconds: 1), (timer) async { //Hier der Timer zum updaten der eigenen Location!
       if(mapboxmapcontroller == null) return;
-      print("Eigene Location loading");
+      //print("Eigene Location loading");
 
       ownLocationLatLng = (await acquireCurrentLocation())!;
+
+      // Get the current user address
+      String currentAddress =
+      (await getParsedReverseGeocoding(ownLocationLatLng))['place'];
+
+      // Store the user location in sharedPreferences
+      sharedPreferences.setDouble('latitude', ownLocationLatLng.latitude);
+      sharedPreferences.setDouble('longitude', ownLocationLatLng.longitude);
+      sharedPreferences.setString('current-address', currentAddress);
 
       mapboxmapcontroller!.updateCircle(userCircle, CircleOptions(
         circleRadius: 8.0,
@@ -423,7 +430,7 @@ class _Page2State extends State<Page2> {
 
     timerFriendLocation = Timer.periodic(Duration(seconds: 5), (timer) async { //Hier der Timer zum updaten der Freunde Location!
       if(mapboxmapcontroller == null) return;
-      print("Other Location Loading");
+      //print("Other Location Loading");
       friendLocationListLatLng = (await acquireOthersLocation(ownLocationLatLng));
       for(var i=0; i<friendListSymbols.length; i++){
         if(friendLocationListLatLng[i]['Lon'] == null || friendLocationListLatLng[i]['Lat'] == null) continue;
@@ -441,37 +448,6 @@ class _Page2State extends State<Page2> {
       }
     });
   }
-
-  void initializeLocationAndSave() async {
-    Location _location = Location();
-    bool? _serviceEnabled;
-    PermissionStatus? _permissionGranted;
-
-    _serviceEnabled = await _location.serviceEnabled();
-    if (!_serviceEnabled) {
-      _serviceEnabled = await _location.requestService();
-    }
-
-    _permissionGranted = await _location.hasPermission();
-    if (_permissionGranted == PermissionStatus.denied) {
-      _permissionGranted = await _location.requestPermission();
-    }
-
-    // Get the current user location
-    LocationData _locationData = await _location.getLocation();
-    LatLng currentLocation =
-    LatLng(_locationData.latitude!, _locationData.longitude!);
-
-    // Get the current user address
-    String currentAddress =
-    (await getParsedReverseGeocoding(currentLocation))['place'];
-
-    // Store the user location in sharedPreferences
-    sharedPreferences.setDouble('latitude', _locationData.latitude!);
-    sharedPreferences.setDouble('longitude', _locationData.longitude!);
-    sharedPreferences.setString('current-address', currentAddress);
-  }
-
 
   @override
   void dispose() {
@@ -492,7 +468,11 @@ class _Page2State extends State<Page2> {
         ),
 
         onMapCreated: (MapboxMapController controller) async {
-          print("jetzt in der onMapCreated");
+          //controller.setGeoJsonSource('restaurants', 'https://api.mapbox.com/directions/v5/mapbox/driving/-122.42,37.78;-77.03,38.91?access_token=pk.eyJ1IjoiYW5uYWtzcnIiLCJhIjoiY2wxMG0wcW83MDAxczNrczRya2pjYXFvdiJ9.VNVotWF_bX62uIlzu9tc-Q')
+
+
+
+          //print("jetzt in der onMapCreated");
           //Acquire current location (returns the LatLong instance)
           ownLocationLatLng = (await acquireCurrentLocation())!;
 
@@ -541,7 +521,7 @@ class _Page2State extends State<Page2> {
           }
 
 
-          print("Jetzt ist die OnMapCreated function fertig!");
+          //print("Jetzt ist die OnMapCreated function fertig!");
           mapboxmapcontroller = controller;
           },
 
