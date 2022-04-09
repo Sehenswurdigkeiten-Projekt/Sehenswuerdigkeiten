@@ -144,7 +144,9 @@ exports.addFriendrequest = async function(userID1, userID2){
 exports.checkForFriendrequest = async function(userID1, userID2){
     const query = "Select count(*) as i from User_Friendrequests where UserID = ? and FriendID = ?"
     const [rows, fields] = await promisePool.execute(query, [userID1, userID2]);
-    return rows;
+    if(rows[0].i != 0)
+        return true;
+    return false;
 }
 exports.getFriendRequestsForUserID = async function(userID){
     const query = "Select b.Username from User_Friendrequests as a join User as b using(UserID) where a.FriendID = ?;";
@@ -183,5 +185,11 @@ exports.getUserInfo = async function(userID){
     const [rows, fields] = await promisePool.execute(query, [userID])
     return rows;
 }
+exports.ignoreFriendrequest = async function(userID, friendID){
+    const query = "Delete from User_Friendrequests where UserID = ? and FriendID = ?"
+    const [rows, fields] = await promisePool.execute(query, [userID, friendID]);
+    console.log("test");
+    return rows;
 
+}
 const test = "Select count(*) from (Select Username, Image from User_UserGroup as a join User as b on a.UserID = b.UserID and GroupID = 11 Union ALL Select Username, Image from UserGroup as a join User as b on LeaderID = UserID and GroupID = 11) as t"

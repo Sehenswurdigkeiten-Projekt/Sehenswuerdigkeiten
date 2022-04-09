@@ -351,3 +351,20 @@ exports.getGroupmembers = async function(req, res){
   res.statusMessage = "Failed to get GroupMembers"
   res.status(413).end();
 }
+
+exports.ignoreFriendrequest = async function(req, res){
+  let username = req.body.username;
+  let token = req.body.token;
+  let friend = req.body.friend;
+  if(await db.validateToken(token, username) && await db.checkIfUserExists(friend)){
+    let uID1 =await db.getUseridFromUsername(username)
+    let uID2 = await db.getUseridFromUsername(friend)
+    if(await db.checkForFriendrequest(uID1, uID2)){
+      await db.ignoreFriendrequest(uID1,uID2);
+      res.status(200).send("OK");
+      return
+    }
+  }
+  res.statusMessage = "Failed to ignore Friendrequest"
+  res.status(420).end();
+}

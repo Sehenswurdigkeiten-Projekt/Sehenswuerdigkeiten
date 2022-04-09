@@ -1,5 +1,4 @@
 const { default: axios } = require("axios");
-const jest = require("jest");
 
 let server = "http://10.10.30.21:30000/LOGIN"
 let method = "post"

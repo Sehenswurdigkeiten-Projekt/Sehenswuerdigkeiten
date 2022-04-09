@@ -37,6 +37,7 @@ app.post("/ADD_FRIEND/", urlencodedParser,jsonParser, request.addFriend)
 app.post("/REMOVE_FRIEND", urlencodedParser, jsonParser, request.removeFriend);
 app.post("/GET_FRIENDREQUESTS", urlencodedParser, jsonParser, request.getFriendRequests);
 app.post("/CHANGE_PASSWORD", urlencodedParser, jsonParser, request.changePassword)
+app.post("/IGNORE_FRIENDREQUEST", urlencodedParser, jsonParser, request.ignoreFriendrequest);
 
 app.post("/GET_FRIENDS", urlencodedParser, jsonParser, request.getFriends)
 app.post("/UPDATE_IMAGE", urlencodedParser, jsonParser, request.updateImage)
