@@ -291,7 +291,7 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  "Friends:",
+                  "Friend requests:",
                   textAlign: TextAlign.left,
                   style: TextStyle(
                     fontSize: 18,
