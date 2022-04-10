@@ -53,6 +53,7 @@ class _MultiSelectState extends State<MultiSelect> {
         child: ListBody(
           children: widget.items
               .map((item) => CheckboxListTile(
+            activeColor: Color(0xff2F8D46),
             value: _selectedItems.contains(item),
             title: Text(item[0]),
             controlAffinity: ListTileControlAffinity.leading,

@@ -9,7 +9,7 @@ class FindPoI{
   Future<List> searchPoI(var cityName, var startLon, var startLat, ) async{
     //Lon = 11.422465473888776
     //Lat = 46.890633738573584
-    print("start FindPoI");
+    //print("start FindPoI");
     var limit = 0, offset = 0, radius = 10000;
     var lon = "", lat = "";
 
@@ -53,13 +53,13 @@ class FindPoI{
               break;
           }
         }
-        print("Ausgabe:");
+        //print("Ausgabe:");
         for (var x = 0; x<results.length; x++){
-          print(results[x]);
+          //print(results[x]);
         }
       }
-      print("results");
-      print(results);
+      //print("results");
+      //print(results);
       return results;
     } else {
       // If the server did not return a 200 OK response,

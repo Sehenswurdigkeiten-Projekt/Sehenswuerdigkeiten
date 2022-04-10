@@ -67,7 +67,7 @@ class AutocompleteBar extends StatelessWidget{
 
         //List<String> list = [];
         //var placesList = List.generate(10, (i) => List.filled(2, '', growable: false));
-        //print(Suggestions()._suggestions);
+        ////print(Suggestions()._suggestions);
         MapEntries.placesMap.clear();
         if (res == '') {
           MapEntries.placesMap['No entries found'] = [''];
@@ -79,14 +79,14 @@ class AutocompleteBar extends StatelessWidget{
             var field = word['fields'];
             MapEntries.placesMap['${field['name']} - ${field['cou_name_en']}'] = field['coordinates'].toString().substring(1, field['coordinates'].toString().length -1);
           }
-          //print('LENGTH: ${list.length}');
+          ////print('LENGTH: ${list.length}');
           //list = list.toSet().toList();
           //placesList = placesList.toSet().toList();
-          //print(placesMap.keys);
+          ////print(placesMap.keys);
           //return MapEntries.placesMap.keys.where((String option) {
             //return option.toLowerCase().contains(textEditingValue.text.toLowerCase());
           //});
-          print(MapEntries.placesMap.values);
+          //print(MapEntries.placesMap.values);
         }
         return MapEntries.placesMap.keys;
 
@@ -256,7 +256,7 @@ class HomePageState extends State<HomePage> {
             onPressed: () {
               HapticFeedback.vibrate();
               setState(() {
-                //print(imageString);
+                ////print(imageString);
                 normalSearchBar = true;
                 pageIndex = 0;
               });
@@ -371,7 +371,7 @@ class _SelectPoI extends State<SelectPoI> {
   }
 
   void removeListPoint(rParray){
-    print(rParray);
+    //print(rParray);
     //rutePoints.removeWhere((element) => element = rParray);
     rutePoints.removeWhere((str){
       return str == rParray;
@@ -382,20 +382,20 @@ class _SelectPoI extends State<SelectPoI> {
   @override
   void initState(){
     super.initState();
-    print("start init");
+    //print("start init");
     _getList().then((value) {
-      print("got List");
+      //print("got List");
       if(value != null)
         setState(() {
           result = value;
           listLength = value.length;
         });
-      print("saved List");
+      //print("saved List");
     });
   }
 
   Future<List> _getList() async{
-    print("get List");
+    //print("get List");
     return await resultF.then((value){
       return value;
     });
@@ -417,7 +417,7 @@ class _SelectPoI extends State<SelectPoI> {
             }
 
             resultNames = resultNames.toSet().toList();
-            print("Route not created: "+ rutePoints.toString());
+            //print("Route not created: "+ rutePoints.toString());
             ScrollController _scrollController = new ScrollController();
             //TODO: Search Button fest anzeigen und nicht gnaz unten
             //TODO: Buttons schöner designen
@@ -507,7 +507,7 @@ class _Page2State extends State<Page2> {
 
     timerOwnLocation = Timer.periodic(Duration(seconds: 1), (timer) async { //Hier der Timer zum updaten der eigenen Location!
       if(mapboxmapcontroller == null) return;
-      //print("Eigene Location loading");
+      ////print("Eigene Location loading");
 
       ownLocationLatLng = (await acquireCurrentLocation())!;
 
@@ -536,7 +536,7 @@ class _Page2State extends State<Page2> {
 
     timerFriendLocation = Timer.periodic(Duration(seconds: 5), (timer) async { //Hier der Timer zum updaten der Freunde Location!
       if(mapboxmapcontroller == null) return;
-      //print("Other Location Loading");
+      ////print("Other Location Loading");
       friendLocationListLatLng = (await acquireOthersLocation(ownLocationLatLng));
       for(var i=0; i<friendListSymbols.length; i++){
         if(friendLocationListLatLng[i]['Lon'] == null || friendLocationListLatLng[i]['Lat'] == null) continue;
@@ -578,7 +578,7 @@ class _Page2State extends State<Page2> {
 
 
 
-            //print("jetzt in der onMapCreated");
+            ////print("jetzt in der onMapCreated");
             //Acquire current location (returns the LatLong instance)
             ownLocationLatLng = (await acquireCurrentLocation())!;
 
@@ -601,8 +601,8 @@ class _Page2State extends State<Page2> {
             userCircle = controller.circles.first;
             friendLocationListLatLng = await acquireOthersLocation(ownLocationLatLng);
 
-            //print("JEtzt locations");
-            //print(friendLocationListLatLng);
+            ////print("JEtzt locations");
+            ////print(friendLocationListLatLng);
             var geo;
             var anzeigen;
 
@@ -627,16 +627,14 @@ class _Page2State extends State<Page2> {
             }
 
             //PoI Circle
-            print("POI Symbol");
-            print(poiLocationListLatLng.length);
             for (var i = 0; i < poiLocationListLatLng.length; i++) {
               geo = LatLng(double.parse(poiLocationListLatLng[i][6]), double.parse(poiLocationListLatLng[i][5]));
               await controller.addSymbol(
                   SymbolOptions(
                     iconSize: 0.4,
                     //Images von typen.
-                    iconImage: "assets/icons/museum.png",
-                    textField: poiLocationListLatLng[i][0],
+                    iconImage: "assets/icons/museumK.png",
+                    //textField: poiLocationListLatLng[i][0],
                     //textOpacity: anzeigen,
                     textOffset: Offset(0, 1),
                     geometry: geo,
@@ -647,7 +645,7 @@ class _Page2State extends State<Page2> {
             }
 
 
-            //print("Jetzt ist die OnMapCreated function fertig!");
+            //////print("Jetzt ist die OnMapCreated function fertig!");
             mapboxmapcontroller = controller;
           },
 
