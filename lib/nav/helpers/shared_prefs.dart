@@ -4,6 +4,8 @@ import 'package:mapbox_gl/mapbox_gl.dart';
 
 import 'package:untitled/main.dart';
 
+import '../../mainstrukturwebseite.dart';
+
 LatLng getCurrentLatLngFromSharedPrefs() {
   return LatLng(sharedPreferences.getDouble('latitude')!,
       sharedPreferences.getDouble('longitude')!);
@@ -11,6 +13,10 @@ LatLng getCurrentLatLngFromSharedPrefs() {
 
 String getCurrentAddressFromSharedPrefs() {
   return sharedPreferences.getString('current-address')!;
+}
+
+LatLng getDestinationLatLngFromSharedPrefs(){
+  return LatLng(sharedPreferences.getDouble('destLat')!, sharedPreferences.getDouble('destLong')!);
 }
 
 LatLng getTripLatLngFromSharedPrefs(String type) {

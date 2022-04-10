@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:untitled/nav/helpers/mapbox_handler.dart';
 import 'package:untitled/nav/helpers/shared_prefs.dart';
@@ -36,10 +35,16 @@ class _ReviewRideState extends State<ReviewRide> {
     _initialCameraPosition = CameraPosition(
         target: getCenterCoordinatesForPolyline(geometry), zoom: 11);
 
+    _kTripEndPoints.add(CameraPosition(target: getCurrentLatLngFromSharedPrefs()));
+    _kTripEndPoints.add(CameraPosition(target: getDestinationLatLngFromSharedPrefs()));
+
+    /*
     for (String type in ['source', 'destination']) {
       _kTripEndPoints
           .add(CameraPosition(target: getTripLatLngFromSharedPrefs(type)));
     }
+
+     */
     super.initState();
   }
 
@@ -52,7 +57,7 @@ class _ReviewRideState extends State<ReviewRide> {
   _onMapCreated(MapboxMapController controller) async {
     this.controller = controller;
   }
-/*
+
   _onStyleLoadedCallback() async {
     for (int i = 0; i < _kTripEndPoints.length; i++) {
       String iconImage = i == 0 ? 'circle' : 'square';
@@ -67,7 +72,7 @@ class _ReviewRideState extends State<ReviewRide> {
     _addSourceAndLineLayer();
   }
 
- */
+
 
   _addSourceAndLineLayer() async {
     // Create a polyLine between source and destination
@@ -117,9 +122,9 @@ class _ReviewRideState extends State<ReviewRide> {
                 accessToken: 'pk.eyJ1Ijoic2VoZW5zd3VlcmRpZ2tlaXRlbi1wcm9qIiwiYSI6ImNsMTBuY2E4djAwNjkzYm5zdjIwY3RpY3cifQ.blnV9_r4xomVn57TX0-i_g',
                 initialCameraPosition: _initialCameraPosition,
                 onMapCreated: _onMapCreated,
-                //onStyleLoadedCallback: _onStyleLoadedCallback,
+                onStyleLoadedCallback: _onStyleLoadedCallback,
                 myLocationTrackingMode: MyLocationTrackingMode.TrackingGPS,
-                minMaxZoomPreference: const MinMaxZoomPreference(11, 11),
+                //minMaxZoomPreference: const MinMaxZoomPreference(11, 11),
               ),
             ),
             reviewRideBottomSheet(context, distance, dropOffTime),

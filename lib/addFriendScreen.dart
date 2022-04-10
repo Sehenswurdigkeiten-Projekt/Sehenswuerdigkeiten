@@ -521,13 +521,14 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
         for(var i = 0; i<groups.length; i++){
           groupsStr += groups[i].toString() + "\n";
         }
-
         showDialog(context: context, builder: (BuildContext context){
           return AlertDialog(
             title: Text(title),
             content: Column(
               mainAxisSize: MainAxisSize.min,
+
               children: [
+
                 Text(
                   "Groups:",
                   textAlign: TextAlign.left,
@@ -580,7 +581,7 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
   GestureDetector buildGroupOptionMembers(BuildContext context, String title){
     return GestureDetector(
       onTap: () async{
-        var stringmembers = "dwauduwagzd";
+        var stringmembers = "ff";
         showDialog(context: context, builder: (BuildContext context){
           return AlertDialog(
             title: Text(title),
@@ -650,8 +651,15 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
                       groupCode.text = "";
                       print("SCHAUGMOMOL");
                       setState(() {
-                        stringmembers = "${isCorrect[1]}";
-                      });
+                        stringmembers = "";
+                        for(var i = 1; i<isCorrect.length; i++){
+                          stringmembers += isCorrect[i] + "\n";
+                          print("HEHEHEH $i--- : ${stringmembers}");
+                        }
+                        //stringmembers = "${isCorrect[1]}";
+                      }
+                      );
+                      //print("HEHEHEH H : $stringmembers");
                       //Navigator.of(context).pop();
                     }
                   },

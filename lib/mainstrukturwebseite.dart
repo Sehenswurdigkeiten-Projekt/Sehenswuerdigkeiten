@@ -5,25 +5,26 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_mapbox_navigation/library.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:untitled/addFriendScreen.dart';
-import 'package:untitled/http_service.dart';
+import 'package:untitled/multiselect.dart';
+import 'package:untitled/nav/helpers/shared_prefs.dart';
 
 import 'package:untitled/settingScreen.dart'; import 'locationstuff.dart';
 import 'nav/screens/prepare_ride.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:location/location.dart';
-import 'package:mapbox_gl/mapbox_gl.dart';
 
-import '../../mainstrukturwebseite.dart';
 import 'package:untitled/nav/helpers/mapbox_handler.dart';
 import 'package:untitled/main.dart';
 
 import 'package:untitled/loginScreen.dart';
-import 'package:untitled/settingScreen.dart';
 import 'package:untitled/signUpScreen.dart'; import 'locationstuff.dart';
+import 'informationWindow.dart';
+import 'findPoI.dart';
+
+import 'globalVariables.dart';
 
 
 class MyApp2 extends StatelessWidget {
@@ -111,12 +112,17 @@ class AutocompleteBar extends StatelessWidget{
 
         );
       },
-        onSelected: (String selection){
+        onSelected: (String selection) {
           MapEntries.selectedCoordinates = MapEntries.placesMap[selection];
+          LatLng destination = new LatLng(double.parse(MapEntries.selectedCoordinates.split(',')[0]), double.parse(MapEntries.selectedCoordinates.split(',')[1]));
+          sharedPreferences.setDouble('destLat', destination.latitude);
+          sharedPreferences.setDouble('destLong', destination.longitude);
+          HomePageState.pageIndex = 2;
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (_) => PrepareRide(MapEntries.placesMap[selection])));
+                  builder: (_) => const HomePage()));
+          //PrepareRide(MapEntries.placesMap[selection])));
         },
       );
   }
@@ -132,7 +138,7 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> {
   static var imageString = "assets/gps_images/gps_image0.png";
-  int pageIndex = 0;
+  static int pageIndex = 0;
   static late HomePageState _homePageState;
 
 
@@ -142,12 +148,13 @@ class HomePageState extends State<HomePage> {
   }
   static HomePageState get homePageState => _homePageState;
   Icon customIcon = const Icon(Icons.search);
-  bool normalSearchBar = true;
-  late Widget customSearchBar;
+  static bool normalSearchBar = true;
+  static late Widget customSearchBar;
 
   final pages = [
     MyFriendsWidget(),
     Page2(),
+    SelectPoI(),
     MySettingWidget(),
   ];
 
@@ -198,34 +205,34 @@ class HomePageState extends State<HomePage> {
      }
 
 
-    return Scaffold(
-      appBar: AppBar(
-        title: customSearchBar,
-        toolbarHeight: 80,
-        automaticallyImplyLeading: false,
-        actions: pageIndex == 1 ? [
-          IconButton(
-            onPressed: () {
-              setState(() {
-                if (customIcon.icon == Icons.search) {
-                  customIcon = const Icon(Icons.cancel);
-                  normalSearchBar = false;
-                }  else {
-                  customIcon = const Icon(Icons.search);
-                  normalSearchBar = true;
-                }
-              });
-            },
-            icon: customIcon,
+     return Scaffold(
+       appBar: AppBar(
+         title: customSearchBar,
+         toolbarHeight: 80,
+         automaticallyImplyLeading: false,
+         actions: pageIndex == 2 ? [
+           IconButton(
+             onPressed: () {
+               setState(() {
+                 if (customIcon.icon == Icons.search) {
+                   customIcon = const Icon(Icons.cancel);
+                   normalSearchBar = false;
+                 }  else {
+                   customIcon = const Icon(Icons.search);
+                   normalSearchBar = true;
+                 }
+               });
+             },
+             icon: customIcon,
 
-          )
-        ] : null,
-        centerTitle: true,
-        backgroundColor: Theme.of(context).primaryColor,
-      ),
-      body: pages[pageIndex],
-      bottomNavigationBar: buildMyNavBar(context),
-    );
+           )
+         ] : null,
+         centerTitle: true,
+         backgroundColor: Theme.of(context).primaryColor,
+       ),
+       body: pages[pageIndex],
+       bottomNavigationBar: buildMyNavBar(context),
+     );
   }
 
   Container buildMyNavBar(BuildContext context) {
@@ -247,14 +254,14 @@ class HomePageState extends State<HomePage> {
             onPressed: () {
               HapticFeedback.vibrate();
               setState(() {
-                print(imageString);
+                //print(imageString);
                 normalSearchBar = true;
                 pageIndex = 0;
               });
             },
             icon: pageIndex == 0
                 ? const Icon(
-              Icons.group_rounded ,
+              Icons.group_rounded,
               color: Colors.white,
               size: 35,
             )
@@ -296,6 +303,27 @@ class HomePageState extends State<HomePage> {
             },
             icon: pageIndex == 2
                 ? const Icon(
+              Icons.room_rounded,
+              color: Colors.white,
+              size: 35,
+            )
+                : const Icon(
+              Icons.room_outlined,
+              color: Colors.white,
+              size: 35,
+            ),
+          ),
+          IconButton(
+            enableFeedback: false,
+            onPressed: () {
+              HapticFeedback.vibrate();
+              setState(() {
+                normalSearchBar = true;
+                pageIndex = 3;
+              });
+            },
+            icon: pageIndex == 3
+                ? const Icon(
               Icons.settings_rounded,
               color: Colors.white,
               size: 35,
@@ -312,23 +340,347 @@ class HomePageState extends State<HomePage> {
   }
 }
 
-class Page1 extends StatelessWidget {
-  const Page1({Key? key}) : super(key: key);
+class SelectPoI extends StatefulWidget {
+  @override
+  State<SelectPoI> createState() => _SelectPoI();
+}
+
+//schauen ob global und sonst auf server speichern.
+class _SelectPoI extends State<SelectPoI> {
+
+  var f = FindPoI();
+  //11.422465473888776
+  //46.890633738573584
+  late Future<List> resultF = f.searchPoI("", getDestinationLatLngFromSharedPrefs().longitude.toString(), getDestinationLatLngFromSharedPrefs().latitude.toString());
+  var listLength;
+  var result;
+  List<String> resultNames = [];
+  var buttonPressedStatus;
+
+  void writeNewInArray(List<String> rutePointsArray){
+    if (rutePoints == null){
+      rutePoints = List.generate(1, (i) => List.filled(7, "", growable: false), growable: true);
+      for(int i = 0; i<rutePointsArray.length; i++){
+        rutePoints[0][i] = rutePointsArray[i];
+      }
+    }else{
+      rutePoints.add(rutePointsArray);
+    }
+  }
+
+  void removeListPoint(rParray){
+    print(rParray);
+    //rutePoints.removeWhere((element) => element = rParray);
+    rutePoints.removeWhere((str){
+      return str == rParray;
+    });
+  }
+
+
+  @override
+  void initState(){
+    super.initState();
+    print("start init");
+    _getList().then((value) {
+      print("got List");
+      if(value != null)
+        setState(() {
+          result = value;
+          listLength = value.length;
+        });
+      print("saved List");
+    });
+  }
+
+  Future<List> _getList() async{
+    print("get List");
+    return await resultF.then((value){
+      return value;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: const Color(0xffC4DFCB),
-      child: Center(
-        child: Text(
-          "Nummer 1",
-          style: TextStyle(
-            color: Colors.green[900],
-            fontSize: 45,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ),
+    //TODO: Erweiterte Kriterien fenster hinzufügen
+    //range bearbeiten, typen von Sehenswürdigkeiten bei der Auswahl sortieren, usw... wie auf dem MockUp
+    return FutureBuilder(
+        future: resultF,
+        builder: (context, snapshot){
+          if(!snapshot.hasData){
+            return Center(child: Text("Wait for Data"));
+          }
+          else{
+            for(var content in result){
+              resultNames.add(content[0]);
+            }
+
+            resultNames = resultNames.toSet().toList();
+            print("Route not created: "+ rutePoints.toString());
+            ScrollController _scrollController = new ScrollController();
+            //TODO: Search Button fest anzeigen und nicht gnaz unten
+            //TODO: Buttons schöner designen
+
+            return WillPopScope(
+              onWillPop: (){
+                Navigator.of(context).pop();
+                return Future.value(false);
+              },
+            child: MultiSelect(items: result,
+              //ListView(
+                /*
+                children: <Widget>[
+                  ListView.builder(
+                    controller: _scrollController,
+                    scrollDirection: Axis.vertical,
+                    shrinkWrap: true,
+                    itemCount:  listLength,
+                    itemBuilder: (context, index) {
+                      return MultiSelect(items: result[index][0]);
+
+                        TextButton(
+                        child: Text(result[index][0]),
+                        onPressed: () {
+                          if (buttonPressedStatus == null) buttonPressedStatus = List.generate(result.length, (i) => List.filled(1, false, growable: false), growable: true);
+                          print("ButtonPressedstatus =" + buttonPressedStatus[index][0].toString());
+                          if (buttonPressedStatus[index][0] == true) buttonPressedStatus[index][0] = false;
+                          else buttonPressedStatus[index][0] = true;
+                          setState(() {
+                            //print("Pressed Staus : " + buttonPressedStatus[index][0].toString() + " " + index.toString());
+                            if(buttonPressedStatus[index][0] == true) {
+                              print("UGABUGA:");
+                              TextButton.styleFrom(
+                                primary: Colors.black,
+                                backgroundColor: Colors.green,
+                              );
+                              writeNewInArray(result[index]);
+                            }else if (buttonPressedStatus[index][0] == false){
+                              TextButton.styleFrom(
+                                primary: Colors.black,
+                                backgroundColor: Colors.green,
+                              );
+                              removeListPoint (result[index]);
+                              print("Route Points:");
+                              print(rutePoints);
+                            }
+                            //remove duplicated points
+                            rutePoints = rutePoints.toSet().toList();
+                          });
+                        },
+                        style: TextButton.styleFrom(
+                          primary: Colors.black,
+                          //backgroundColor: Colors.green,
+                        ),
+                      );
+
+                    },
+                  ) ,
+                  SizedBox(height: 100),
+                  Center(
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: Color(0xffBDBDBD)),
+                          padding: const EdgeInsets.symmetric(horizontal: 40),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20)
+                          )
+                      ),
+
+                      onPressed: (){
+                        setState(() {
+                          poiLocationListLatLng = rutePoints;
+                        });
+                      },
+                      child: const Text(
+                          "Search",
+                          style: TextStyle(
+                            fontSize: 16,
+                            letterSpacing: 2.2,
+                            color: Colors.black,
+                          )),
+                    ),
+                  ),
+                ]
+                    */
+            /*
+              Scaffold(
+              appBar: AppBar(
+                title: HomePageState.customSearchBar,
+                toolbarHeight: 80,
+                automaticallyImplyLeading: false,
+                centerTitle: true,
+                backgroundColor: Theme.of(context).primaryColor,
+              ),
+              body:ListView(
+                  children: <Widget>[
+                    ListView.builder(
+                      controller: _scrollController,
+                      scrollDirection: Axis.vertical,
+                      shrinkWrap: true,
+                      itemCount:  listLength,
+                      itemBuilder: (context, index) {
+                        return TextButton(
+                          child: Text(result[index][0]),
+                          onPressed: () {
+                            if (buttonPressedStatus == null) buttonPressedStatus = List.generate(result.length, (i) => List.filled(1, false, growable: false), growable: true);
+                            print("ButtonPressedstatus =" + buttonPressedStatus[index][0].toString());
+                            if (buttonPressedStatus[index][0] == true) buttonPressedStatus[index][0] = false;
+                            else buttonPressedStatus[index][0] = true;
+                            setState(() {
+                              //print("Pressed Staus : " + buttonPressedStatus[index][0].toString() + " " + index.toString());
+                              if(buttonPressedStatus[index][0] == true) {
+                                writeNewInArray(result[index]);
+                              }else if (buttonPressedStatus[index][0] == false){
+                                removeListPoint (result[index]);
+                                print("Route Points:");
+                                print(rutePoints);
+                              }
+                            });
+                          },
+                          style: TextButton.styleFrom(
+                            primary: Colors.purple,
+                            backgroundColor: Colors.blue,
+                          ),
+                        );
+                      },
+                    ) ,
+                    SizedBox(height: 100),
+                    Center(
+                      child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                            side: BorderSide(color: Color(0xffBDBDBD)),
+                            padding: const EdgeInsets.symmetric(horizontal: 40),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20)
+                            )
+                        ),
+
+                        onPressed: (){
+                          setState(() {
+                            poiLocationListLatLng = rutePoints;
+                          });
+                        },
+                        child: const Text(
+                            "Search",
+                            style: TextStyle(
+                              fontSize: 16,
+                              letterSpacing: 2.2,
+                              color: Colors.black,
+                            )),
+                      ),
+                    ),
+                  ]
+              ),
+
+              bottomNavigationBar:Container(
+              height: 60,
+              decoration: BoxDecoration(
+                //color: Theme.of(context).primaryColor,
+                color: Theme.of(context).primaryColor,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(50),
+                  topRight: Radius.circular(50),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  IconButton(
+                    enableFeedback: false,
+                    onPressed: () {
+                      HapticFeedback.vibrate();
+                      setState(() {
+                        //print(imageString);
+                        HomePageState.normalSearchBar = true;
+                        HomePageState.pageIndex = 0;
+                      });
+                    },
+                    icon: HomePageState.pageIndex == 0
+                        ? const Icon(
+                      Icons.group_rounded,
+                      color: Colors.white,
+                      size: 35,
+                    )
+                        : const Icon(
+                      Icons.group_outlined,
+                      color: Colors.white,
+                      size: 35,
+                    ),
+                  ),
+                  IconButton(
+                    enableFeedback: false,
+                    onPressed: () {
+                      HapticFeedback.vibrate();
+                      setState(() {
+                        HomePageState.normalSearchBar = true;
+                        HomePageState.pageIndex = 1;
+                      });
+                    },
+                    icon: HomePageState.pageIndex == 1
+                        ? const Icon(
+                      Icons.room_rounded,
+                      color: Colors.white,
+                      size: 35,
+                    )
+                        : const Icon(
+                      Icons.room_outlined,
+                      color: Colors.white,
+                      size: 35,
+                    ),
+                  ),
+                  IconButton(
+                    enableFeedback: false,
+                    onPressed: () {
+                      HapticFeedback.vibrate();
+                      setState(() {
+                        HomePageState.normalSearchBar = true;
+                        HomePageState.pageIndex = 2;
+                      });
+                    },
+                    icon: HomePageState.pageIndex == 2
+                        ? const Icon(
+                      Icons.room_rounded,
+                      color: Colors.white,
+                      size: 35,
+                    )
+                        : const Icon(
+                      Icons.room_outlined,
+                      color: Colors.white,
+                      size: 35,
+                    ),
+                  ),
+                  IconButton(
+                    enableFeedback: false,
+                    onPressed: () {
+                      HapticFeedback.vibrate();
+                      setState(() {
+                        HomePageState.normalSearchBar = true;
+                        HomePageState.pageIndex = 3;
+                      });
+                    },
+                    icon: HomePageState.pageIndex == 3
+                        ? const Icon(
+                      Icons.settings_rounded,
+                      color: Colors.white,
+                      size: 35,
+                    )
+                        : const Icon(
+                      Icons.settings_outlined,
+                      color: Colors.white,
+                      size: 35,
+                    ),
+                  ),
+                ],
+              ),
+
+
+              ),
+
+
+               */
+              )
+            );
+          }
+        }
     );
   }
 }
@@ -402,13 +754,21 @@ class _Page2State extends State<Page2> {
   void initState() {
     //10.10.30.96:3000
     super.initState();
-    initializeLocationAndSave();
 
     timerOwnLocation = Timer.periodic(Duration(seconds: 1), (timer) async { //Hier der Timer zum updaten der eigenen Location!
       if(mapboxmapcontroller == null) return;
-      print("Eigene Location loading");
+      //print("Eigene Location loading");
 
       ownLocationLatLng = (await acquireCurrentLocation())!;
+
+      // Get the current user address
+      String currentAddress =
+      (await getParsedReverseGeocoding(ownLocationLatLng))['place'];
+
+      // Store the user location in sharedPreferences
+      sharedPreferences.setDouble('latitude', ownLocationLatLng.latitude);
+      sharedPreferences.setDouble('longitude', ownLocationLatLng.longitude);
+      sharedPreferences.setString('current-address', currentAddress);
 
       mapboxmapcontroller!.updateCircle(userCircle, CircleOptions(
         circleRadius: 8.0,
@@ -423,7 +783,7 @@ class _Page2State extends State<Page2> {
 
     timerFriendLocation = Timer.periodic(Duration(seconds: 5), (timer) async { //Hier der Timer zum updaten der Freunde Location!
       if(mapboxmapcontroller == null) return;
-      print("Other Location Loading");
+      //print("Other Location Loading");
       friendLocationListLatLng = (await acquireOthersLocation(ownLocationLatLng));
       for(var i=0; i<friendListSymbols.length; i++){
         if(friendLocationListLatLng[i]['Lon'] == null || friendLocationListLatLng[i]['Lat'] == null) continue;
@@ -442,37 +802,6 @@ class _Page2State extends State<Page2> {
     });
   }
 
-  void initializeLocationAndSave() async {
-    Location _location = Location();
-    bool? _serviceEnabled;
-    PermissionStatus? _permissionGranted;
-
-    _serviceEnabled = await _location.serviceEnabled();
-    if (!_serviceEnabled) {
-      _serviceEnabled = await _location.requestService();
-    }
-
-    _permissionGranted = await _location.hasPermission();
-    if (_permissionGranted == PermissionStatus.denied) {
-      _permissionGranted = await _location.requestPermission();
-    }
-
-    // Get the current user location
-    LocationData _locationData = await _location.getLocation();
-    LatLng currentLocation =
-    LatLng(_locationData.latitude!, _locationData.longitude!);
-
-    // Get the current user address
-    String currentAddress =
-    (await getParsedReverseGeocoding(currentLocation))['place'];
-
-    // Store the user location in sharedPreferences
-    sharedPreferences.setDouble('latitude', _locationData.latitude!);
-    sharedPreferences.setDouble('longitude', _locationData.longitude!);
-    sharedPreferences.setString('current-address', currentAddress);
-  }
-
-
   @override
   void dispose() {
     super.dispose();
@@ -483,49 +812,53 @@ class _Page2State extends State<Page2> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: MapboxMap(
-        accessToken: token,
-        styleString: style,
-        initialCameraPosition: CameraPosition(
-          zoom: 15.0,
-          target: LatLng(14.508, 46.048),
-        ),
+        body: MapboxMap(
+          accessToken: token,
+          styleString: style,
+          initialCameraPosition: CameraPosition(
+            zoom: 15.0,
+            target: LatLng(14.508, 46.048),
+          ),
 
-        onMapCreated: (MapboxMapController controller) async {
-          print("jetzt in der onMapCreated");
-          //Acquire current location (returns the LatLong instance)
-          ownLocationLatLng = (await acquireCurrentLocation())!;
+          onMapCreated: (MapboxMapController controller) async {
+            //controller.setGeoJsonSource('restaurants', 'https://api.mapbox.com/directions/v5/mapbox/driving/-122.42,37.78;-77.03,38.91?access_token=pk.eyJ1IjoiYW5uYWtzcnIiLCJhIjoiY2wxMG0wcW83MDAxczNrczRya2pjYXFvdiJ9.VNVotWF_bX62uIlzu9tc-Q')
 
-          // You can either use the moveCamera or animateCamera, but the former
-          // causes a sudden movement from the initial to 'new' camera position,
-          // while animateCamera gives a smooth animated transition
-          await controller.animateCamera(
-            CameraUpdate.newLatLng(ownLocationLatLng),
-          );
 
-          await controller.addCircle(
-            CircleOptions(
-              circleRadius: 8.0,
-              circleColor: myColorCircle,
-              circleOpacity: 0.8,
-              geometry: ownLocationLatLng,
-              draggable: false,
-            ),
-          );
-          userCircle = controller.circles.first;
-          friendLocationListLatLng = await acquireOthersLocation(ownLocationLatLng);
 
-          //print("JEtzt locations");
-          //print(friendLocationListLatLng);
-          var geo;
-          var anzeigen;
+            //print("jetzt in der onMapCreated");
+            //Acquire current location (returns the LatLong instance)
+            ownLocationLatLng = (await acquireCurrentLocation())!;
 
-          for(var i=0; i<friendLocationListLatLng.length;i++){
-            (friendLocationListLatLng[i]['Lat'] == null) ? geo = LatLng(0, 0) : geo = LatLng(friendLocationListLatLng[i]['Lat'], friendLocationListLatLng[i]['Lon']);
-            (friendLocationListLatLng[i]['Lat'] == null) ? anzeigen = 0.0 : anzeigen = 0.8;
+            // You can either use the moveCamera or animateCamera, but the former
+            // causes a sudden movement from the initial to 'new' camera position,
+            // while animateCamera gives a smooth animated transition
+            await controller.animateCamera(
+              CameraUpdate.newLatLng(ownLocationLatLng),
+            );
 
-            await controller.addSymbol(
-                SymbolOptions(
+            await controller.addCircle(
+              CircleOptions(
+                circleRadius: 8.0,
+                circleColor: myColorCircle,
+                circleOpacity: 0.8,
+                geometry: ownLocationLatLng,
+                draggable: false,
+              ),
+            );
+            userCircle = controller.circles.first;
+            friendLocationListLatLng = await acquireOthersLocation(ownLocationLatLng);
+
+            //print("JEtzt locations");
+            //print(friendLocationListLatLng);
+            var geo;
+            var anzeigen;
+
+            for(var i=0; i<friendLocationListLatLng.length;i++){
+              (friendLocationListLatLng[i]['Lat'] == null) ? geo = LatLng(0, 0) : geo = LatLng(friendLocationListLatLng[i]['Lat'], friendLocationListLatLng[i]['Lon']);
+              (friendLocationListLatLng[i]['Lat'] == null) ? anzeigen = 0.0 : anzeigen = 0.8;
+
+              await controller.addSymbol(
+                  SymbolOptions(
                     iconSize: 0.4,
                     iconImage: "assets/gps_images/${friendLocationListLatLng[i]['Image']}",
                     iconOpacity: anzeigen,
@@ -534,57 +867,59 @@ class _Page2State extends State<Page2> {
                     textOffset: Offset(0,1),
                     geometry: geo,
                     draggable: false,
-                )
-            );
+                  )
+              );
 
-            friendListSymbols.add(controller.symbols.last);
-          }
+              friendListSymbols.add(controller.symbols.last);
+            }
+
+            //PoI Circle
+            print("POI Symbol");
+            print(poiLocationListLatLng.length);
+            for (var i = 0; i < poiLocationListLatLng.length; i++) {
+              geo = LatLng(double.parse(poiLocationListLatLng[i][6]), double.parse(poiLocationListLatLng[i][5]));
+              await controller.addSymbol(
+                  SymbolOptions(
+                    iconSize: 0.4,
+                    //Images von typen.
+                    iconImage: "assets/gps_images/gps_image0.png",
+                    textField: poiLocationListLatLng[i][0],
+                    //textOpacity: anzeigen,
+                    textOffset: Offset(0, 1),
+                    geometry: geo,
+                    draggable: false,
+
+                  )
+              );
+            }
 
 
-          print("Jetzt ist die OnMapCreated function fertig!");
-          mapboxmapcontroller = controller;
+            //print("Jetzt ist die OnMapCreated function fertig!");
+            mapboxmapcontroller = controller;
           },
 
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (_) => const PrepareRide('Paris')))
-/*
-            final res = await http.get(Uri.parse('https://public.opendatasoft.com/api/records/1.0/search/?dataset=geonames-all-cities-with-a-population-1000&q=&sort=name&facet=name&facet=cou_name_en&refine.alternate_names=Rom'));
+        ),
 
-            Map<String, dynamic> values = jsonDecode(res.body);
-            for(var word in values['records']){
-              var field = word['fields'];
-              print(field['cou_name_en']);
-              print(field['name']);
-
-            }
-
- */
-            //print(values['records']);
-            /*
-            if(values.length > 0){
-              for(var i = 0; i< values.length; i++){
-                if(values[i]!=null){
-                  Map<String, dynamic> map = values[i];
-                  _postList.add(Post.fromJson(map));
-                  print(map['name']);
-                }
-              }
-            }
-
-             */
-            //print(cities);
-
-
-          ,
-        backgroundColor: Colors.green,
-        child: const Icon(Icons.navigation),
-      ),
+        floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          SizedBox(
+            height: 10,
+          ),
+          FloatingActionButton(
+              child: Icon(
+                  Icons.star
+              ),
+              onPressed: () =>
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => poiInformationWindow(),
+                      )
+                  )
+          )
+        ]
+    )
     );
-
-
   }
 }

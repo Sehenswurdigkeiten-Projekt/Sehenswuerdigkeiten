@@ -253,11 +253,12 @@ class NewScreen extends StatelessWidget {
 
 Future<List<Object>> checkIfCorrect (String name, String pass, String confPass) async {
   bool isCorrect = false;
-  late Object token;
+  late Object token = "";
 
   print("Name: $name, Pass: $pass, ConfPass: $pass");
   if(pass == confPass && name != "" && pass != "") {
     var resArray = await requestServer(name, pass);
+    print("RESS: $resArray");
     token = resArray[0];
     Object statusCode = resArray[1].toString();
 

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mapbox_navigation/library.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:untitled/nav/helpers/shared_prefs.dart';
-import 'package:untitled/nav/ui/rate_ride.dart';
+
+import '../../mainstrukturwebseite.dart';
 
 class TurnByTurn extends StatefulWidget {
   const TurnByTurn({Key? key}) : super(key: key);
@@ -13,17 +14,17 @@ class TurnByTurn extends StatefulWidget {
 
 class _TurnByTurnState extends State<TurnByTurn> {
   // Waypoints to mark trip start and end
-  LatLng source = getTripLatLngFromSharedPrefs('source');
-  LatLng destination = getTripLatLngFromSharedPrefs('destination');
+  late LatLng source; //getTripLatLngFromSharedPrefs('source');
+  late LatLng destination; //getTripLatLngFromSharedPrefs('destination');
   late WayPoint sourceWaypoint, destinationWaypoint;
   var wayPoints = <WayPoint>[];
 
   // Config variables for Mapbox Navigation
   late MapBoxNavigation directions;
   late MapBoxOptions _options;
-  late double distanceRemaining, durationRemaining;
   late MapBoxNavigationViewController _controller;
-  final bool isMultipleStop = false;
+  late double distanceRemaining, durationRemaining;
+  bool isMultipleStop = false;
   String instruction = "";
   bool arrived = false;
   bool routeBuilt = false;
@@ -45,6 +46,8 @@ class _TurnByTurnState extends State<TurnByTurn> {
         voiceInstructionsEnabled: true,
         bannerInstructionsEnabled: true,
         mode: MapBoxNavigationMode.drivingWithTraffic,
+        allowsUTurnAtWayPoints: true,
+        alternatives: true,
         isOptimized: true,
         units: VoiceUnits.metric,
         simulateRoute: true,
@@ -52,12 +55,18 @@ class _TurnByTurnState extends State<TurnByTurn> {
 
     // Configure waypoints
     sourceWaypoint = WayPoint(
-        name: "Source", latitude: source.latitude, longitude: source.longitude);
+        name: "Source", latitude: 46.7100050, longitude: 11.6497561);
+    var middleWayPoint = WayPoint(name: 'Middle', latitude: 46.7098951, longitude: 11.6497986);
+
+    LatLng destination = new LatLng(double.parse(MapEntries.selectedCoordinates.split(',')[0]), double.parse(MapEntries.selectedCoordinates.split(',')[1]));
     destinationWaypoint = WayPoint(
         name: "Destination",
         latitude: destination.latitude,
         longitude: destination.longitude);
+    isMultipleStop = true;
+
     wayPoints.add(sourceWaypoint);
+    wayPoints.add(middleWayPoint);
     wayPoints.add(destinationWaypoint);
 
     // Start the trip
@@ -66,7 +75,7 @@ class _TurnByTurnState extends State<TurnByTurn> {
 
   @override
   Widget build(BuildContext context) {
-    return const RateRide();
+    return HomePage();
   }
 
   Future<void> _onRouteEvent(e) async {

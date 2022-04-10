@@ -47,7 +47,7 @@ Future<LatLng?> acquireCurrentLocation() async {
 
 
 Future<List<dynamic>> acquireOthersLocation(LatLng myLocation) async {
-  print("Jetzt otherlocation function");
+  //print("Jetzt otherlocation function");
   //Connect to Server and get the location from the people
   var latlongs = [];
   var rng = Random();
@@ -58,8 +58,8 @@ Future<List<dynamic>> acquireOthersLocation(LatLng myLocation) async {
   //latlongs.add(LatLng(rng.nextDouble() * 90,rng.nextDouble() * 90));
 
   latlongs = await requestServerFriendPos("http://185.5.199.33:30000/UPDATE_GPS", myLocation);
-  print("Jetzt die latlongs bekommen");
-  print(latlongs);
+  //print("Jetzt die latlongs bekommen");
+  //print(latlongs);
 
 
   return latlongs;
@@ -68,9 +68,9 @@ Future<List<dynamic>> requestServerFriendPos(String name, LatLng myLocation) asy
   String username = MyLoginWidget2.username;
   String token = MyLoginWidget2.token;
 
-  print("Jetzt in der requestServer");
-  print(MyLoginWidget2.token);
-  print(MyLoginWidget2.username);
+  //print("Jetzt in der requestServer");
+  //print(MyLoginWidget2.token);
+  //print(MyLoginWidget2.username);
 
   if(token == "") token = MySignupWidget2.token;
   if(username == "") username = MySignupWidget2.username;
@@ -82,13 +82,13 @@ Future<List<dynamic>> requestServerFriendPos(String name, LatLng myLocation) asy
     "lat": "${myLocation.latitude}",
     "toNotify":"-"
   };
-  print("DA");
+  //print("DA");
 
   var client = new http.Client();
   var uri = Uri.parse(name);
   http.Response res = await client.post(uri, body: body);
-  print("DA2");
-  print(res.body);
+  //print("DA2");
+  //print(res.body);
   if(res.body.length == 0){
     return [];
   }
