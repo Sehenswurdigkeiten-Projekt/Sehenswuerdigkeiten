@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:untitled/informationSightsWidget.dart';
 import 'globalVariables.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
@@ -113,23 +114,7 @@ class _poiInformationWindow extends State<poiInformationWindow> {
                 shrinkWrap: true,
                 itemCount: informations.length,
                 itemBuilder: (context, index){
-
-
-                  return Container(
-                    child: Text(informations[index]),
-                    height: 190.0,
-                    width: MediaQuery.of(context).size.width - 100.0,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(0),
-                        color: Colors.blue,
-                        image: DecorationImage(
-                            image: new NetworkImage(
-                                linkStored[index],
-                            ),
-                            fit: BoxFit.fill
-                        )
-                    ),
-                  );
+                  return informationSightsWidget(informations[index], linkStored[index], poiLocationListLatLng[index][0].toString());
                   /*return Stack(
                     children: [
                       Center(
