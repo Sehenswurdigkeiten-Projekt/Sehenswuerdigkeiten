@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:untitled/globalVariables.dart';
 import 'package:untitled/nav/screens/prepare_ride.dart';
 
+import 'mainstrukturwebseite.dart';
 import 'nav/helpers/mapbox_handler.dart';
 import 'nav/screens/review_ride.dart';
 
@@ -31,16 +32,17 @@ class _MultiSelectState extends State<MultiSelect> {
     });
   }
 
-  // this function is called when the Cancel button is pressed
-  void _cancel() {
-    Navigator.pop(context);
-  }
-
 // this function is called when the Submit button is tapped
   void _submit() {
     setState(() {
       poiLocationListLatLng = _selectedItems;
     });
+    HomePageState.pageIndex = 1;
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (_) =>
+                HomePage()));
     //Navigator.push();
   }
 

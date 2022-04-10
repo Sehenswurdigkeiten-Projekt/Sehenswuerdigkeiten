@@ -52,7 +52,7 @@ class _TurnByTurnState extends State<TurnByTurn> {
         alternatives: true,
         isOptimized: true,
         units: VoiceUnits.metric,
-        simulateRoute: true,
+        simulateRoute: false,
         language: "en");
 
     //LatLng(double.parse(poiLocationListLatLng[i][6]), double.parse(poiLocationListLatLng[i][5]))
