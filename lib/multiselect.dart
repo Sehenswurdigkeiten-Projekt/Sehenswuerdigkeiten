@@ -37,7 +37,7 @@ class _MultiSelectState extends State<MultiSelect> {
     setState(() {
       poiLocationListLatLng = _selectedItems;
     });
-    Navigator.of(context).pop();
+    //Navigator.push();
   }
 
   @override
