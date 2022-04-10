@@ -20,7 +20,6 @@ class MultiSelect extends StatefulWidget {
 class _MultiSelectState extends State<MultiSelect> {
   // this variable holds the selected items
   final List<List<String>> _selectedItems = [];
-
 // This function is triggered when a checkbox is checked or unchecked
   void _itemChange(itemValue, bool isSelected) {
     setState(() {
@@ -64,7 +63,12 @@ class _MultiSelectState extends State<MultiSelect> {
       ),
       actions: [
         TextButton(
-          child: const Text('Start navigation'),
+          child: const Text(
+            'Start navigation',
+            style: TextStyle(
+                color: Color(0xff2F8D46)
+            ),
+          ),
           onPressed:() async{
             setState(() {
               poiLocationListLatLng = _selectedItems;
@@ -79,7 +83,12 @@ class _MultiSelectState extends State<MultiSelect> {
             },
         ),
         ElevatedButton(
-          child: const Text('Submit'),
+          style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all(Color(0xff2F8D46))
+          ),
+          child: const Text(
+            'Submit'
+          ),
           onPressed: _submit,
         ),
       ],
