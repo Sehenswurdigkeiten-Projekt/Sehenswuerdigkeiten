@@ -98,6 +98,7 @@ class _poiInformationWindow extends State<poiInformationWindow> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Color(0xff2F8D46),
         leading: IconButton(
             onPressed: () {
               HomePageState.pageIndex = 1;

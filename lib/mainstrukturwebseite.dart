@@ -635,7 +635,7 @@ class _Page2State extends State<Page2> {
                   SymbolOptions(
                     iconSize: 0.4,
                     //Images von typen.
-                    iconImage: "assets/gps_images/gps_image0.png",
+                    iconImage: "assets/icons/museum.png",
                     textField: poiLocationListLatLng[i][0],
                     //textOpacity: anzeigen,
                     textOffset: Offset(0, 1),
