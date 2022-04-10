@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:untitled/addFriendScreen.dart';
+import 'package:untitled/multiselect.dart';
 import 'package:untitled/nav/helpers/shared_prefs.dart';
 
 import 'package:untitled/settingScreen.dart'; import 'locationstuff.dart';
@@ -24,7 +25,7 @@ import 'informationWindow.dart';
 import 'findPoI.dart';
 
 import 'globalVariables.dart';
-List<dynamic> poiLocationListLatLng = [];
+
 
 class MyApp2 extends StatelessWidget {
 
@@ -116,10 +117,12 @@ class AutocompleteBar extends StatelessWidget{
           LatLng destination = new LatLng(double.parse(MapEntries.selectedCoordinates.split(',')[0]), double.parse(MapEntries.selectedCoordinates.split(',')[1]));
           sharedPreferences.setDouble('destLat', destination.latitude);
           sharedPreferences.setDouble('destLong', destination.longitude);
+          HomePageState.pageIndex = 2;
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (_) => PrepareRide(MapEntries.placesMap[selection])));
+                  builder: (_) => const HomePage()));
+          //PrepareRide(MapEntries.placesMap[selection])));
         },
       );
   }
@@ -135,7 +138,7 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> {
   static var imageString = "assets/gps_images/gps_image0.png";
-  int pageIndex = 0;
+  static int pageIndex = 0;
   static late HomePageState _homePageState;
 
 
@@ -145,8 +148,8 @@ class HomePageState extends State<HomePage> {
   }
   static HomePageState get homePageState => _homePageState;
   Icon customIcon = const Icon(Icons.search);
-  bool normalSearchBar = true;
-  late Widget customSearchBar;
+  static bool normalSearchBar = true;
+  static late Widget customSearchBar;
 
   final pages = [
     MyFriendsWidget(),
@@ -207,7 +210,7 @@ class HomePageState extends State<HomePage> {
          title: customSearchBar,
          toolbarHeight: 80,
          automaticallyImplyLeading: false,
-         actions: pageIndex == 1 ? [
+         actions: pageIndex == 2 ? [
            IconButton(
              onPressed: () {
                setState(() {
@@ -348,9 +351,10 @@ class _SelectPoI extends State<SelectPoI> {
   var f = FindPoI();
   //11.422465473888776
   //46.890633738573584
-  late Future<List> resultF = f.searchPoI("", "11.422465473888776", "46.890633738573584");
+  late Future<List> resultF = f.searchPoI("", getDestinationLatLngFromSharedPrefs().longitude.toString(), getDestinationLatLngFromSharedPrefs().latitude.toString());
   var listLength;
   var result;
+  List<String> resultNames = [];
   var buttonPressedStatus;
 
   void writeNewInArray(List<String> rutePointsArray){
@@ -384,7 +388,7 @@ class _SelectPoI extends State<SelectPoI> {
           result = value;
           listLength = value.length;
         });
-      print("safed List");
+      print("saved List");
     });
   }
 
@@ -406,11 +410,24 @@ class _SelectPoI extends State<SelectPoI> {
             return Center(child: Text("Wait for Data"));
           }
           else{
-            print("Rute not created: "+ rutePoints.toString());
+            for(var content in result){
+              resultNames.add(content[0]);
+            }
+
+            resultNames = resultNames.toSet().toList();
+            print("Route not created: "+ rutePoints.toString());
             ScrollController _scrollController = new ScrollController();
             //TODO: Search Button fest anzeigen und nicht gnaz unten
             //TODO: Buttons schöner designen
-            return ListView(
+
+            return WillPopScope(
+              onWillPop: (){
+                Navigator.of(context).pop();
+                return Future.value(false);
+              },
+            child: MultiSelect(items: result,
+              //ListView(
+                /*
                 children: <Widget>[
                   ListView.builder(
                     controller: _scrollController,
@@ -418,7 +435,9 @@ class _SelectPoI extends State<SelectPoI> {
                     shrinkWrap: true,
                     itemCount:  listLength,
                     itemBuilder: (context, index) {
-                      return TextButton(
+                      return MultiSelect(items: result[index][0]);
+
+                        TextButton(
                         child: Text(result[index][0]),
                         onPressed: () {
                           if (buttonPressedStatus == null) buttonPressedStatus = List.generate(result.length, (i) => List.filled(1, false, growable: false), growable: true);
@@ -431,9 +450,11 @@ class _SelectPoI extends State<SelectPoI> {
                               writeNewInArray(result[index]);
                             }else if (buttonPressedStatus[index][0] == false){
                               removeListPoint (result[index]);
-                              print("Rute Points:");
+                              print("Route Points:");
                               print(rutePoints);
                             }
+                            //remove duplicated points
+                            rutePoints = rutePoints.toSet().toList();
                           });
                         },
                         style: TextButton.styleFrom(
@@ -441,6 +462,7 @@ class _SelectPoI extends State<SelectPoI> {
                           backgroundColor: Colors.blue,
                         ),
                       );
+
                     },
                   ) ,
                   SizedBox(height: 100),
@@ -469,6 +491,184 @@ class _SelectPoI extends State<SelectPoI> {
                     ),
                   ),
                 ]
+                    */
+            /*
+              Scaffold(
+              appBar: AppBar(
+                title: HomePageState.customSearchBar,
+                toolbarHeight: 80,
+                automaticallyImplyLeading: false,
+                centerTitle: true,
+                backgroundColor: Theme.of(context).primaryColor,
+              ),
+              body:ListView(
+                  children: <Widget>[
+                    ListView.builder(
+                      controller: _scrollController,
+                      scrollDirection: Axis.vertical,
+                      shrinkWrap: true,
+                      itemCount:  listLength,
+                      itemBuilder: (context, index) {
+                        return TextButton(
+                          child: Text(result[index][0]),
+                          onPressed: () {
+                            if (buttonPressedStatus == null) buttonPressedStatus = List.generate(result.length, (i) => List.filled(1, false, growable: false), growable: true);
+                            print("ButtonPressedstatus =" + buttonPressedStatus[index][0].toString());
+                            if (buttonPressedStatus[index][0] == true) buttonPressedStatus[index][0] = false;
+                            else buttonPressedStatus[index][0] = true;
+                            setState(() {
+                              //print("Pressed Staus : " + buttonPressedStatus[index][0].toString() + " " + index.toString());
+                              if(buttonPressedStatus[index][0] == true) {
+                                writeNewInArray(result[index]);
+                              }else if (buttonPressedStatus[index][0] == false){
+                                removeListPoint (result[index]);
+                                print("Route Points:");
+                                print(rutePoints);
+                              }
+                            });
+                          },
+                          style: TextButton.styleFrom(
+                            primary: Colors.purple,
+                            backgroundColor: Colors.blue,
+                          ),
+                        );
+                      },
+                    ) ,
+                    SizedBox(height: 100),
+                    Center(
+                      child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                            side: BorderSide(color: Color(0xffBDBDBD)),
+                            padding: const EdgeInsets.symmetric(horizontal: 40),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20)
+                            )
+                        ),
+
+                        onPressed: (){
+                          setState(() {
+                            poiLocationListLatLng = rutePoints;
+                          });
+                        },
+                        child: const Text(
+                            "Search",
+                            style: TextStyle(
+                              fontSize: 16,
+                              letterSpacing: 2.2,
+                              color: Colors.black,
+                            )),
+                      ),
+                    ),
+                  ]
+              ),
+
+              bottomNavigationBar:Container(
+              height: 60,
+              decoration: BoxDecoration(
+                //color: Theme.of(context).primaryColor,
+                color: Theme.of(context).primaryColor,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(50),
+                  topRight: Radius.circular(50),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  IconButton(
+                    enableFeedback: false,
+                    onPressed: () {
+                      HapticFeedback.vibrate();
+                      setState(() {
+                        //print(imageString);
+                        HomePageState.normalSearchBar = true;
+                        HomePageState.pageIndex = 0;
+                      });
+                    },
+                    icon: HomePageState.pageIndex == 0
+                        ? const Icon(
+                      Icons.group_rounded,
+                      color: Colors.white,
+                      size: 35,
+                    )
+                        : const Icon(
+                      Icons.group_outlined,
+                      color: Colors.white,
+                      size: 35,
+                    ),
+                  ),
+                  IconButton(
+                    enableFeedback: false,
+                    onPressed: () {
+                      HapticFeedback.vibrate();
+                      setState(() {
+                        HomePageState.normalSearchBar = true;
+                        HomePageState.pageIndex = 1;
+                      });
+                    },
+                    icon: HomePageState.pageIndex == 1
+                        ? const Icon(
+                      Icons.room_rounded,
+                      color: Colors.white,
+                      size: 35,
+                    )
+                        : const Icon(
+                      Icons.room_outlined,
+                      color: Colors.white,
+                      size: 35,
+                    ),
+                  ),
+                  IconButton(
+                    enableFeedback: false,
+                    onPressed: () {
+                      HapticFeedback.vibrate();
+                      setState(() {
+                        HomePageState.normalSearchBar = true;
+                        HomePageState.pageIndex = 2;
+                      });
+                    },
+                    icon: HomePageState.pageIndex == 2
+                        ? const Icon(
+                      Icons.room_rounded,
+                      color: Colors.white,
+                      size: 35,
+                    )
+                        : const Icon(
+                      Icons.room_outlined,
+                      color: Colors.white,
+                      size: 35,
+                    ),
+                  ),
+                  IconButton(
+                    enableFeedback: false,
+                    onPressed: () {
+                      HapticFeedback.vibrate();
+                      setState(() {
+                        HomePageState.normalSearchBar = true;
+                        HomePageState.pageIndex = 3;
+                      });
+                    },
+                    icon: HomePageState.pageIndex == 3
+                        ? const Icon(
+                      Icons.settings_rounded,
+                      color: Colors.white,
+                      size: 35,
+                    )
+                        : const Icon(
+                      Icons.settings_outlined,
+                      color: Colors.white,
+                      size: 35,
+                    ),
+                  ),
+                ],
+              ),
+
+
+              ),
+
+
+               */
+              )
             );
           }
         }
@@ -679,6 +879,7 @@ class _Page2State extends State<Page2> {
                     textOffset: Offset(0, 1),
                     geometry: geo,
                     draggable: false,
+
                   )
               );
             }
@@ -693,15 +894,6 @@ class _Page2State extends State<Page2> {
         floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          FloatingActionButton(
-            onPressed: () =>
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) => const PrepareRide('Paris'))),
-            backgroundColor: Colors.green,
-            child: const Icon(Icons.navigation),
-          ),
           SizedBox(
             height: 10,
           ),

@@ -75,7 +75,7 @@ class _TurnByTurnState extends State<TurnByTurn> {
 
   @override
   Widget build(BuildContext context) {
-    return Page2();
+    return HomePage();
   }
 
   Future<void> _onRouteEvent(e) async {

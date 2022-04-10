@@ -85,7 +85,7 @@ class _poiInformationWindow extends State<poiInformationWindow> {
       body: FutureBuilder(
           future: informationsF,
           builder: (context, snapshot){
-            if (!snapshot.hasData) return Center(child: Text("Select Points of Intrest"));
+            if (!snapshot.hasData) return Center(child: Text("Select Points of Interest"));
             else{
               return ListView.builder(
                 controller: _scrollController,
@@ -93,12 +93,8 @@ class _poiInformationWindow extends State<poiInformationWindow> {
                 shrinkWrap: true,
                 itemCount: informations.length,
                 itemBuilder: (context, index){
-                  return TextField(
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: informations[index],
-                      )
+                  return Text(
+                    informations[index]
                   );
                 },
               );
