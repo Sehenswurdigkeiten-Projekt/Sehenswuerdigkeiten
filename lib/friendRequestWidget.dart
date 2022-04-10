@@ -27,6 +27,7 @@ class _friendRequestWidgetState extends State<friendRequestWidget>{
           child: IconButton(
               onPressed: (){
                 print("Friend request abgelehnt bei id $id");
+                requestServerIgnoreFriendRequest(friendname);
                 setState(() {
                   angenommen = true;
                 });
@@ -73,6 +74,36 @@ class _friendRequestWidgetState extends State<friendRequestWidget>{
 
     var client = new http.Client();
     var uri = Uri.parse("$address/add_friend");
+    http.Response res = await client.post(uri, body: body);
+
+    var resArray = [res.body, res.statusCode];
+
+    print("RESARRAY: $resArray");
+
+    return resArray;
+  }
+
+  Future<List<Object>> requestServerIgnoreFriendRequest(String friend) async{
+    print("In der requestServerIgnoreFriendRequest");
+    String username = MyLoginWidget2.username;
+    String token = MyLoginWidget2.token;
+
+    print(MyLoginWidget2.token);
+    print(MyLoginWidget2.username);
+
+    if(token == "") token = MySignupWidget2.token;
+    if(username == "") username = MySignupWidget2.username;
+
+    var body = {
+      "username":username,
+      "token":token,
+      "friend":friend,
+    };
+
+    var address = 'http://185.5.199.33:30000';
+
+    var client = new http.Client();
+    var uri = Uri.parse("$address/IGNORE_FRIENDREQUEST");
     http.Response res = await client.post(uri, body: body);
 
     var resArray = [res.body, res.statusCode];
