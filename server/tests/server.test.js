@@ -1,9 +1,7 @@
 const { default: axios } = require("axios");
+let server = "http://10.10.30.21:3001/"
+let method = "GET"
 
-let server = "http://10.10.30.21:3001/LOGIN"
-let method = "post"
-
-let res
 test("Trying to login",async ()=>{
     let body = {username:"Larcher", "pwd":"Hummer"}
 

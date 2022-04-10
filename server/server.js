@@ -1,4 +1,14 @@
 const express = require("express")
+var fs = require('fs');
+var http = require('http');
+var https = require('https');
+var privateKey  = fs.readFileSync('key.pem', 'utf8');
+var certificate = fs.readFileSync('cert.pem', 'utf8');
+
+const options = {
+    key: fs.readFileSync('key.pem'),
+    cert: fs.readFileSync('cert.pem')
+  };
 const app = express()
 
 var bodyParser = require('body-parser')
@@ -9,16 +19,12 @@ let port = process.env.PORT
 
 if(port == undefined)
     port = 30000;
-
-
-
 //TODO: DELTE USER, DELETE GROUP, DELETE ROUTE, IMPLEMENT !SHIT BELOW!
 //TODO: ERROR HANDLING WICHTIG
 
 const request = require("./routes/requests");
 const { application } = require("express");
 
-//TODO: should probably return Friends and Groups or maybe make new Post requests
 app.get("/", urlencodedParser, jsonParser, (req, res)=>{res.send("hallo")})
 
 app.post("/LOGIN", urlencodedParser,jsonParser,request.login)
@@ -51,3 +57,5 @@ app.post("/CREATE_ROUTE", urlencodedParser,jsonParser, async function(req,res){
   
 })
 app.listen(port, () => console.log(`Hello world app listening on port ${port}!`))
+//const httpsServer = https.createServer(options, app);
+//httpsServer.listen(port, () => console.log(`Hello world app listening on port ${port}!`));
