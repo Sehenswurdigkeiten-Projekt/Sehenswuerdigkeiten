@@ -1,0 +1,36 @@
+{
+    "logs": [
+        {
+            "outputFile": "A:\\Schule\\5BT\\Info\\projekt\\Sehenswuerdigkeiten\\build\\app\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-port\\values-port.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\Anna\\.gradle\\caches\\transforms-2\\files-2.1\\a651380312f51d76373d1e510a15f4e7\\jetified-ui-1.2.0\\res\\values-port\\values-port.xml",
+                    "from": {
+                        "startLines": "2,3,4,5,6",
+                        "startColumns": "4,4,4,4,4",
+                        "startOffsets": "55,120,188,260,326",
+                        "endColumns": "64,67,71,65,57",
+                        "endOffsets": "115,183,255,321,379"
+                    },
+                    "to": {
+                        "startLines": "3,4,5,6,7",
+                        "startColumns": "4,4,4,4,4",
+                        "startOffsets": "111,176,244,316,382",
+                        "endColumns": "64,67,71,65,57",
+                        "endOffsets": "171,239,311,377,435"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\Anna\\.gradle\\caches\\transforms-2\\files-2.1\\39ea149bda8c1917f16c92d5cd9a2fc6\\appcompat-1.2.0\\res\\values-port\\values-port.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "55",
+                        "endOffsets": "106"
+                    }
+                }
+            ]
+        }
+    ]
+}
