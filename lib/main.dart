@@ -22,6 +22,7 @@ class MyApp1 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'One Trip',
       theme: ThemeData.dark().copyWith(
 

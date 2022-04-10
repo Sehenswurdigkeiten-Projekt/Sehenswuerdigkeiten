@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:untitled/globalVariables.dart';
 import 'package:untitled/nav/helpers/mapbox_handler.dart';
 import 'package:untitled/nav/helpers/shared_prefs.dart';
 
@@ -37,9 +38,17 @@ class _ReviewRideState extends State<ReviewRide> {
     _initialCameraPosition = CameraPosition(
         target: getCenterCoordinatesForPolyline(geometry), zoom: 11);
 
+    _kTripEndPoints.add(CameraPosition(target: getDestinationLatLngFromSharedPrefs()));
+
+    for(var i = 0; i < poiLocationListLatLng.length; i++){
+      _kTripEndPoints.add(CameraPosition(target: new LatLng(double.parse(poiLocationListLatLng[i][5]), double.parse(poiLocationListLatLng[i][6]))));
+    }
+    /*
     _kTripEndPoints.add(CameraPosition(target: getCurrentLatLngFromSharedPrefs()));
     _kTripEndPoints.add(CameraPosition(target: getDestinationLatLngFromSharedPrefs()));
 
+
+     */
     /*
     for (String type in ['source', 'destination']) {
       _kTripEndPoints
@@ -64,13 +73,13 @@ class _ReviewRideState extends State<ReviewRide> {
   }
 
   _onStyleLoadedCallback() async {
-    for (int i = 0; i < _kTripEndPoints.length; i++) {
-      String iconImage = i == 0 ? 'circle' : 'square';
+    for (int i = 0; i < poiLocationListLatLng.length; i++) {
+      //String iconImage = i == 0 ? 'circle' : 'square';
       await controller.addSymbol(
         SymbolOptions(
-          geometry: _kTripEndPoints[i].target,
-          iconSize: 0.1,
-          iconImage: "assets/icon/$iconImage.png",
+          geometry: LatLng(double.parse(poiLocationListLatLng[i][5]), double.parse(poiLocationListLatLng[i][6])),
+          iconSize: 0.4,
+          iconImage: "assets/gps_images/gps_image0.png",
         ),
       );
     }
