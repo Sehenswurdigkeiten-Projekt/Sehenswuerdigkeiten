@@ -20,7 +20,11 @@ import 'package:untitled/main.dart';
 
 import 'package:untitled/loginScreen.dart';
 import 'package:untitled/signUpScreen.dart'; import 'locationstuff.dart';
+import 'informationWindow.dart';
+import 'findPoI.dart';
 
+import 'globalVariables.dart';
+List<dynamic> poiLocationListLatLng = [];
 
 class MyApp2 extends StatelessWidget {
 
@@ -147,6 +151,7 @@ class HomePageState extends State<HomePage> {
   final pages = [
     MyFriendsWidget(),
     Page2(),
+    SelectPoI(),
     MySettingWidget(),
   ];
 
@@ -197,34 +202,34 @@ class HomePageState extends State<HomePage> {
      }
 
 
-    return Scaffold(
-      appBar: AppBar(
-        title: customSearchBar,
-        toolbarHeight: 80,
-        automaticallyImplyLeading: false,
-        actions: pageIndex == 1 ? [
-          IconButton(
-            onPressed: () {
-              setState(() {
-                if (customIcon.icon == Icons.search) {
-                  customIcon = const Icon(Icons.cancel);
-                  normalSearchBar = false;
-                }  else {
-                  customIcon = const Icon(Icons.search);
-                  normalSearchBar = true;
-                }
-              });
-            },
-            icon: customIcon,
+     return Scaffold(
+       appBar: AppBar(
+         title: customSearchBar,
+         toolbarHeight: 80,
+         automaticallyImplyLeading: false,
+         actions: pageIndex == 1 ? [
+           IconButton(
+             onPressed: () {
+               setState(() {
+                 if (customIcon.icon == Icons.search) {
+                   customIcon = const Icon(Icons.cancel);
+                   normalSearchBar = false;
+                 }  else {
+                   customIcon = const Icon(Icons.search);
+                   normalSearchBar = true;
+                 }
+               });
+             },
+             icon: customIcon,
 
-          )
-        ] : null,
-        centerTitle: true,
-        backgroundColor: Theme.of(context).primaryColor,
-      ),
-      body: pages[pageIndex],
-      bottomNavigationBar: buildMyNavBar(context),
-    );
+           )
+         ] : null,
+         centerTitle: true,
+         backgroundColor: Theme.of(context).primaryColor,
+       ),
+       body: pages[pageIndex],
+       bottomNavigationBar: buildMyNavBar(context),
+     );
   }
 
   Container buildMyNavBar(BuildContext context) {
@@ -253,7 +258,7 @@ class HomePageState extends State<HomePage> {
             },
             icon: pageIndex == 0
                 ? const Icon(
-              Icons.group_rounded ,
+              Icons.group_rounded,
               color: Colors.white,
               size: 35,
             )
@@ -295,6 +300,27 @@ class HomePageState extends State<HomePage> {
             },
             icon: pageIndex == 2
                 ? const Icon(
+              Icons.room_rounded,
+              color: Colors.white,
+              size: 35,
+            )
+                : const Icon(
+              Icons.room_outlined,
+              color: Colors.white,
+              size: 35,
+            ),
+          ),
+          IconButton(
+            enableFeedback: false,
+            onPressed: () {
+              HapticFeedback.vibrate();
+              setState(() {
+                normalSearchBar = true;
+                pageIndex = 3;
+              });
+            },
+            icon: pageIndex == 3
+                ? const Icon(
               Icons.settings_rounded,
               color: Colors.white,
               size: 35,
@@ -311,23 +337,141 @@ class HomePageState extends State<HomePage> {
   }
 }
 
-class Page1 extends StatelessWidget {
-  const Page1({Key? key}) : super(key: key);
+class SelectPoI extends StatefulWidget {
+  @override
+  State<SelectPoI> createState() => _SelectPoI();
+}
+
+//schauen ob global und sonst auf server speichern.
+class _SelectPoI extends State<SelectPoI> {
+
+  var f = FindPoI();
+  //11.422465473888776
+  //46.890633738573584
+  late Future<List> resultF = f.searchPoI("", "11.422465473888776", "46.890633738573584");
+  var listLength;
+  var result;
+  var buttonPressedStatus;
+
+  void writeNewInArray(List<String> rutePointsArray){
+    if (rutePoints == null){
+      rutePoints = List.generate(1, (i) => List.filled(7, "", growable: false), growable: true);
+      for(int i = 0; i<rutePointsArray.length; i++){
+        rutePoints[0][i] = rutePointsArray[i];
+      }
+    }else{
+      rutePoints.add(rutePointsArray);
+    }
+  }
+
+  void removeListPoint(rParray){
+    print(rParray);
+    //rutePoints.removeWhere((element) => element = rParray);
+    rutePoints.removeWhere((str){
+      return str == rParray;
+    });
+  }
+
+
+  @override
+  void initState(){
+    super.initState();
+    print("start init");
+    _getList().then((value) {
+      print("got List");
+      if(value != null)
+        setState(() {
+          result = value;
+          listLength = value.length;
+        });
+      print("safed List");
+    });
+  }
+
+  Future<List> _getList() async{
+    print("get List");
+    return await resultF.then((value){
+      return value;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: const Color(0xffC4DFCB),
-      child: Center(
-        child: Text(
-          "Nummer 1",
-          style: TextStyle(
-            color: Colors.green[900],
-            fontSize: 45,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ),
+    //TODO: Erweiterte Kriterien fenster hinzufügen
+    //range bearbeiten, typen von Sehenswürdigkeiten bei der Auswahl sortieren, usw... wie auf dem MockUp
+    return FutureBuilder(
+        future: resultF,
+        builder: (context, snapshot){
+          if(!snapshot.hasData){
+            return Center(child: Text("Wait for Data"));
+          }
+          else{
+            print("Rute not created: "+ rutePoints.toString());
+            ScrollController _scrollController = new ScrollController();
+            //TODO: Search Button fest anzeigen und nicht gnaz unten
+            //TODO: Buttons schöner designen
+            return ListView(
+                children: <Widget>[
+                  ListView.builder(
+                    controller: _scrollController,
+                    scrollDirection: Axis.vertical,
+                    shrinkWrap: true,
+                    itemCount:  listLength,
+                    itemBuilder: (context, index) {
+                      return TextButton(
+                        child: Text(result[index][0]),
+                        onPressed: () {
+                          if (buttonPressedStatus == null) buttonPressedStatus = List.generate(result.length, (i) => List.filled(1, false, growable: false), growable: true);
+                          print("ButtonPressedstatus =" + buttonPressedStatus[index][0].toString());
+                          if (buttonPressedStatus[index][0] == true) buttonPressedStatus[index][0] = false;
+                          else buttonPressedStatus[index][0] = true;
+                          setState(() {
+                            //print("Pressed Staus : " + buttonPressedStatus[index][0].toString() + " " + index.toString());
+                            if(buttonPressedStatus[index][0] == true) {
+                              writeNewInArray(result[index]);
+                            }else if (buttonPressedStatus[index][0] == false){
+                              removeListPoint (result[index]);
+                              print("Rute Points:");
+                              print(rutePoints);
+                            }
+                          });
+                        },
+                        style: TextButton.styleFrom(
+                          primary: Colors.purple,
+                          backgroundColor: Colors.blue,
+                        ),
+                      );
+                    },
+                  ) ,
+                  SizedBox(height: 100),
+                  Center(
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: Color(0xffBDBDBD)),
+                          padding: const EdgeInsets.symmetric(horizontal: 40),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20)
+                          )
+                      ),
+
+                      onPressed: (){
+                        setState(() {
+                          poiLocationListLatLng = rutePoints;
+                        });
+                      },
+                      child: const Text(
+                          "Search",
+                          style: TextStyle(
+                            fontSize: 16,
+                            letterSpacing: 2.2,
+                            color: Colors.black,
+                          )),
+                    ),
+                  ),
+                ]
+            );
+          }
+        }
     );
   }
 }
@@ -459,53 +603,53 @@ class _Page2State extends State<Page2> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: MapboxMap(
-        accessToken: token,
-        styleString: style,
-        initialCameraPosition: CameraPosition(
-          zoom: 15.0,
-          target: LatLng(14.508, 46.048),
-        ),
+        body: MapboxMap(
+          accessToken: token,
+          styleString: style,
+          initialCameraPosition: CameraPosition(
+            zoom: 15.0,
+            target: LatLng(14.508, 46.048),
+          ),
 
-        onMapCreated: (MapboxMapController controller) async {
-          //controller.setGeoJsonSource('restaurants', 'https://api.mapbox.com/directions/v5/mapbox/driving/-122.42,37.78;-77.03,38.91?access_token=pk.eyJ1IjoiYW5uYWtzcnIiLCJhIjoiY2wxMG0wcW83MDAxczNrczRya2pjYXFvdiJ9.VNVotWF_bX62uIlzu9tc-Q')
+          onMapCreated: (MapboxMapController controller) async {
+            //controller.setGeoJsonSource('restaurants', 'https://api.mapbox.com/directions/v5/mapbox/driving/-122.42,37.78;-77.03,38.91?access_token=pk.eyJ1IjoiYW5uYWtzcnIiLCJhIjoiY2wxMG0wcW83MDAxczNrczRya2pjYXFvdiJ9.VNVotWF_bX62uIlzu9tc-Q')
 
 
 
-          //print("jetzt in der onMapCreated");
-          //Acquire current location (returns the LatLong instance)
-          ownLocationLatLng = (await acquireCurrentLocation())!;
+            //print("jetzt in der onMapCreated");
+            //Acquire current location (returns the LatLong instance)
+            ownLocationLatLng = (await acquireCurrentLocation())!;
 
-          // You can either use the moveCamera or animateCamera, but the former
-          // causes a sudden movement from the initial to 'new' camera position,
-          // while animateCamera gives a smooth animated transition
-          await controller.animateCamera(
-            CameraUpdate.newLatLng(ownLocationLatLng),
-          );
+            // You can either use the moveCamera or animateCamera, but the former
+            // causes a sudden movement from the initial to 'new' camera position,
+            // while animateCamera gives a smooth animated transition
+            await controller.animateCamera(
+              CameraUpdate.newLatLng(ownLocationLatLng),
+            );
 
-          await controller.addCircle(
-            CircleOptions(
-              circleRadius: 8.0,
-              circleColor: myColorCircle,
-              circleOpacity: 0.8,
-              geometry: ownLocationLatLng,
-              draggable: false,
-            ),
-          );
-          userCircle = controller.circles.first;
-          friendLocationListLatLng = await acquireOthersLocation(ownLocationLatLng);
+            await controller.addCircle(
+              CircleOptions(
+                circleRadius: 8.0,
+                circleColor: myColorCircle,
+                circleOpacity: 0.8,
+                geometry: ownLocationLatLng,
+                draggable: false,
+              ),
+            );
+            userCircle = controller.circles.first;
+            friendLocationListLatLng = await acquireOthersLocation(ownLocationLatLng);
 
-          //print("JEtzt locations");
-          //print(friendLocationListLatLng);
-          var geo;
-          var anzeigen;
+            //print("JEtzt locations");
+            //print(friendLocationListLatLng);
+            var geo;
+            var anzeigen;
 
-          for(var i=0; i<friendLocationListLatLng.length;i++){
-            (friendLocationListLatLng[i]['Lat'] == null) ? geo = LatLng(0, 0) : geo = LatLng(friendLocationListLatLng[i]['Lat'], friendLocationListLatLng[i]['Lon']);
-            (friendLocationListLatLng[i]['Lat'] == null) ? anzeigen = 0.0 : anzeigen = 0.8;
+            for(var i=0; i<friendLocationListLatLng.length;i++){
+              (friendLocationListLatLng[i]['Lat'] == null) ? geo = LatLng(0, 0) : geo = LatLng(friendLocationListLatLng[i]['Lat'], friendLocationListLatLng[i]['Lon']);
+              (friendLocationListLatLng[i]['Lat'] == null) ? anzeigen = 0.0 : anzeigen = 0.8;
 
-            await controller.addSymbol(
-                SymbolOptions(
+              await controller.addSymbol(
+                  SymbolOptions(
                     iconSize: 0.4,
                     iconImage: "assets/gps_images/${friendLocationListLatLng[i]['Image']}",
                     iconOpacity: anzeigen,
@@ -514,20 +658,67 @@ class _Page2State extends State<Page2> {
                     textOffset: Offset(0,1),
                     geometry: geo,
                     draggable: false,
-                )
-            );
+                  )
+              );
 
-            friendListSymbols.add(controller.symbols.last);
-          }
+              friendListSymbols.add(controller.symbols.last);
+            }
+
+            //PoI Circle
+            print("POI Symbol");
+            print(poiLocationListLatLng.length);
+            for (var i = 0; i < poiLocationListLatLng.length; i++) {
+              geo = LatLng(double.parse(poiLocationListLatLng[i][6]), double.parse(poiLocationListLatLng[i][5]));
+              await controller.addSymbol(
+                  SymbolOptions(
+                    iconSize: 0.4,
+                    //Images von typen.
+                    iconImage: "assets/gps_images/gps_image0.png",
+                    textField: poiLocationListLatLng[i][0],
+                    //textOpacity: anzeigen,
+                    textOffset: Offset(0, 1),
+                    geometry: geo,
+                    draggable: false,
+                  )
+              );
+            }
 
 
-          //print("Jetzt ist die OnMapCreated function fertig!");
-          mapboxmapcontroller = controller;
+            //print("Jetzt ist die OnMapCreated function fertig!");
+            mapboxmapcontroller = controller;
           },
 
-      )
+        ),
+
+        floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            onPressed: () =>
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const PrepareRide('Paris'))),
+            backgroundColor: Colors.green,
+            child: const Icon(Icons.navigation),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          FloatingActionButton(
+              child: Icon(
+                  Icons.star
+              ),
+              onPressed: () =>
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => poiInformationWindow(),
+                      )
+                  )
+          )
+        ]
+    )
     );
-
-
   }
 }
