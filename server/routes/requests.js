@@ -164,10 +164,15 @@ exports.joinGroup = async function(req,res)
     res.status(405).end();
     return
   }
-  
   const rows = await db.getGroupidFromGroupcode(groupCode)
-  groupID = rows[0].GroupID;
-  userID = await db.getUseridFromUsername(username);
+  if(rows.length == 0){
+    console.log("[SERVER %s]: User(%s) failed to join Group(%s)", dateTime(), username, groupCode);
+    res.statusMessage = "Failed to join group"
+    res.status(405).end();
+    return
+  }
+    groupID = rows[0].GroupID;
+    userID = await db.getUseridFromUsername(username);
 
   if(await db.checkIfUserIsInGroup(userID, groupID)){
     console.log("[SERVER %s]: User(%s) failed to join Group(%s)", dateTime(), username, groupCode);
@@ -224,18 +229,17 @@ exports.addFriend =  async function(req, res)
     let userID2 = await db.getUseridFromUsername(username2)
     let areFriends = await db.checkIfFriends(userID1 , userID2)
     if(areFriends){
-      console.log("[SERVER %s]: Failed to add friend(" + username2 + ", "+isReal+") for User("+username1+", "+isValid+")", dateTime())
+      console.log("[SERVER %s]: Failed to add friend(" + username2 + ", "+isReal+") for User("+username1+", "+isValid+") you already are friends", dateTime())
       res.statusMessage = "you are already friends"
       res.status(403).end();
       return;
     } 
     let duplicateRequest = await db.checkForFriendrequest(userID1, userID2);
     const rows = await db.checkForFriendrequest(userID2, userID1)
+    console.log(duplicateRequest);
 
-    console.log(duplicateRequest[0].i);
-
-    if(duplicateRequest[0].i == 0){
-      if(rows[0].i == 1){
+    if(!duplicateRequest){
+      if(rows){
         console.log("[SERVER %s]: Friend(%s) and User(%s) are Friends", dateTime(), username2, username1);
 
         await db.addFriend(userID1, userID2)
@@ -359,8 +363,9 @@ exports.ignoreFriendrequest = async function(req, res){
   if(await db.validateToken(token, username) && await db.checkIfUserExists(friend)){
     let uID1 =await db.getUseridFromUsername(username)
     let uID2 = await db.getUseridFromUsername(friend)
-    if(await db.checkForFriendrequest(uID1, uID2)){
-      await db.ignoreFriendrequest(uID1,uID2);
+
+    if(await db.checkForFriendrequest(uID2, uID1)){
+      await db.ignoreFriendrequest(uID2,uID1);
       res.status(200).send("OK");
       return
     }

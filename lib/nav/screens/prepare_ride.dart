@@ -5,7 +5,7 @@ import 'package:untitled/nav/widgets/search_listview.dart';
 import '../widgets/review_ride_fa_button.dart';
 
 class PrepareRide extends StatefulWidget {
-  const PrepareRide(String selection, {Key? key}) : super(key: key);
+  const PrepareRide( {Key? key}) : super(key: key);
   @override
   State<PrepareRide> createState() => _PrepareRideState();
 

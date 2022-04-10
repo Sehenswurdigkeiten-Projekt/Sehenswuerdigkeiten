@@ -51,10 +51,9 @@ Future<Map> getParsedReverseGeocoding(LatLng latLng) async {
 }
 
 // ----------------------------- Mapbox Directions API -----------------------------
-Future<Map> getDirectionsAPIResponse(
-    LatLng sourceLatLng, LatLng destinationLatLng) async {
+Future<Map> getDirectionsAPIResponse() async {
   final response =
-      await getCyclingRouteUsingMapbox(sourceLatLng, destinationLatLng);
+      await getCyclingRouteUsingMapbox();
   Map geometry = response['routes'][0]['geometry'];
   num duration = response['routes'][0]['duration'];
   num distance = response['routes'][0]['distance'];

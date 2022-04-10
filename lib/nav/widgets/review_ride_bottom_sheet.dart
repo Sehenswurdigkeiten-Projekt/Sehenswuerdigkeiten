@@ -32,17 +32,10 @@ Widget reviewRideBottomSheet(
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   child: ListTile(
                     tileColor: Colors.grey[200],
-                    leading: const Image(
-                        image: AssetImage('assets/image/sport-car.png'),
-                        height: 50,
-                        width: 50),
                     title: const Text('Premier',
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold)),
                     subtitle: Text('$distance km, $dropOffTime drop off'),
-                    trailing: const Text('\$384.22',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 18)),
                   ),
                 ),
                 ElevatedButton(

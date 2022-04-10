@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mapbox_navigation/library.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:untitled/globalVariables.dart';
 import 'package:untitled/nav/helpers/shared_prefs.dart';
 
 import '../../mainstrukturwebseite.dart';
@@ -37,6 +38,7 @@ class _TurnByTurnState extends State<TurnByTurn> {
   }
 
   Future<void> initialize() async {
+    print("HERE");
     if (!mounted) return;
 
     // Setup directions and options
@@ -53,21 +55,33 @@ class _TurnByTurnState extends State<TurnByTurn> {
         simulateRoute: true,
         language: "en");
 
-    // Configure waypoints
-    sourceWaypoint = WayPoint(
-        name: "Source", latitude: 46.7100050, longitude: 11.6497561);
-    var middleWayPoint = WayPoint(name: 'Middle', latitude: 46.7098951, longitude: 11.6497986);
+    //LatLng(double.parse(poiLocationListLatLng[i][6]), double.parse(poiLocationListLatLng[i][5]))
 
-    LatLng destination = new LatLng(double.parse(MapEntries.selectedCoordinates.split(',')[0]), double.parse(MapEntries.selectedCoordinates.split(',')[1]));
+    // Configure waypoints
+    //LatLng destination = new LatLng(double.parse(MapEntries.selectedCoordinates.split(',')[0]), double.parse(MapEntries.selectedCoordinates.split(',')[1]));
+    LatLng destination = getDestinationLatLngFromSharedPrefs();
+    sourceWaypoint = WayPoint(
+        name: "Source", latitude: destination.latitude, longitude: destination.longitude);
+    //var middleWayPoint = WayPoint(name: 'Middle', latitude: 46.7098951, longitude: 11.6497986);
+
+    /*
     destinationWaypoint = WayPoint(
         name: "Destination",
         latitude: destination.latitude,
         longitude: destination.longitude);
+
+     */
     isMultipleStop = true;
 
     wayPoints.add(sourceWaypoint);
-    wayPoints.add(middleWayPoint);
-    wayPoints.add(destinationWaypoint);
+
+    for(var i = 0; i < poiLocationListLatLng.length; i++){
+      wayPoints.add(new WayPoint(name: i.toString(), latitude: double.parse(poiLocationListLatLng[i][6]), longitude: double.parse(poiLocationListLatLng[i][5])));
+    }
+
+    print(wayPoints);
+    //wayPoints.add(middleWayPoint);
+    //wayPoints.add(destinationWaypoint);
 
     // Start the trip
     await directions.startNavigation(wayPoints: wayPoints, options: _options);

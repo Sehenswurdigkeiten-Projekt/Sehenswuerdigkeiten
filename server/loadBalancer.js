@@ -5,6 +5,23 @@ var bodyParser = require('body-parser');
 var jsonParser = bodyParser.json()
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
 
+var fs = require('fs');
+var http = require('http');
+var https = require('https');
+var privateKey  = fs.readFileSync('key.pem', 'utf8');
+var certificate = fs.readFileSync('cert.pem', 'utf8');
+
+const options = {
+    key: fs.readFileSync('key.pem'),
+    cert: fs.readFileSync('cert.pem')
+  };
+
+const httpsAgent = new https.Agent({
+	rejectUnauthorized: false, // (NOTE: this will disable client verification)
+	cert: fs.readFileSync("cert.pem"),
+	key: fs.readFileSync("key.pem"),
+	passphrase: "Fallmerayer123!"
+})
 
 const servers = [
 	"http://10.10.30.21:30000",
@@ -25,7 +42,8 @@ const handler = async (req, res) =>{
 		method : method,
 		baseURL : server,
 		data : body,
-		headers: headers
+		headers: headers/*,
+		httpsAgent: httpsAgent*/
 	}
 	axios.request(config).then(function(sRes){res.send(sRes.data);}).catch(function(err){
 		console.log(err);
@@ -33,7 +51,8 @@ const handler = async (req, res) =>{
 	});
 }
 app.use(urlencodedParser,jsonParser,(req,res)=>{handler(req, res)});
-
+//const httpsServer = https.createServer(options, app);
+//httpsServer.listen(3002, () => console.log("Load Balancer Server listening on PORT 3001!"));
 app.listen(3001, err =>{
 	err ?
 	console.log("Failed to listen on PORT 3001"):

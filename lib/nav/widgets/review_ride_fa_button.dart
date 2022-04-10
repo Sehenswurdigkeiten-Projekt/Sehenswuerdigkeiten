@@ -14,14 +14,7 @@ Widget reviewRideFaButton(BuildContext context) {
         LatLng? sourceLatLng = getCurrentLatLngFromSharedPrefs();
         LatLng destinationLatLng = getDestinationLatLngFromSharedPrefs();
 
-        Map modifiedResponse =
-            await getDirectionsAPIResponse(sourceLatLng, destinationLatLng);
 
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (_) =>
-                    ReviewRide(modifiedResponse: modifiedResponse)));
       },
       label: const Text('Review Ride'));
 }

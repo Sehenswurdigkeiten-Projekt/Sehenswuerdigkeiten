@@ -3,6 +3,10 @@ import 'dart:developer';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled/globalVariables.dart';
+import 'package:untitled/nav/screens/prepare_ride.dart';
+
+import 'nav/helpers/mapbox_handler.dart';
+import 'nav/screens/review_ride.dart';
 
 class MultiSelect extends StatefulWidget {
   final List<List<String>> items;
@@ -58,8 +62,19 @@ class _MultiSelectState extends State<MultiSelect> {
       ),
       actions: [
         TextButton(
-          child: const Text('Cancel'),
-          onPressed: _cancel,
+          child: const Text('Start navigation'),
+          onPressed:() async{
+            setState(() {
+              poiLocationListLatLng = _selectedItems;
+            });
+            Map modifiedResponse =
+              await getDirectionsAPIResponse();
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) =>
+                      ReviewRide(modifiedResponse: modifiedResponse)));
+            },
         ),
         ElevatedButton(
           child: const Text('Submit'),
