@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled/informationSightsWidget.dart';
+import 'package:untitled/mainstrukturwebseite.dart';
 import 'globalVariables.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
@@ -98,7 +99,10 @@ class _poiInformationWindow extends State<poiInformationWindow> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () {
+              HomePageState.pageIndex = 1;
+              Navigator.pop(context);
+            },
             icon: const Icon(Icons.arrow_back)),
         title: const Text('Detailed information'),
       ),
