@@ -193,6 +193,8 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
     );
   }
 
+
+
   GestureDetector buildFriendOptionShow(BuildContext context, String title){
     return GestureDetector(
       onTap: () async {
@@ -578,9 +580,124 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
     );
   }
 
+  /*
+
+  Scaffold buildFriendOptionAdd(BuildContext context, String title){
+    return Scaffold(
+      body: Container(
+        alignment: FractionalOffset.center,
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              GestureDetector(
+                onTap: (){
+                  showDialog(context: context, builder: (BuildContext context){
+                    return AlertDialog(
+                      title: Text(title),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          TextField(
+                            autofocus: false,
+                            cursorColor: const Color(0xff9a9a9a),
+                            maxLength: 20,
+
+                            controller: friendsName,
+
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.allow(RegExp('[A-Za-zÀÁÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿÆÐƎƏƐƔĲŊŒẞÞǷȜæðǝəɛɣĳŋœĸſßþƿȝĄƁÇĐƊĘĦĮƘŁØƠŞȘŢȚŦŲƯY̨Ƴąɓçđɗęħįƙłøơşșţțŧųưy̨ƴÁÀÂÄǍĂĀÃÅǺĄÆǼǢƁĆĊĈČÇĎḌĐƊÐÉÈĖÊËĚĔĒĘẸƎƏƐĠĜǦĞĢƔáàâäǎăāãåǻąæǽǣɓćċĉčçďḍđɗðéèėêëěĕēęẹǝəɛġĝǧğģɣĤḤĦIÍÌİÎÏǏĬĪĨĮỊĲĴĶƘĹĻŁĽĿʼNŃN̈ŇÑŅŊÓÒÔÖǑŎŌÕŐỌØǾƠŒĥḥħıíìiîïǐĭīĩįịĳĵķƙĸĺļłľŀŉńn̈ňñņŋóòôöǒŏōõőọøǿơœŔŘŖŚŜŠŞȘṢẞŤŢṬŦÞÚÙÛÜǓŬŪŨŰŮŲỤƯẂẀŴẄǷÝỲŶŸȲỸƳŹŻŽẒŕřŗſśŝšşșṣßťţṭŧþúùûüǔŭūũűůųụưẃẁŵẅƿýỳŷÿȳỹƴźżžẓ0-9_.-]')),
+                              //FilteringTextInputFormatter.allow(RegExp('[A-Za-zÀÁÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿÆÐƎƏƐƔĲŊŒẞÞǷȜæðǝəɛɣĳŋœĸſßþƿȝĄƁÇĐƊĘĦĮƘŁØƠŞȘŢȚŦŲƯY̨Ƴąɓçđɗęħįƙłøơşșţțŧųưy̨ƴÁÀÂÄǍĂĀÃÅǺĄÆǼǢƁĆĊĈČÇĎḌĐƊÐÉÈĖÊËĚĔĒĘẸƎƏƐĠĜǦĞĢƔáàâäǎăāãåǻąæǽǣɓćċĉčçďḍđɗðéèėêëěĕēęẹǝəɛġĝǧğģɣĤḤĦIÍÌİÎÏǏĬĪĨĮỊĲĴĶƘĹĻŁĽĿʼNŃN̈ŇÑŅŊÓÒÔÖǑŎŌÕŐỌØǾƠŒĥḥħıíìiîïǐĭīĩįịĳĵķƙĸĺļłľŀŉńn̈ňñņŋóòôöǒŏōõőọøǿơœŔŘŖŚŜŠŞȘṢẞŤŢṬŦÞÚÙÛÜǓŬŪŨŰŮŲỤƯẂẀŴẄǷÝỲŶŸȲỸƳŹŻŽẒŕřŗſśŝšşșṣßťţṭŧþúùûüǔŭūũűůųụưẃẁŵẅƿýỳŷÿȳỹƴźżžẓ0-9_.-]')),
+                            ],
+
+                            decoration: const InputDecoration(
+                              suffixIcon: Icon(
+                                Icons.person_add,
+                                color: Color(0xff9a9a9a),
+                              ),
+                              enabledBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(color: Color(0xff2F8D46)),
+                              ),
+                              focusedBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(color: Color(0xff2F8D46)),
+                              ),
+                              labelText: 'Friend Name',
+                              labelStyle: TextStyle(
+                                color: Color(0xff9a9a9a),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      actions: [
+                        TextButton(
+                            onPressed: () async {
+                              String username = MyLoginWidget2.username;
+                              bool isCorrect = await checkIfCorrect(friendsName.text);
+                              if(isCorrect == false || friendsName.text == username){
+                                Alert(
+                                  type: AlertType.warning,
+                                  context: context,
+                                  title: "Something is wrong!",
+                                  desc: "Please correct it!",
+                                ).show();
+                                friendsName.text = "";
+                              }
+                              else{
+                                print(friendsName.text);
+
+                                friendsName.text = "";
+
+                                Navigator.of(context).pop();
+                              }
+                            },
+                            child: const Text(
+                                "Add",
+                                style: TextStyle(
+                                  color: Color(0xff2F8D46),
+                                ))
+                        ),
+                        TextButton(
+                            onPressed: (){
+                              friendsName.text = "";
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text(
+                                "Close",
+                                style: TextStyle(
+                                  color: Color(0xff2F8D46),
+                                ))
+                        )
+                      ],
+                    );
+                  });
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(title, style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey[600]
+                      )),
+                      Icon(Icons.arrow_forward_ios, color: Colors.grey)
+                    ],
+                  ),
+                ),
+              )
+            ],
+        ),
+      ),
+
+    );
+  }
+
+   */
+
   GestureDetector buildGroupOptionMembers(BuildContext context, String title){
     return GestureDetector(
-      onTap: () async{
+      onTap: ()async{
         var stringmembers = "ff";
         showDialog(context: context, builder: (BuildContext context){
           return AlertDialog(
