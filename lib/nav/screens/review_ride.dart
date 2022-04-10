@@ -23,8 +23,10 @@ class _ReviewRideState extends State<ReviewRide> {
 
   // Directions API response related
   late String distance;
+  late var duration;
   late String dropOffTime;
   late Map geometry;
+  late var waypoints;
 
   @override
   void initState() {
@@ -52,6 +54,9 @@ class _ReviewRideState extends State<ReviewRide> {
     distance = (widget.modifiedResponse['distance'] / 1000).toStringAsFixed(1);
     dropOffTime = getDropOffTime(widget.modifiedResponse['duration']);
     geometry = widget.modifiedResponse['geometry'];
+    waypoints = widget.modifiedResponse['waypoint'];
+    print("WAYPOINTS");
+    print(waypoints);
   }
 
   _onMapCreated(MapboxMapController controller) async {

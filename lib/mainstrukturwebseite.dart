@@ -115,8 +115,10 @@ class AutocompleteBar extends StatelessWidget{
         onSelected: (String selection) {
           MapEntries.selectedCoordinates = MapEntries.placesMap[selection];
           LatLng destination = new LatLng(double.parse(MapEntries.selectedCoordinates.split(',')[0]), double.parse(MapEntries.selectedCoordinates.split(',')[1]));
+
           sharedPreferences.setDouble('destLat', destination.latitude);
           sharedPreferences.setDouble('destLong', destination.longitude);
+
           HomePageState.pageIndex = 2;
           Navigator.push(
               context,
