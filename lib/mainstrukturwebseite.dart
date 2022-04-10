@@ -770,6 +770,9 @@ class _Page2State extends State<Page2> {
       sharedPreferences.setDouble('longitude', ownLocationLatLng.longitude);
       sharedPreferences.setString('current-address', currentAddress);
 
+      sharedPreferences.setDouble('destLat', ownLocationLatLng.latitude);
+      sharedPreferences.setDouble('destLong', ownLocationLatLng.longitude);
+
       mapboxmapcontroller!.updateCircle(userCircle, CircleOptions(
         circleRadius: 8.0,
         circleColor:  myColorCircle,
