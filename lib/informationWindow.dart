@@ -62,14 +62,14 @@ class _poiInformationWindow extends State<poiInformationWindow> {
       print("Response Name request: " +responseName.body);
       Map<String, dynamic> jsonDataName = jsonDecode(responseName.body);
 
-      if (jsonDataName['entities'][poiLocationListLatLng[i][2]]['labels']['de'] == null){
+      if (jsonDataName['entities'][poiLocationListLatLng[i][2]]['labels']['en'] == null){
         print("There is no German description");
         infErg.add("There is no German description");
       }else{
-        nameToFindWiki = (("${jsonDataName['entities'][poiLocationListLatLng[i][2]]['labels']['de']['value']}"));
+        nameToFindWiki = (("${jsonDataName['entities'][poiLocationListLatLng[i][2]]['labels']['en']['value']}"));
 
         print("Name ausgelesen: ");
-        print(("${jsonDataName['entities'][poiLocationListLatLng[i][2]]['labels']['de']['value']}"));
+        print(("${jsonDataName['entities'][poiLocationListLatLng[i][2]]['labels']['en']['value']}"));
 
         //summary abfragen und speichern
         //https://en.wikipedia.org/api/rest_v1/page/summary/Stack_Overflow
