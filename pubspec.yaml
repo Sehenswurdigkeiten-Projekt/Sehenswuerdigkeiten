@@ -89,7 +89,6 @@ flutter:
     assets:
         - assets/images/
         - assets/icons/
-        - assets/icon/
         - assets/gps_images/
         - assets/config/
 

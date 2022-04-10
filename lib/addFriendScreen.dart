@@ -698,7 +698,7 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
   GestureDetector buildGroupOptionMembers(BuildContext context, String title){
     return GestureDetector(
       onTap: ()async{
-        var stringmembers = "ff";
+        var stringmembers = "";
         showDialog(context: context, builder: (BuildContext context){
           return AlertDialog(
             title: Text(title),
