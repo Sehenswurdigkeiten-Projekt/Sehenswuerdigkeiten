@@ -521,13 +521,13 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
         for(var i = 0; i<groups.length; i++){
           groupsStr += groups[i].toString() + "\n";
         }
-
         showDialog(context: context, builder: (BuildContext context){
           return AlertDialog(
             title: Text(title),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+
                 Text(
                   "Groups:",
                   textAlign: TextAlign.left,
@@ -580,7 +580,7 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
   GestureDetector buildGroupOptionMembers(BuildContext context, String title){
     return GestureDetector(
       onTap: () async{
-        var stringmembers = "dwauduwagzd";
+        var stringmembers = "ff";
         showDialog(context: context, builder: (BuildContext context){
           return AlertDialog(
             title: Text(title),
