@@ -428,8 +428,17 @@ class _SelectPoI extends State<SelectPoI> {
                           setState(() {
                             //print("Pressed Staus : " + buttonPressedStatus[index][0].toString() + " " + index.toString());
                             if(buttonPressedStatus[index][0] == true) {
+                              print("UGABUGA:");
+                              TextButton.styleFrom(
+                                primary: Colors.black,
+                                backgroundColor: Colors.green,
+                              );
                               writeNewInArray(result[index]);
                             }else if (buttonPressedStatus[index][0] == false){
+                              TextButton.styleFrom(
+                                primary: Colors.black,
+                                backgroundColor: Colors.green,
+                              );
                               removeListPoint (result[index]);
                               print("Rute Points:");
                               print(rutePoints);
@@ -437,8 +446,8 @@ class _SelectPoI extends State<SelectPoI> {
                           });
                         },
                         style: TextButton.styleFrom(
-                          primary: Colors.purple,
-                          backgroundColor: Colors.blue,
+                          primary: Colors.black,
+                          //backgroundColor: Colors.green,
                         ),
                       );
                     },

@@ -526,6 +526,7 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
             title: Text(title),
             content: Column(
               mainAxisSize: MainAxisSize.min,
+
               children: [
 
                 Text(
@@ -650,8 +651,15 @@ class _MyFriendsWidget extends State<MyFriendsWidget> {
                       groupCode.text = "";
                       print("SCHAUGMOMOL");
                       setState(() {
-                        stringmembers = "${isCorrect[1]}";
-                      });
+                        stringmembers = "";
+                        for(var i = 1; i<isCorrect.length; i++){
+                          stringmembers += isCorrect[i] + "\n";
+                          print("HEHEHEH $i--- : ${stringmembers}");
+                        }
+                        //stringmembers = "${isCorrect[1]}";
+                      }
+                      );
+                      //print("HEHEHEH H : $stringmembers");
                       //Navigator.of(context).pop();
                     }
                   },
